@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.game.mapper.OpPackMaterialMapper">
+
+  <resultMap type="org.jeecg.modules.game.entity.OpPackMaterial" id="OpPackMaterial">
+    <id column="id" property="id"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="material_name" property="materialName"/>
+    <result column="type" property="type"/>
+    <result column="format" property="format"/>
+    <result column="specs" property="specs"/>
+    <result column="show_url" property="showUrl"/>
+    <result column="material_desc" property="materialDesc"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+  </resultMap>
+
+  <select id="getPackMaterialList" resultMap="OpPackMaterial">
+    select * from op_pack_material ${ew.customSqlSegment} order by id DESC
+  </select>
+
+</mapper>

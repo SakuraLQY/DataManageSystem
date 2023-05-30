@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.users.mapper.OpPayBlackMapper">
+
+  <resultMap type="org.jeecg.modules.users.vo.OpPayBlackVo" id="OpPayBlackVo">
+    <id column="id" property="id"/>
+    <result column="rule_type" property="ruleType"/>
+    <result column="rule_id" property="ruleId"/>
+    <result column="gameName" property="gameName"/>
+    <result column="subGameName" property="subGameName"/>
+    <result column="pay_limit_user_id" property="payLimitUserId"/>
+    <result column="pay_limit_ip" property="payLimitIp"/>
+    <result column="pay_limit_device" property="payLimitDevice"/>
+    <result column="descs" property="descs"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_by" property="updateBy"/>
+    <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+  <select id="getPayBlackList" resultMap="OpPayBlackVo">
+    SELECT a.*,
+           b.game_name as gameName,
+           c.game_name as subGameName
+    FROM op_pay_black a
+           LEFT JOIN op_game b ON a.rule_type = 0
+      AND a.rule_id = b.id
+           LEFT JOIN op_sub_game c ON a.rule_type = 1
+      AND a.rule_id = c.id ${ew.customSqlSegment}
+    order by id DESC
+  </select>
+
+</mapper>

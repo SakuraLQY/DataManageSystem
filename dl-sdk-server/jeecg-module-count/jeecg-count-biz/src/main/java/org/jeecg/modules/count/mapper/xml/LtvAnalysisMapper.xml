@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.LtvAnalysisMapper">
+
+  <select id="queryLtvAllList" resultType="org.jeecg.modules.count.bo.LtvAnalysisBo">
+    SELECT a.time_daily as 'dateTime',
+    IfNULL(SUM(a.count_user),0) as 'countUser',
+    SUM(b.day1) as 'ltv1',
+    SUM(b.day2) as 'ltv2',
+    SUM(b.day3) as 'ltv3',
+    SUM(b.day4) as 'ltv4',
+    SUM(b.day5) as 'ltv5',
+    SUM(b.day6) as 'ltv6',
+    SUM(b.day7) as 'ltv7',
+    SUM(b.day15) as 'ltv15',
+    SUM(b.day30) as 'ltv30',
+    SUM(b.day45) as 'ltv45',
+    SUM(b.day60) as 'ltv60',
+    SUM(b.day90) as 'ltv90',
+    SUM(b.day120) as 'ltv120',
+    SUM(b.day150) as 'ltv150'
+    FROM ct_daily as a
+    INNER JOIN ct_daily_payback as b
+    ON a.id = b.daily_id
+      ${ew.customSqlSegment}
+  </select>
+  <select id="queryLtvByTypeList" resultType="org.jeecg.modules.count.bo.LtvAnalysisBo">
+    SELECT a.${type} as 'id',
+      IfNULL(SUM(a.count_user),0) as 'countUser',
+      SUM(b.day1) as 'ltv1',
+      SUM(b.day2) as 'ltv2',
+      SUM(b.day3) as 'ltv3',
+      SUM(b.day4) as 'ltv4',
+      SUM(b.day5) as 'ltv5',
+      SUM(b.day6) as 'ltv6',
+      SUM(b.day7) as 'ltv7',
+      SUM(b.day15) as 'ltv15',
+      SUM(b.day30) as 'ltv30',
+      SUM(b.day45) as 'ltv45',
+      SUM(b.day60) as 'ltv60',
+      SUM(b.day90) as 'ltv90',
+      SUM(b.day120) as 'ltv120',
+      SUM(b.day150) as 'ltv150'
+    FROM ct_daily as a
+           INNER JOIN ct_daily_payback as b
+                      ON a.id = b.daily_id
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectByDealId" resultType="java.lang.String">
+    select deal_name as 'dealName' from open_gateway.op_deal where id = #{id};
+  </select>
+  <select id="selectByChannelId" resultType="java.lang.String">
+    select channel_name as 'channelName' from open_gateway.op_channel where id = #{id};
+  </select>
+  <select id="selectByGameId" resultType="java.lang.String">
+    select game_name as 'gameName' from open_gateway.op_game where id = #{id};
+  </select>
+  <select id="selectBySubGameId" resultType="java.lang.String">
+    select game_name as 'subGameName' from open_gateway.op_sub_game where id = #{id};
+  </select>
+</mapper>

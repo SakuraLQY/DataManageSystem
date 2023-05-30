@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpJrttPutAccountMapper">
+  <resultMap type="org.jeecg.modules.advert.vo.OpJrttPutAccountVo" id="OpPrivacyPolicyVo">
+    <id column="id" property="id"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="level_id" property="levelId"/>
+    <result column="pid" property="pid"/>
+    <result column="app_id" property="appId"/>
+    <result column="account" property="account"/>
+    <result column="nick_name" property="nickName"/>
+    <result column="password" property="password"/>
+    <result column="sub_game_ids" property="subGameIds"/>
+    <result column="put_user" property="putUser"/>
+    <result column="account_desc" property="accountDesc"/>
+    <result column="state" property="state"/>
+    <result column="create_time" property="createTime"/>
+    <result column="authorize_time" property="authorizeTime"/>
+  </resultMap>
+
+  <select id="getOpJrttPutAccountList" resultMap="OpPrivacyPolicyVo">
+    select a.*,b.authorize_time from op_put_account a LEFT JOIN op_jrtt_put_account b ON a.id =
+    b.account_id
+    <where>
+      <if test="nickName !=null and nickName!=''">
+        and nick_name like concat('%', #{nickName}, '%')
+      </if>
+      <if test="account !=null and account!=''">
+        and account like concat('%', #{account}, '%')
+      </if>
+      <if test="levelId !=null and levelId!=''">
+        and level_id = #{levelId}
+      </if>
+      <if test="state !=null and state!=''">
+        and state = #{state}
+      </if>
+      <if test="gameId !=null and gameId!=''">
+        and JSON_CONTAINS(sub_game_ids, JSON_OBJECT('gameId',#{gameId}))
+      </if>
+      <if test="subGameId !=null and subGameId!=''">
+        and JSON_CONTAINS(sub_game_ids, JSON_OBJECT('subGameId',#{subGameId}))
+      </if>
+        and channel_id =4
+    </where>
+    order by a.id DESC
+  </select>
+</mapper>

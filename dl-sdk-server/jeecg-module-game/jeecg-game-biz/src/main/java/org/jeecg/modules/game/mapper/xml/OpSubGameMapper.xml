@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.game.mapper.OpSubGameMapper">
+
+    <resultMap type="org.jeecg.modules.game.vo.OpSubGameVo" id="OpSubGameVo">
+        <id column="id" property="id"/>
+        <result column="game_id" property="gameId"/>
+        <result column="game_name" property="gameName"/>
+        <result column="game_type" property="gameType"/>
+        <result column="vendor_id" property="vendorId"/>
+        <result column="game2_pkg_url" property="game2PkgUrl"/>
+        <result column="deliver_url" property="deliverUrl"/>
+        <result column="pack_name" property="packName"/>
+        <result column="phone_switch" property="phoneSwitch"/>
+        <result column="privacy_switch" property="privacySwitch"/>
+        <result column="id_auth_switch" property="idAuthSwitch"/>
+        <result column="id_auth_api" property="idAuthApi"/>
+        <result column="official_anti_indulge_switch" property="officialAntiIndulgeSwitch"/>
+        <result column="official_biz_id" property="officialBizId"/>
+        <result column="anti_indulge_switch" property="antiIndulgeSwitch"/>
+        <result column="platform_currency_switch" property="platformCurrencySwitch"/>
+        <result column="platform_currency_discount" property="platformCurrencyDiscount"/>
+        <result column="platform_currency_pkg_config" property="platformCurrencyPkgConfig"/>
+        <result column="descs" property="descs"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="getSubGameList" resultMap="OpSubGameVo">
+        select a.*,b.game_name faGameName,c.vendor_name vendorName  from op_sub_game a LEFT JOIN op_game b ON a.game_id = b.id LEFT JOIN op_vendor c ON a.vendor_id = c.id
+        ${ew.customSqlSegment} order by a.id DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpMaterialMapper">
+
+  <resultMap type="org.jeecg.modules.advert.vo.OpMaterialVo" id="OpMaterialVo">
+    <id column="id" property="id"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="material_name" property="materialName"/>
+    <result column="type1" property="type1"/>
+    <result column="type2" property="type2"/>
+    <result column="show_url" property="showUrl"/>
+    <result column="material_desc" property="materialDesc"/>
+    <result column="jrtt_material_id" property="jrttMaterialId"/>
+    <result column="jrtt_file_id" property="jrttFileId"/>
+    <result column="jrtt_create_account_id" property="jrttCreateAccountId"/>
+    <result column="gdt_create_account_id" property="gdtCreateAccountId"/>
+    <result column="gdt_material_id" property="gdtMaterialId"/>
+    <result column="gdt_file_id" property="gdtFileId"/>
+    <result column="kuaishou_create_account_id" property="kuaishouCreateAccountId"/>
+    <result column="kuaishou_material_id" property="kuaishouMaterialId"/>
+    <result column="kuaishou_file_id" property="kuaishouFileId"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+    <result column="jrtt_status" property="jrttStatus"/>
+    <result column="gdt_status" property="gdtStatus"/>
+    <result column="ks_status" property="ksStatus"/>
+  </resultMap>
+
+  <select id="getMaterialList" resultMap="OpMaterialVo">
+    select *
+    from op_material ${ew.customSqlSegment}
+    order by id DESC
+  </select>
+
+  <resultMap id="SiteMaterial" type="org.jeecg.modules.advert.vo.ResponseSiteMaterialVo">
+    <id column="id" property="id"/>
+    <result column="material_name" property="materialName"/>
+    <result column="show_url" property="showUrl"/>
+  </resultMap>
+
+  <select id="getSiteMaterialPage" resultMap="SiteMaterial">
+    select id,material_name,show_url
+    from op_material ${ew.customSqlSegment}
+  </select>
+
+</mapper>

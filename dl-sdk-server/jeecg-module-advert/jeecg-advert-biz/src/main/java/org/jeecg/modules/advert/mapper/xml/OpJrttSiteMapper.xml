@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpJrttSiteMapper">
+
+  <resultMap id="sites" type="org.jeecg.modules.advert.vo.JrttSiteListVo">
+    <id column="id" property="id"></id>
+    <result column="site_name" property="siteName"></result>
+    <result column="site_content" property="siteContent"></result>
+    <result column="game_name" property="gameName"></result>
+    <result column="sub_game_name" property="subGameName"></result>
+
+  </resultMap>
+
+
+  <select id="getPage" resultMap="sites">
+    SELECT site.id,
+           site.site_name,
+           site.site_content,
+           game.game_name,
+           subGame.game_name as sub_game_name
+    FROM op_jrtt_site as site
+           LEFT JOIN op_game AS game ON site.game_id = game.id
+           LEFT JOIN op_sub_game AS subGame on site.sub_game_id = subGame.id ${ew.customSqlSegment}
+  </select>
+
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.LtvAnalyzeMapper">
+
+  <select id="getPaybackLtvData" resultType="org.jeecg.modules.count.vo.LtvPaybackVo">
+    SELECT *
+    FROM (
+           SELECT DATE (a.time_daily) as 'ltvDate',
+    ${ltvSql}
+		IFNULL(SUM(a.count_user),0) as 'regCount'
+    FROM ct_daily as a
+      LEFT JOIN ct_daily_payback AS b
+    ON a.id = b.daily_id
+      LEFT JOIN open_gateway.op_deal as f ON a.deal_id = f.id
+      ${ew.customSqlSegment}
+    GROUP BY ltvDate
+      ) as t
+    ORDER BY ltvDate ASC;
+  </select>
+</mapper>

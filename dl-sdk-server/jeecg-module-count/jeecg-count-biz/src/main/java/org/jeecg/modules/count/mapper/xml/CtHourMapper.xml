@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtHourMapper">
+
+  <select id="getSummaryAdvertHour" resultType="org.jeecg.modules.count.bo.HourBo">
+
+    SELECT
+      DATE(time_hour) AS 'day',
+      IFNULL(SUM(IF(HOUR(time_hour)=0, ${level}, 0)),0) AS zeroHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=1, ${level}, 0)),0) AS oneHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=2, ${level}, 0)),0) AS twoHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=3, ${level}, 0)),0) AS threeHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=4, ${level}, 0)),0) AS fourHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=5, ${level}, 0)),0) AS fiveHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=6, ${level}, 0)),0) AS sixHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=7, ${level}, 0)),0) AS sevenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=8, ${level}, 0)),0) AS eightHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=9, ${level}, 0)),0) AS nineHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=10, ${level}, 0)),0) AS tenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=11, ${level}, 0)),0) AS elevenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=12, ${level}, 0)),0) AS twelveHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=13, ${level}, 0)),0) AS thirteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=14, ${level}, 0)),0) AS fourteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=15, ${level}, 0)),0) AS fifteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=16, ${level}, 0)),0) AS sixteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=17, ${level}, 0)),0) AS seventeenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=18, ${level}, 0)),0) AS eighteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=19, ${level}, 0)),0) AS nineteenHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=20, ${level}, 0)),0) AS twentyHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=21, ${level}, 0)),0) AS twentyoneHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=22, ${level}, 0)),0) AS twentytwoHour,
+      IFNULL(SUM(IF(HOUR(time_hour)=23, ${level}, 0)),0) AS twentythreeHour
+    FROM
+      ct_hour
+      ${ew.customSqlSegment}
+    GROUP BY DATE (time_hour);
+  </select>
+
+</mapper>

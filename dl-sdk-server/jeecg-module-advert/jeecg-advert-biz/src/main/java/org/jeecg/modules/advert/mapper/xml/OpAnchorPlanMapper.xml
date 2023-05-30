@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpAnchorPlanMapper">
+
+  <resultMap id="CampaignAnchorVo" type="org.jeecg.modules.advert.vo.CampaignAnchorVo">
+    <id column="id" property="anchorId"/>
+    <result column="plan_name" property="anchorName"/>
+    <result column="deal_id" property="dealId"/>
+    <result column="deal_args" property="trackUrl"/>
+    <result column="pkg_url" property="downloadUrl"/>
+  </resultMap>
+
+  <select id="anchorDealInfo" resultMap="CampaignAnchorVo">
+    select oap.id, oap.plan_name, od.deal_args, od.pkg_url, oap.deal_id
+    from op_anchor_plan oap
+           left join op_deal od on oap.deal_id = od.id
+    where oap.deal_id is not null;
+  </select>
+</mapper>

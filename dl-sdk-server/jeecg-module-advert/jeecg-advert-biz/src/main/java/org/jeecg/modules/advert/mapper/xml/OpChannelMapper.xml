@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpChannelMapper">
+
+  <select id="getCallbackData" resultType="org.jeecg.modules.advert.vo.LogCallbackDataVo">
+    select op.pkg_name as pkgName,
+    oc.channel_name as channelName,
+    av.deal_id as dealId,
+    av.unique_type as uniqueType,
+    av.unique_id as uniqueId,
+    av.create_time as createTime,
+    av.update_time as updateTime,
+    av.visit_data as visitData
+    from `open_attribution`.at_visit_${tableName}  as av
+    left join `open_gateway`.op_pkg as op
+    on av.pkg_id=op.id
+    left join `open_gateway`.op_channel as oc
+    on av.channel_id=oc.id
+    ${ew.customSqlSegment}
+  </select>
+</mapper>

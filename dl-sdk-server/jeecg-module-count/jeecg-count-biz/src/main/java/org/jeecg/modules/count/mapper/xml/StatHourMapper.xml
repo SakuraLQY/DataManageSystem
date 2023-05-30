@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.StatHourMapper">
+
+  <select id="queryList" resultType="org.jeecg.modules.count.bo.StatHourBo">
+    SELECT DATE(a.time_daily) as 'dateTime',
+      a.sub_game_id as 'gameId',a.deal_id as 'dealId',
+      SUM(a.count_active_dev) as 'countActive',
+      SUM(a.count_active) as 'countAllActive',
+      SUM(a.count_user) as 'regCount',
+      SUM(a.count_user_dev) as 'countUserDev',
+      SUM(a.count_valid_user) as 'AllValidReg',
+      SUM(a.count_valid_user_dev) as 'validReg',
+      SUM(a.first_payuser) as 'firstPayUser',
+      SUM(a.first_money) as 'firstPayMoney',
+      SUM(a.count_dau) as 'countDau',
+      SUM(a.alive_payuser) as 'alivePayUser',
+      SUM(a.total_payuser) as 'AllAlivePayUser',
+      SUM(a.total_money) as 'totalMoney',
+      ${sql}
+      IFNULL(SUM(b.day2),0) as 'loyal2',
+      IFNULL(SUM(b.day3),0) as 'loyal3',
+      IFNULL(SUM(b.day7),0) as 'loyal7',
+      IFNULL(SUM(b.day15),0) as 'loyal15',
+      IFNULL(SUM(b.day30),0) as 'loyal30'
+    FROM ct_daily as a
+      LEFT JOIN ct_daily_loyal as b
+    ON a.id= b.daily_id
+      left JOIN ct_daily_payback as c
+      ON a.id = c.daily_id
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectGameNameById" resultType="java.lang.String">
+    select game_name from open_gateway.op_sub_game where id = #{id};
+  </select>
+  <select id="selectDealNameById" resultType="java.lang.String">
+    select deal_name from open_gateway.op_deal where id = #{id};
+  </select>
+</mapper>

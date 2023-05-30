@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.LogManageMapper">
+
+  <select id="getDeviceData" resultType="org.jeecg.modules.count.vo.LogDeviceDataVo">
+    select op.pkg_name as gameName,
+    oc.channel_name as channelName,
+    cd.deal_id as dealId,
+    od.deal_name as dealName,
+    cd.unique_id as uniqueId,
+    cd.device_id as deviceId,
+    cd.serial_id as serialId,
+    cd.android_id as androidId,
+    cd.client_ip as clientIp,
+    cd.dev_os as devOs,
+    cd.dev_os_ver as devOsVer,
+    cd.dev_model as devModel,
+    cd.pkg_name as pkgName,
+    cd.pkg_version_code as pkgVersionCode,
+    cd.pkg_version_name as pkgVersionName,
+    cd.sdk_version as sdkVersion,
+    cd.register_time as registerTime,
+    cd.login_time as loginTime,
+    cd.pay_time as payTime,
+    cd.create_time as createTime,
+    cd.update_time as updateTime
+    from `open_countly`.ct_device as cd
+    left join `open_gateway`.op_pkg as op
+    on cd.pkg_id=op.id
+    left join `open_gateway`.op_channel as oc
+    on cd.channel_id=oc.id
+    left join `open_gateway`.op_deal as od
+    on cd.deal_id=od.id ${ew.customSqlSegment}
+  </select>
+
+
+</mapper>

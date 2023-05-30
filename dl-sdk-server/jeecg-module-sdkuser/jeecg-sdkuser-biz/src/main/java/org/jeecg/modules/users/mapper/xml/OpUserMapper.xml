@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.users.mapper.OpUserMapper">
+
+  <resultMap type="org.jeecg.modules.users.vo.OpUserVo" id="OpUserVo">
+    <id column="id" property="id"/>
+    <result column="user_name" property="userName"/>
+    <result column="user_type" property="userType"/>
+    <result column="user_phone" property="userPhone"/>
+    <result column="signup_time" property="signupTime"/>
+    <result column="signup_ip" property="signupIp"/>
+    <result column="signup_device" property="signupDevice"/>
+    <result column="signin_time" property="signinTime"/>
+    <result column="signin_ip" property="signinIp"/>
+    <result column="signin_device" property="signinDevice"/>
+    <result column="charge_time" property="chargeTime"/>
+    <result column="platform_currency" property="platformCurrency"/>
+    <result column="real_name" property="realName"/>
+    <result column="real_number" property="realNumber"/>
+  </resultMap>
+
+  <select id="getUserList" resultMap="OpUserVo">
+    select a.id,
+           a.user_name,
+           a.user_type,
+           a.user_phone,
+           a.signup_time,
+           a.signup_ip,
+           a.signup_device,
+           a.signin_time,
+           a.signin_ip,
+           a.signin_device,
+           a.charge_time,
+           a.platform_currency,
+           b.real_name,
+           b.real_number
+    from op_user a
+           LEFT JOIN op_user_realname_info b ON a.id = b.user_id
+      ${ew.customSqlSegment}
+  </select>
+
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtUserMapper">
+
+  <resultMap type="org.jeecg.modules.count.vo.CtUserVo" id="CtUserVo">
+    <id column="id" property="id"/>
+    <result column="deal_id" property="dealId"/>
+    <result column="user_id" property="userId"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="channel_type_id" property="channelTypeId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+    <result column="unique_id" property="uniqueId"/>
+    <result column="server_init" property="serverInit"/>
+    <result column="server_last" property="serverLast"/>
+    <result column="client_ip" property="clientIp"/>
+    <result column="day_online_time" property="dayOnlineTime"/>
+    <result column="online_time" property="onlineTime"/>
+    <result column="login_mask" property="loginMask"/>
+    <result column="register_time" property="registerTime"/>
+    <result column="login_time" property="loginTime"/>
+    <result column="pay_time" property="payTime"/>
+    <result column="first_pay_time" property="firstPayTime"/>
+    <result column="alive_time" property="aliveTime"/>
+    <result column="play_time" property="playTime"/>
+    <result column="pay_user_login_mask" property="payUserLoginMask"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+    <result column="user_name" property="userName"/>
+    <result column="user_phone" property="userPhone"/>
+    <result column="gameName" property="gameName"/>
+    <result column="subGameName" property="subGameName"/>
+    <result column="pkgName" property="pkgName"/>
+    <result column="dealName" property="dealName"/>
+    <result column="channelName" property="channelName"/>
+  </resultMap>
+
+  <select id="queryPageList" resultMap="CtUserVo">
+    select a.*, b.user_name
+    from `open_countly`.`ct_user` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="queryAllList" resultMap="CtUserVo">
+    select a.*,
+           b.user_name
+           c.game_name gameName,
+           d.game_name subGameName,
+           e.pkg_name  pkgName,
+           f.deal_name dealName,
+           g.channel_name channelName
+    from `open_countly`.`ct_user` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+           LEFT JOIN `open_gateway`.`op_game` c ON a.game_id = c.id
+           LEFT JOIN `open_gateway`.`op_sub_game` d ON a.sub_game_id = d.id
+           LEFT JOIN `open_gateway`.`op_pkg` e ON a.pkg_id = e.id
+           LEFT JOIN `open_gateway`.`op_deal` f ON a.deal_id = f.id
+           LEFT JOIN `open_gateway`.`op_channel` g ON a.channel_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <resultMap type="org.jeecg.modules.count.vo.PayUserVo" id="PayUserVo">
+    <id column="id" property="id"/>
+    <result column="deal_id" property="dealId"/>
+    <result column="user_id" property="userId"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="channel_type_id" property="channelTypeId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+    <result column="server_init" property="serverInit"/>
+    <result column="server_last" property="serverLast"/>
+    <result column="online_time" property="onlineTime"/>
+    <result column="register_time" property="registerTime"/>
+    <result column="login_time" property="loginTime"/>
+    <result column="pay_time" property="payTime"/>
+    <result column="first_pay_time" property="firstPayTime"/>
+    <result column="create_time" property="createTime"/>
+    <result column="user_name" property="userName"/>
+    <result column="user_phone" property="userPhone"/>
+    <result column="gameName" property="gameName"/>
+    <result column="subGameName" property="subGameName"/>
+    <result column="pkgName" property="pkgName"/>
+    <result column="dealName" property="dealName"/>
+    <result column="channelName" property="channelName"/>
+  </resultMap>
+
+  <select id="queryPagePayUserList" resultMap="PayUserVo">
+    select a.*, b.user_name, b.user_phone
+    from `open_countly`.`ct_user` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="getAllPayUserList" resultMap="PayUserVo">
+    select a.*,
+           b.user_name, b.user_phone,
+          c.game_name gameName,
+          d.game_name subGameName,
+           e.pkg_name  pkgName,
+           f.deal_name dealName,
+           g.channel_name channelName
+    from `open_countly`.`ct_user` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+           LEFT JOIN `open_gateway`.`op_game` c ON a.game_id = c.id
+           LEFT JOIN `open_gateway`.`op_sub_game` d ON a.sub_game_id = d.id
+           LEFT JOIN `open_gateway`.`op_pkg` e ON a.pkg_id = e.id
+           LEFT JOIN `open_gateway`.`op_deal` f ON a.deal_id = f.id
+           LEFT JOIN `open_gateway`.`op_channel` g ON a.channel_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <resultMap type="org.jeecg.modules.count.vo.OnlineUserVo" id="OnlineUserVo">
+    <id column="id" property="id"/>
+    <result column="deal_id" property="dealId"/>
+    <result column="user_id" property="userId"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="channel_type_id" property="channelTypeId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+    <result column="server_init" property="serverInit"/>
+    <result column="server_last" property="serverLast"/>
+    <result column="online_time" property="onlineTime"/>
+    <result column="register_time" property="registerTime"/>
+    <result column="login_time" property="loginTime"/>
+    <result column="pay_time" property="payTime"/>
+    <result column="first_pay_time" property="firstPayTime"/>
+    <result column="create_time" property="createTime"/>
+    <result column="user_name" property="userName"/>
+    <result column="user_phone" property="userPhone"/>
+    <result column="gameName" property="gameName"/>
+    <result column="subGameName" property="subGameName"/>
+    <result column="pkgName" property="pkgName"/>
+    <result column="dealName" property="dealName"/>
+    <result column="channelName" property="channelName"/>
+  </resultMap>
+
+  <select id="getOnlineUserList" resultMap="OnlineUserVo">
+    select ${typeName} as id, count(user_id) as countOnline
+    from `open_countly`.`ct_user`
+      ${ew.customSqlSegment} group by ${typeName}
+  </select>
+
+</mapper>

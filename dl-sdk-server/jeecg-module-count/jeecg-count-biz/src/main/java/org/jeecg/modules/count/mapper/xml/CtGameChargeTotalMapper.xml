@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtGameChargeTotalMapper">
+
+  <select id="selectParams" resultType="org.jeecg.modules.count.vo.CtGameChargeTotal">
+    select game_id          as gameId,
+           sub_game_id      as subGameId,
+           SUM(count_user)  as countUser,
+           SUM(alive_money) as totalMoney
+    from ct_daily
+    GROUP BY subGameId, gameId
+    ORDER BY gameId;
+  </select>
+  <!--查询游戏名-->
+  <select id="queryGameById" resultType="java.lang.String">
+    SELECT game_name
+    FROM open_gateway.op_game
+    WHERE id = #{id};
+  </select>
+  <select id="querySubGameById" resultType="java.lang.String">
+    SELECT game_name
+    FROM open_gateway.op_sub_game
+    WHERE id = #{id};
+  </select>
+</mapper>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtDailyMapper">
+  <resultMap id="SummaryDailyBo" type="org.jeecg.modules.count.bo.summary.SummaryDailyBo">
+    <id column="id" property="id"/>
+    <id column="name" property="name"/>
+    <id column="count_active" property="countActive"/>
+    <id column="count_active_dev" property="countActiveDev"/>
+    <id column="count_user" property="countUser"/>
+    <id column="count_user_dev" property="countUserDev"/>
+    <id column="count_valid_user" property="countValidUser"/>
+    <id column="count_valid_user_dev" property="countValidUserDev"/>
+    <id column="first_money" property="firstMoney"/>
+    <id column="first_money_dev" property="firstMoneyDev"/>
+    <id column="first_payuser" property="firstPayuser"/>
+    <id column="first_payuser_dev" property="firstPayuserDev"/>
+    <id column="first_order" property="firstOrder"/>
+    <id column="first_order_dev" property="firstOrderDev"/>
+    <id column="total_money" property="totalMoney"/>
+    <id column="total_money_dev" property="totalMoneyDev"/>
+    <id column="total_payuser" property="totalPayuser"/>
+    <id column="total_payuser_dev" property="totalPayuserDev"/>
+    <id column="count_dau" property="countDau"/>
+    <id column="count_dau_dev" property="countDauDev"/>
+    <id column="alive_payuser" property="alivePayuser"/>
+    <id column="alive_payuser_dev" property="alivePayuserDev"/>
+    <id column="alive_money" property="aliveMoney"/>
+    <id column="alive_money_dev" property="aliveMoneyDev"/>
+    <id column="alive_order" property="aliveOrder"/>
+    <id column="alive_order_dev" property="aliveOrderDev"/>
+    <id column="loyal2" property="loyal2"/>
+    <id column="loyal3" property="loyal3"/>
+    <id column="loyal4" property="loyal4"/>
+    <id column="loyal5" property="loyal5"/>
+    <id column="loyal6" property="loyal6"/>
+    <id column="loyal7" property="loyal7"/>
+    <id column="loyal2_dev" property="loyal2Dev"/>
+    <id column="loyal3_dev" property="loyal3Dev"/>
+    <id column="loyal4_dev" property="loyal4Dev"/>
+    <id column="loyal5_dev" property="loyal5Dev"/>
+    <id column="loyal6_dev" property="loyal6Dev"/>
+    <id column="loyal7_dev" property="loyal7Dev"/>
+    <id column="payback1" property="payback1"/>
+    <id column="payback2" property="payback2"/>
+    <id column="payback3" property="payback3"/>
+    <id column="payback4" property="payback4"/>
+    <id column="payback5" property="payback5"/>
+    <id column="payback6" property="payback6"/>
+    <id column="payback7" property="payback7"/>
+    <id column="payback1_dev" property="payback1Dev"/>
+    <id column="payback2_dev" property="payback2Dev"/>
+    <id column="payback3_dev" property="payback3Dev"/>
+    <id column="payback4_dev" property="payback4Dev"/>
+    <id column="payback5_dev" property="payback5Dev"/>
+    <id column="payback6_dev" property="payback6Dev"/>
+    <id column="payback7_dev" property="payback7Dev"/>
+  </resultMap>
+
+  <resultMap id="DetailDailyBo" type="org.jeecg.modules.count.bo.DetailDailyBo">
+    <id column="day" property="day"/>
+    <id column="count_active" property="countActive"/>
+    <id column="count_user" property="countUser"/>
+    <id column="count_valid_user_dev" property="countValidUserDev"/>
+    <id column="first_money" property="firstMoney"/>
+    <id column="first_payuser" property="firstPayuser"/>
+    <id column="total_money" property="totalMoney"/>
+    <id column="total_payuser" property="totalPayuser"/>
+    <id column="count_dau" property="countDau"/>
+    <id column="alive_payuser" property="alivePayuser"/>
+    <id column="alive_money" property="aliveMoney"/>
+  </resultMap>
+
+  <resultMap id="SummaryAdvertDailyBo" type="org.jeecg.modules.count.bo.SummaryAdvertDailyBo">
+    <id column="day" property="day"/>
+    <id column="count_active" property="countActive"/>
+    <id column="deal_id" property="dealId"/>
+    <id column="pkg_name" property="pkgName"/>
+    <id column="deal_name" property="dealName"/>
+    <id column="channel_name" property="channelName"/>
+    <id column="count_active" property="countActive"/>
+    <id column="count_active_dev" property="countActiveDev"/>
+    <id column="count_user" property="countUser"/>
+    <id column="count_user_dev" property="countUserDev"/>
+    <id column="count_valid_user" property="countValidUser"/>
+    <id column="first_payuser" property="firstPayuser"/>
+    <id column="first_money" property="firstMoney"/>
+    <id column="total_money" property="totalMoney"/>
+    <id column="count_dau" property="countDau"/>
+    <id column="alive_payuser" property="alivePayuser"/>
+    <id column="alive_money" property="aliveMoney"/>
+    <id column="loyal2" property="loyal2"/>
+    <id column="loyal3" property="loyal3"/>
+    <id column="loyal4" property="loyal4"/>
+    <id column="loyal5" property="loyal5"/>
+    <id column="loyal6" property="loyal6"/>
+    <id column="loyal7" property="loyal7"/>
+    <id column="payback1" property="payback1"/>
+    <id column="payback2" property="payback2"/>
+    <id column="payback3" property="payback3"/>
+    <id column="payback4" property="payback4"/>
+    <id column="payback5" property="payback5"/>
+    <id column="payback6" property="payback6"/>
+    <id column="payback7" property="payback7"/>
+  </resultMap>
+
+
+  <select id="getSummaryDaily" resultMap="SummaryDailyBo">
+    select
+      ${groupBy} as id,
+      ${groupName} as name,
+      sum(a.count_active) as count_active,
+      sum(a.count_active_dev) as count_active_dev,
+      sum(a.count_user) as count_user,
+      sum(a.count_user_dev) as count_user_dev,
+      sum(a.count_valid_user) as count_valid_user,
+      sum(a.count_valid_user_dev) as count_valid_user_dev,
+      sum(a.first_money) as first_money,
+      sum(a.first_money_dev) as first_money_dev,
+      sum(a.first_payuser) as first_payuser,
+      sum(a.first_payuser_dev) as first_payuser_dev,
+      sum(a.first_order) as first_order,
+      sum(a.first_order_dev) as first_order_dev,
+      sum(a.total_money) as total_money,
+      sum(a.total_payuser) as total_payuser,
+      sum(a.total_payuser_dev) as total_payuser_dev,
+      sum(a.count_dau) as count_dau,
+      sum(a.count_dau_dev) as count_dau_dev,
+      sum(a.alive_payuser) as alive_payuser,
+      sum(a.alive_payuser_dev) as alive_payuser_dev,
+      sum(a.alive_money) as alive_money,
+      sum(a.alive_money_dev) as alive_money_dev,
+      sum(a.alive_order) as alive_order,
+      sum(a.alive_order_dev) as alive_order_dev,
+      IFNULL(sum(l.day2),0) as loyal2,
+      IFNULL(sum(l.day3),0) as loyal3,
+      IFNULL(sum(l.day4),0) as loyal4,
+      IFNULL(sum(l.day5),0) as loyal5,
+      IFNULL(sum(l.day6),0) as loyal6,
+      IFNULL(sum(l.day7),0) as loyal7,
+      IFNULL(sum(ld.day2),0) as loyal2_dev,
+      IFNULL(sum(ld.day3),0) as loyal3_dev,
+      IFNULL(sum(ld.day4),0) as loyal4_dev,
+      IFNULL(sum(ld.day5),0) as loyal5_dev,
+      IFNULL(sum(ld.day6),0) as loyal6_dev,
+      IFNULL(sum(ld.day7),0) as loyal7_dev,
+      IFNULL(sum(p.day1),0) as payback1,
+      IFNULL(sum(p.day2),0) as payback2,
+      IFNULL(sum(p.day3),0) as payback3,
+      IFNULL(sum(p.day4),0) as payback4,
+      IFNULL(sum(p.day5),0) as payback5,
+      IFNULL(sum(p.day6),0) as payback6,
+      IFNULL(sum(p.day7),0) as payback7,
+      IFNULL(sum(pd.day1),0) as payback1_dev,
+      IFNULL(sum(pd.day2),0) as payback2_dev,
+      IFNULL(sum(pd.day3),0) as payback3_dev,
+      IFNULL(sum(pd.day4),0) as payback4_dev,
+      IFNULL(sum(pd.day5),0) as payback5_dev,
+      IFNULL(sum(pd.day6),0) as payback6_dev,
+      IFNULL(sum(pd.day7),0) as payback7_dev
+    from ct_daily a
+    left join ct_daily_loyal l on a.id = l.daily_id
+    left join ct_daily_loyal_dev ld on a.id = ld.daily_id
+    left join ct_daily_payback p on a.id = p.daily_id
+    left join ct_daily_payback_dev pd on a.id = pd.daily_id
+    left join open_gateway.op_deal b on a.deal_id = b.id
+    left join open_gateway.op_pkg c on a.pkg_id = c.id
+    left join open_gateway.op_game d on a.game_id = d.id
+    left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+    left join open_gateway.op_channel f on a.channel_id = f.id
+    left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+    left join open_gateway.op_put_account h on b.account_id = h.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="getDetailDaily" resultMap="DetailDailyBo">
+    select
+      DATE(a.time_daily) as day,
+      sum(a.count_active) as count_active,
+      sum(a.count_user) as count_user,
+      sum(a.count_valid_user_dev) as count_valid_user_dev,
+      sum(a.first_money) as first_money,
+      sum(a.first_payuser) as first_payuser,
+      sum(a.total_money) as total_money,
+      sum(a.total_payuser) as total_payuser,
+      sum(a.count_dau) as count_dau,
+      sum(a.alive_payuser) as alive_payuser,
+      sum(a.alive_money) as alive_money
+    from ct_daily a
+       left join open_gateway.op_deal b on a.deal_id = b.id
+       left join open_gateway.op_pkg c on a.pkg_id = c.id
+       left join open_gateway.op_game d on a.game_id = d.id
+       left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+       left join open_gateway.op_channel f on a.channel_id = f.id
+       left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <resultMap type="org.jeecg.modules.count.vo.CostDataVo" id="CostDataVo">
+    <result column="costDay" property="costDay"/>
+    <result column="costMoney" property="costMoney"/>
+  </resultMap>
+
+  <select id="getCostData" resultMap="CostDataVo">
+    select DATE(cost_day) as costDay, SUM(cost_money) as costMoney
+    from `open_gateway`.`op_cost` a left join `open_gateway`.`op_deal` f
+    on a.deal_id=f.id ${ew.customSqlSegment}
+    GROUP BY cost_day
+  </select>
+
+  <resultMap type="org.jeecg.modules.count.vo.RoiCostVo" id="RoiCostVo">
+    <result column="costDay" property="costDay"/>
+    <result column="cost_money" property="costMoney"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="channel_type_id" property="channelTypeId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+  </resultMap>
+
+  <select id="getRoiCostData" resultMap="RoiCostVo">
+    select DATE(a.cost_day) as costDay,
+      a.cost_money,
+      a.game_id,
+      a.sub_game_id,
+      a.pkg_id,
+      a.channel_type_id,
+      a.channel_id,
+      a.channel_sub_account_id
+    from `open_gateway`.`op_cost` a
+      left join `open_gateway`.`op_deal` f
+    on a.deal_id = f.id ${ew.customSqlSegment}
+  </select>
+
+  <resultMap type="org.jeecg.modules.count.vo.DauDataVo" id="DauDataVo">
+    <result column="registerTime" property="registerTime"/>
+    <result column="payTime" property="payTime"/>
+    <result column="counts" property="counts"/>
+  </resultMap>
+
+  <select id="getDauCostData" resultMap="DauDataVo">
+    select DATE(a.register_time) as registerTime,
+      DATE(a.pay_time) as payTime,
+      count(a.id) as counts
+    from `open_countly`.`ct_user` a
+      left join `open_gateway`.`op_deal` f
+    on a.deal_id = f.id ${ew.customSqlSegment}
+    GROUP BY register_time, pay_time
+  </select>
+
+  <select id="getDailyPaybackData" resultType="org.jeecg.modules.count.vo.DailyPaybackVo">
+    select *
+    from (select DATE(a.time_daily) as registerTime,
+                 SUM(a.total_money) as totalMoney,
+                 SUM(a.first_money) as firstMoney,
+                 SUM(a.count_user) as countUser,
+                 SUM(a.first_payuser) as firstPayuser,
+                 SUM(a.total_money_ios) as totalMoneyIos,
+                 SUM(a.total_money-a.total_money_discount) as remainTotalMoney,
+                 ${roiSql} from `open_countly`.`ct_daily` a
+    left join `open_countly`.`ct_daily_payback` b
+    on a.id = b.daily_id
+    left join `open_gateway`.`op_deal` f
+    on a.deal_id = f.id ${ew.customSqlSegment}
+    GROUP BY registerTime ) as t order by t.registerTime desc
+  </select>
+
+  <select id="getSummaryAdvertDaily" resultMap="SummaryAdvertDailyBo">
+    select
+      ${day} as day,
+      ${dealId} as deal_id,
+      ${pkgName} as pkg_name,
+      ${dealName} as deal_name,
+      ${channelName} as channel_name,
+      sum(a.count_active) as count_active,
+      sum(a.count_active_dev) as count_active_dev,
+      sum(a.count_user) as count_user,
+      sum(a.count_user_dev) as count_user_dev,
+      sum(a.count_valid_user) as count_valid_user,
+      sum(a.first_payuser) as first_payuser,
+      sum(a.first_money) as first_money,
+      sum(a.total_money) as total_money,
+      sum(a.total_payuser) as total_payuser,
+      sum(a.count_dau) as count_dau,
+      sum(a.alive_payuser) as alive_payuser,
+      sum(a.alive_money) as alive_money,
+      IFNULL(sum(l.day2),0) as loyal2,
+      IFNULL(sum(l.day3),0) as loyal3,
+      IFNULL(sum(l.day4),0) as loyal4,
+      IFNULL(sum(l.day5),0) as loyal5,
+      IFNULL(sum(l.day6),0) as loyal6,
+      IFNULL(sum(l.day7),0) as loyal7,
+      IFNULL(sum(p.day1),0) as payback1,
+      IFNULL(sum(p.day2),0) as payback2,
+      IFNULL(sum(p.day3),0) as payback3,
+      IFNULL(sum(p.day4),0) as payback4,
+      IFNULL(sum(p.day5),0) as payback5,
+      IFNULL(sum(p.day6),0) as payback6,
+      IFNULL(sum(p.day7),0) as payback7
+    from ct_daily a
+      left join ct_daily_loyal l on a.id = l.daily_id
+      left join ct_daily_payback p on a.id = p.daily_id
+      left join open_gateway.op_deal b on a.deal_id = b.id
+      left join open_gateway.op_pkg c on a.pkg_id = c.id
+      left join open_gateway.op_game d on a.game_id = d.id
+      left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+      left join open_gateway.op_channel f on a.channel_id = f.id
+      left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+</mapper>

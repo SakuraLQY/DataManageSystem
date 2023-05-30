@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.AtUniqueMapper">
+
+  <select id="getDeviceCallbackData" resultType="org.jeecg.modules.advert.vo.LogDeviceCallbackDataVo">
+    select au.deal_id as dealId,
+    au.unique_id as uniqueId,
+    au.create_time as createTime,
+    au.update_time as updateTime,
+    au.visit_data as visitData
+    from at_unique_${tableName} as au ${ew.customSqlSegment}
+  </select>
+
+</mapper>

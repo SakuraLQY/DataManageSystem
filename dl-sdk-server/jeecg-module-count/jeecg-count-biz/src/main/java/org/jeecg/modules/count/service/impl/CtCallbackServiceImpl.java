@@ -1,0 +1,285 @@
+package org.jeecg.modules.count.service.impl;
+
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.ws.spi.http.HttpHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.C;
+import org.jeecg.common.advert.dto.JrttVisitDto;
+import org.jeecg.common.constant.ChannelConstant;
+import org.jeecg.common.constant.SubGameTypeConstant;
+import org.jeecg.common.game.api.IAdvertApi;
+import org.jeecg.common.game.api.IGameApi;
+import org.jeecg.common.game.bo.PkgChannelConfJrtt;
+import org.jeecg.common.game.vo.OpPkgModel;
+import org.jeecg.common.game.vo.OpSubGameModel;
+import org.jeecg.common.kafka.dto.ParseLoginDto;
+import org.jeecg.common.kafka.dto.ParsePayDto;
+import org.jeecg.common.kafka.dto.ParseStartDto;
+import org.jeecg.common.util.CountUtil;
+import org.jeecg.common.util.RestUtil;
+import org.jeecg.modules.count.bo.callback.CallbackDataJrtt;
+import org.jeecg.modules.count.bo.callback.CallbackDataJrttPaySdk;
+import org.jeecg.modules.count.bo.callback.CallbackJrttPaySdkRequest;
+import org.jeecg.modules.count.bo.callback.JrttPaySdkEvents;
+import org.jeecg.modules.count.bo.callback.JrttPaySdkHeader;
+import org.jeecg.modules.count.bo.callback.JrttPaySdkUser;
+import org.jeecg.modules.count.constant.CallBackChannelConstant;
+import org.jeecg.modules.count.constant.CallBackEventType;
+import org.jeecg.modules.count.constant.CallBackState;
+import org.jeecg.modules.count.constant.CallBackUrlConstant;
+import org.jeecg.modules.count.entity.CtCallback;
+import org.jeecg.modules.count.mapper.CtCallbackMapper;
+import org.jeecg.modules.count.service.ICtCallbackService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+/**
+ * @Description: ct_callback
+ * @Author: jeecg-boot
+ * @Date: 2023-04-13
+ * @Version: V1.0
+ */
+@Slf4j
+@Service
+@DS("open_countly")
+public class CtCallbackServiceImpl extends ServiceImpl<CtCallbackMapper, CtCallback> implements
+    ICtCallbackService {
+
+    @Autowired
+    private IGameApi iGameApi;
+    @Autowired
+    private IAdvertApi iAdvertApi;
+
+    @Override
+    public void parsePayCallback(ParsePayDto parsePayDto) {
+        OpSubGameModel opSubGameModel = iGameApi.getOpSubGame(parsePayDto.getSubGameId());
+        if (SubGameTypeConstant.IOS.equals(opSubGameModel.getGameType())) {
+            String visitData = iAdvertApi.getUnique(parsePayDto.getDealId(),
+                parsePayDto.getUniqueId(),
+                null, null, null, parsePayDto.getClientIp());
+            if (StringUtils.isEmpty(visitData)) {
+                log.error("向头条推送支付信息时查询visitData为空,订单号:{}", parsePayDto.getOrderId());
+                return;
+            }
+            // 渠道判断
+            if (ChannelConstant.JRTT.equals(parsePayDto.getChannelId())) {
+                // 星图和头条
+                pushToJrtt(CallBackEventType.JRTT_PAY, visitData, parsePayDto.getMoney());
+            }
+        } else {
+            // 渠道判断
+            if (ChannelConstant.JRTT.equals(parsePayDto.getChannelId())
+                || ChannelConstant.XING_TU.equals(parsePayDto.getChannelId())) {
+                OpPkgModel opPkgModel = iGameApi.getOpPkgById(parsePayDto.getPkgId());
+                PkgChannelConfJrtt pkgChannelConfJrtt = opPkgModel.getJrttConf();
+                String userUniqueId = parsePayDto.getDealId() + "" + parsePayDto.getUserId();
+                pushToJrttPaySdk(userUniqueId, pkgChannelConfJrtt, parsePayDto.getUniqueId(),
+                    parsePayDto.getMoney());
+            }
+        }
+    }
+
+    @Override
+    public void parseStartCallback(ParseStartDto parseStartDto) {
+        OpSubGameModel opSubGameModel = iGameApi.getOpSubGame(parseStartDto.getSubGameId());
+        if (SubGameTypeConstant.IOS.equals(opSubGameModel.getGameType())) {
+            String visitData = iAdvertApi.getUnique(parseStartDto.getDealId(),
+                parseStartDto.getUniqueId(), parseStartDto.getDeviceId(),
+                parseStartDto.getSerialId(), parseStartDto.getAndroidId(),
+                parseStartDto.getClientIp());
+            // 渠道判断
+            if (ChannelConstant.JRTT.equals(parseStartDto.getChannelId())
+                || ChannelConstant.XING_TU.equals(parseStartDto.getChannelId())) {
+                // 星图和头条
+                pushToJrtt(CallBackEventType.JRTT_START, visitData, null);
+            }
+        }
+    }
+
+    @Override
+    public void parseRegisterCallback(ParseLoginDto parseLoginDto) {
+        OpSubGameModel opSubGameModel = iGameApi.getOpSubGame(parseLoginDto.getSubGameId());
+        if (SubGameTypeConstant.IOS.equals(opSubGameModel.getGameType())) {
+            String visitData = iAdvertApi.getUnique(parseLoginDto.getDealId(),
+                parseLoginDto.getUniqueId(), null, null, null, null);
+            // 渠道判断
+            if (ChannelConstant.JRTT.equals(parseLoginDto.getChannelId())
+                || ChannelConstant.XING_TU.equals(parseLoginDto.getChannelId())) {
+                pushToJrtt(CallBackEventType.JRTT_REGISTER, visitData, null);
+            }
+        }
+    }
+
+    /**
+     * @param eventType
+     * @param visitData
+     * @param money
+     * @author chenyw
+     * @description 头条API上报
+     * @date 20:34 2023/4/24/024
+     **/
+    private void pushToJrtt(Integer eventType, String visitData, BigDecimal money) {
+        JrttVisitDto jrttVisitDto = JSONObject.parseObject(visitData, JrttVisitDto.class);
+        String url = jrttVisitDto.getCallbackUrl() + "&event_type=" + eventType;
+        if (CallBackEventType.JRTT_PAY.equals(eventType)) {
+            // 支付加上金额
+            money = money.multiply(BigDecimal.valueOf(100)).setScale(0, RoundingMode.HALF_UP);
+            String props = "{\"pay_amount:\":" + money + "}";
+            try {
+                props = URLEncoder.encode(props, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                log.error("URLEncoder失败:", e);
+            }
+            url = url + "&props=" + props;
+        }
+        CallbackDataJrtt callBackDataJrtt = new CallbackDataJrtt(url);
+        CtCallback insert = new CtCallback();
+        insert.setCallbackChannel(CallBackChannelConstant.JRTT);
+        insert.setEventType(eventType);
+        insert.setCallbackData(JSONObject.toJSONString(callBackDataJrtt));
+        insert.setCallbackNum(0);
+        insert.setCallbackState(CallBackState.WAIT);
+        save(insert);
+    }
+
+    /**
+     * @param userUniqueId
+     * @param pkgChannelConfJrtt
+     * @param udid
+     * @param money
+     * @author chenyw
+     * @description 头条SDK上报
+     * @date 20:34 2023/4/24/024
+     **/
+    private void pushToJrttPaySdk(String userUniqueId, PkgChannelConfJrtt pkgChannelConfJrtt,
+        String udid, BigDecimal money) {
+        if (pkgChannelConfJrtt == null) {
+            //  渠道参数缺失 返回
+            return;
+        }
+        if (StringUtils.isEmpty(pkgChannelConfJrtt.getPackageName()) || StringUtils.isEmpty(
+            pkgChannelConfJrtt.getAppKey())) {
+            // 参数不存在，则不走服务端埋点接口上报
+            return;
+        }
+        Integer currencyAmount = money.setScale(0, BigDecimal.ROUND_DOWN).intValue();
+        CallbackDataJrttPaySdk callBackDataJrttPaySdk = new CallbackDataJrttPaySdk(
+            pkgChannelConfJrtt.getAppKey(),
+            userUniqueId, udid, pkgChannelConfJrtt.getPackageName(), currencyAmount);
+        CtCallback insert = new CtCallback();
+        insert.setCallbackChannel(CallBackChannelConstant.JRTT_SDK_PAY);
+        insert.setEventType(CallBackEventType.JRTT_SDK_PAY);
+        insert.setCallbackData(JSONObject.toJSONString(callBackDataJrttPaySdk));
+        insert.setCallbackNum(0);
+        insert.setCallbackState(CallBackState.WAIT);
+        save(insert);
+    }
+
+    /**
+     * @author chenyw
+     * @description 定时请求callback
+     * @date 13:48 2023/4/25/025
+     **/
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void handleCallback() {
+        // 最大重试次数
+        int MAX_RETRY_NUM = 3;
+        List<CtCallback> ctCallbackList = list(
+            new LambdaQueryWrapper<CtCallback>().eq(CtCallback::getCallbackState,
+                CallBackState.WAIT).lt(CtCallback::getCallbackNum, MAX_RETRY_NUM));
+        for (CtCallback ctCallback : ctCallbackList) {
+            Integer result = CallBackState.FAIL;
+            // 不同渠道不同推送方法
+            if (CallBackChannelConstant.JRTT.equals(ctCallback.getCallbackChannel())) {
+                result = handleJrtt(ctCallback);
+            } else if (CallBackChannelConstant.JRTT_SDK_PAY.equals(
+                ctCallback.getCallbackChannel())) {
+                result = handleJrttSdkPay(ctCallback);
+            }
+            ctCallback.setCallbackNum(CountUtil.increaseInt(ctCallback.getCallbackNum()));
+            ctCallback.setCallbackState(result);
+            updateById(ctCallback);
+        }
+    }
+
+    /**
+     * @param ctCallback
+     * @return java.lang.Integer
+     * @author chenyw
+     * @description 推送到头条
+     * @date 10:14 2023/4/25/025
+     **/
+    private Integer handleJrtt(CtCallback ctCallback) {
+        log.info("推送至头条:{}", ctCallback.getCallbackData());
+        try {
+            String callbackData = ctCallback.getCallbackData();
+            CallbackDataJrtt callBackDataJrtt = JSONObject.parseObject(callbackData,
+                CallbackDataJrtt.class);
+            JSONObject jsonObject = RestUtil.get(callBackDataJrtt.getUrl());
+            log.info("推送至头条成功,响应:{}", jsonObject);
+        } catch (Exception e) {
+            log.error("推送至头条失败", e);
+            return CallBackState.FAIL;
+        }
+        return CallBackState.SUCCESS;
+    }
+
+    /**
+     * @param ctCallback
+     * @return java.lang.Integer
+     * @author chenyw
+     * @description 推送到头条 sdk特殊上报 支付
+     * @date 10:14 2023/4/25/025
+     **/
+    private Integer handleJrttSdkPay(CtCallback ctCallback) {
+        log.info("推送至头条(服务端埋点):{}", ctCallback.getCallbackData());
+        try {
+            String callbackData = ctCallback.getCallbackData();
+            CallbackDataJrttPaySdk callBackDataJrtt = JSONObject.parseObject(callbackData,
+                CallbackDataJrttPaySdk.class);
+            CallbackJrttPaySdkRequest callbackJrttPaySdkRequest = new CallbackJrttPaySdkRequest();
+            JrttPaySdkUser jrttPaySdkUser = new JrttPaySdkUser();
+            jrttPaySdkUser.setUdid(callBackDataJrtt.getUdid());
+            jrttPaySdkUser.setUserUniqueId(callBackDataJrtt.getUserUniqueId());
+            callbackJrttPaySdkRequest.setUser(jrttPaySdkUser);
+            JrttPaySdkHeader jrttPaySdkHeader = new JrttPaySdkHeader();
+            jrttPaySdkHeader.setAppPackage(callBackDataJrtt.getAppPackage());
+            callbackJrttPaySdkRequest.setHeader(jrttPaySdkHeader);
+            JrttPaySdkEvents jrttPaySdkEvents = new JrttPaySdkEvents();
+            jrttPaySdkEvents.setEvent("purchase");
+            jrttPaySdkEvents.setParams(
+                "{\"currency\":\"rmb\",\"is_success\":\"yes\",\"is_server\":\"yes\",\"currency_amount\":"
+                    + callBackDataJrtt.getCurrencyAmount() + "}");
+            jrttPaySdkEvents.setLocalTimeMs(System.currentTimeMillis());
+            List<JrttPaySdkEvents> jrttPaySdkEventsList = new ArrayList();
+            jrttPaySdkEventsList.add(jrttPaySdkEvents);
+            callbackJrttPaySdkRequest.setEvents(jrttPaySdkEventsList);
+            JSONObject param = (JSONObject) JSONObject.toJSON(callbackJrttPaySdkRequest);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("X-MCS-AppKey", callBackDataJrtt.getAppKey());
+            JSONObject res = RestUtil.post(CallBackUrlConstant.JRTT_PAY_SDK_URL, headers, null,
+                param);
+            log.info("推送至头条成功,响应:{}", res);
+        } catch (Exception e) {
+            log.error("推送至头条失败", e);
+            return CallBackState.FAIL;
+        }
+        return CallBackState.SUCCESS;
+    }
+
+}

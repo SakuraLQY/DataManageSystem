@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpCostMapper">
+
+  <resultMap id="OpCostVo" type="org.jeecg.modules.advert.vo.OpCostVo">
+    <id column="id" property="id"/>
+    <id column="game_id" property="gameId"/>
+    <id column="sub_game_id" property="subGameId"/>
+    <id column="pkg_id" property="pkgId"/>
+    <id column="channel_type_id" property="channelTypeId"/>
+    <id column="channel_id" property="channelId"/>
+    <id column="channel_sub_account_id" property="channelSubAccountId"/>
+    <id column="deal_id" property="dealId"/>
+    <id column="channel_deal_id" property="channelDealId"/>
+    <id column="cost_day" property="costDay"/>
+    <id column="cost_money" property="costMoney"/>
+    <id column="id" property="download"/>
+    <id column="id" property="click"/>
+    <id column="id" property="exhibition"/>
+    <id column="account_id" property="accountId"/>
+    <id column="platform" property="platform"/>
+    <id column="cost_desc" property="costDesc"/>
+    <id column="create_time" property="createTime"/>
+    <id column="update_time" property="updateTime"/>
+    <id column="sub_game_name" property="subGameName"/>
+    <id column="pkg_name" property="pkgName"/>
+    <id column="channel_name" property="channelName"/>
+    <id column="channel_sub_account_name" property="channelSubAccountName"/>
+    <id column="deal_name" property="dealName"/>
+    <id column="account_name" property="accountName"/>
+  </resultMap>
+
+  <resultMap id="OpCostTotalVo" type="org.jeecg.modules.advert.vo.OpCostTotalVo">
+    <id column="total_cost_money" property="totalCostMoney"/>
+    <id column="total_exhibition" property="totalExhibition"/>
+    <id column="total_click" property="totalClick"/>
+    <id column="total_download" property="totalDownload"/>
+  </resultMap>
+
+  <resultMap id="SummaryCostVo" type="org.jeecg.common.count.vo.CostMoneyModel">
+    <id column="id" property="id"/>
+    <id column="cost_money" property="costMoney"/>
+  </resultMap>
+
+  <select id="costInfoPage" resultMap="OpCostVo">
+    select oc.id,
+           oc.game_id,
+           oc.sub_game_id,
+           oc.pkg_id,
+           oc.channel_type_id,
+           oc.channel_id,
+           oc.channel_sub_account_id,
+           oc.deal_id,
+           oc.channel_deal_id,
+           oc.cost_day,
+           oc.cost_money,
+           oc.download,
+           oc.click,
+           oc.exhibition,
+           oc.account_id,
+           oc.platform,
+           oc.cost_desc,
+           oc.create_time,
+           oc.update_time,
+           og.game_name,
+           osg.game_name         'sub_game_name',
+           opkg.nick_name        'pkg_name',
+           opa.nick_name         'account_name',
+           ocsa.sub_account_name 'channel_sub_account_name',
+           och.channel_name,
+           od.deal_name
+    from op_cost oc
+           left join op_game og on oc.game_id = og.id
+           left join op_sub_game osg on oc.sub_game_id = osg.id
+           left join op_pkg opkg on oc.pkg_id = opkg.id
+           left join op_put_account opa on oc.account_id = opa.id
+           left join op_channel och on oc.channel_id = och.id
+           left join op_channel_sub_account ocsa on oc.channel_sub_account_id = ocsa.id
+           left join op_deal od on oc.deal_id = od.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="costTotal" resultMap="OpCostTotalVo">
+    select
+           sum(cost_money) as total_cost_money,
+           sum(exhibition) as total_exhibition,
+           sum(click) as total_click,
+           sum(download) as total_download
+    from op_cost oc ${ew.customSqlSegment}
+  </select>
+
+  <select id="getSummaryCost" resultMap="SummaryCostVo">
+    select
+      ${groupBy} as id,
+      sum(a.cost_money) as cost_money
+    from op_cost a
+    left join op_deal b on a.deal_id = b.id
+    ${ew.customSqlSegment}
+  </select>
+
+</mapper>

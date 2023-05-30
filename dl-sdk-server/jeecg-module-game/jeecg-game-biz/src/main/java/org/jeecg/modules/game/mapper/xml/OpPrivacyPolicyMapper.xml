@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.game.mapper.OpPrivacyPolicyMapper">
+
+  <resultMap type="org.jeecg.modules.game.entity.OpPrivacyPolicy" id="OpPrivacyPolicy">
+    <id column="id" property="id"/>
+    <result column="content" property="content"/>
+    <result column="name" property="name"/>
+    <result column="url" property="url"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+  </resultMap>
+
+  <select id="getPrivacyPolicyList" resultMap="OpPrivacyPolicy">
+    select * from op_privacy_policy
+      ${ew.customSqlSegment} order by id DESC
+  </select>
+
+</mapper>

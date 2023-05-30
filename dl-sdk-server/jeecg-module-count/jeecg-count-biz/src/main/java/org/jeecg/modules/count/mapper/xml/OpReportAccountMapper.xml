@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.OpReportAccountMapper">
+<resultMap id="reportAccount" type="org.jeecg.modules.count.bo.ReportAccountBo">
+  <id column="id" property="id"/>
+  <result column="channel_id" property="channelId"/>
+  <result column="level_id" property="levelId"/>
+  <result column="pid" property="pid"/>
+  <result column="app_id" property="appId"/>
+  <result column="account" property="account"/>
+  <result column="nick_name" property="nickName"/>
+  <result column="password" property="password"/>
+  <result column="sub_game_ids" property="subGameIds"/>
+  <result column="put_user" property="putUser"/>
+  <result column="account_desc" property="accountDesc"/>
+  <result column="state" property="state"/>
+  <result column="create_time" property="createTime"/>
+  <result column="channel_name" property="channelName"/>
+</resultMap>
+
+  <select id="queryAccountList" resultMap="reportAccount">
+    SELECT distinct a.* ,
+           e.channel_name,
+           d.create_by as 'createUser'
+    FROM op_put_account as a
+           LEFT JOIN op_deal as d
+                     ON a.channel_id = d.channel_id
+           LEFT JOIN op_channel as e
+                     ON a.channel_Id = e.id
+           LEFT JOIN op_channel_sub_account as g
+                    ON a.channel_id = g.channel_id
+           LEFT JOIN op_user as h
+                     ON a.put_user = h.user_name
+      ${ew.customSqlSegment}
+  </select>
+  <select id="queryAccountCost" resultType="org.jeecg.modules.count.bo.ReportAccountCostBo">
+    SELECT account_id as 'accountId',
+      SUM(cost_money) as 'costMoney',
+      sum(exhibition) as 'exhibition',
+      sum(download) as 'download',
+      MAX(cost_day) as 'updateTime'
+    FROM op_cost
+           ${ew.customSqlSegment}
+    GROUP BY accountId;
+  </select>
+  <select id="queryBillByAccountId" resultType="org.jeecg.modules.count.bo.ReportAccountBillBo">
+    SELECT DISTINCT
+      a.nick_name as 'nickName',
+      a.put_user as 'putUser',
+      a.account,
+      a.create_time as 'dateTime',
+      b.create_by as 'createUser'
+    FROM
+      op_put_account as a
+        LEFT JOIN op_deal as b
+                  ON a.channel_id = b.channel_id
+    where a.id = #{id};
+  </select>
+  <select id="queryBillCostById" resultType="org.jeecg.modules.count.bo.ReportBillCostBo">
+    SELECT game_id as 'gameId',
+    sub_game_id as 'subGameId',
+    cost_desc as 'costDesc',
+    DATE(cost_day) AS 'dateTime',
+      cost_money as 'money',
+      exhibition,
+      download
+    FROM op_cost
+    where account_id = #{id};
+  </select>
+  <select id="getNameByGameId" resultType="java.lang.String">
+    select game_name as 'gameName' from op_game where id = #{id};
+  </select>
+  <select id="getNameBySubGameId" resultType="java.lang.String">
+    select game_name as 'subGameName' from op_sub_game where id = #{id};
+  </select>
+</mapper>

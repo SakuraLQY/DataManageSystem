@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtDailySummaryMapper">
+
+    <select id="getQueryTodayList" parameterType="org.jeecg.modules.count.vo.CtDailySummary" resultType="org.jeecg.modules.count.dto.DailySummaryDto">
+        SELECT
+            IFNULL(SUM(${level}),0) AS 'total',
+            IFNULL(SUM(IF(HOUR(time_hour)=0, ${level}, 0)),0) AS zeroHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=1, ${level}, 0)),0) AS oneHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=2, ${level}, 0)),0) AS twoHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=3, ${level}, 0)),0) AS threeHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=4, ${level}, 0)),0) AS fourHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=5, ${level}, 0)),0) AS fiveHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=6, ${level}, 0)),0) AS sixHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=7, ${level}, 0)),0) AS sevenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=8, ${level}, 0)),0) AS eightHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=9, ${level}, 0)),0) AS nineHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=10, ${level}, 0)),0) AS tenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=11, ${level}, 0)),0) AS elevenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=12, ${level}, 0)),0) AS twelveHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=13, ${level}, 0)),0) AS thirteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=14, ${level}, 0)),0) AS fourteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=15, ${level}, 0)),0) AS fifteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=16, ${level}, 0)),0) AS sixteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=17, ${level}, 0)),0) AS seventeenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=18, ${level}, 0)),0) AS eighteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=19, ${level}, 0)),0) AS nineteenHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=20, ${level}, 0)),0) AS twentyHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=21, ${level}, 0)),0) AS twentyoneHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=22, ${level}, 0)),0) AS twentytwoHour,
+            IFNULL(SUM(IF(HOUR(time_hour)=23, ${level}, 0)),0)AS twentythreeHour
+        FROM
+            ct_hour as a
+        LEFT JOIN
+        open_gateway.op_deal as b
+        ON a.deal_id = b.id
+        LEFT JOIN
+        open_gateway.op_pkg as c
+        ON b.pkg_id = c.id
+        <where>
+            a.time_hour between CONCAT(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),' ','00:00:00') and  CONCAT(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),' ','23:59:59')
+            <if test="ctDailySummary.dealId!=null ">
+                and a.deal_id = #{ctDailySummary.dealId}
+            </if>
+            <if test="ctDailySummary.channelId != null and ctDailySummary.channelId.length > 0">
+                AND a.channel_id IN
+                <foreach collection="ctDailySummary.channelId" item="channelId" open="(" separator="," close=")">
+                    #{channelId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.channelSubAccountId != null and ctDailySummary.channelSubAccountId > 0">
+                AND a.channel_sub_account_id IN
+                <foreach collection="ctDailySummary.channelSubAccountId" item="channelSubAccountId" open="(" separator="," close=")">
+                    #{channelSubAccountId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.channelTypeId != null and ctDailySummary.channelTypeId.length > 0">
+                AND a.channel_type_id IN
+                <foreach collection="ctDailySummary.channelTypeId" item="channelTypeId" open="(" separator="," close=")">
+                    #{channelTypeId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.gameId != null and ctDailySummary.gameId.length > 0">
+                AND a.game_id IN
+                <foreach collection="ctDailySummary.gameId" item="gameId" open="(" separator="," close=")">
+                    #{gameId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.subGameId != null and ctDailySummary.subGameId.length > 0">
+                AND a.sub_game_id IN
+                <foreach collection="ctDailySummary.subGameId" item="subGameId" open="(" separator="," close=")">
+                    #{subGameId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.pkgId != null and ctDailySummary.pkgId.length > 0">
+                AND a.pkg_id IN
+                <foreach collection="ctDailySummary.pkgId" item="pkgId" open="(" separator="," close=")">
+                    #{pkgId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="getYesterdayList" parameterType="org.jeecg.modules.count.vo.CtDailySummary" resultType="org.jeecg.modules.count.dto.DailySummaryDto">
+        SELECT
+        IFNULL(SUM(${level}),0) AS 'total',
+        IFNULL(SUM(IF(HOUR(time_hour)=0, ${level}, 0)),0) AS zeroHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=1, ${level}, 0)),0) AS oneHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=2, ${level}, 0)),0) AS twoHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=3, ${level}, 0)),0) AS threeHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=4, ${level}, 0)),0) AS fourHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=5, ${level}, 0)),0) AS fiveHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=6, ${level}, 0)),0) AS sixHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=7, ${level}, 0)),0) AS sevenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=8, ${level}, 0)),0) AS eightHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=9, ${level}, 0)),0) AS nineHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=10, ${level}, 0)),0) AS tenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=11, ${level}, 0)),0) AS elevenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=12, ${level}, 0)),0) AS twelveHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=13, ${level}, 0)),0) AS thirteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=14, ${level}, 0)),0) AS fourteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=15, ${level}, 0)),0) AS fifteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=16, ${level}, 0)),0) AS sixteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=17, ${level}, 0)),0) AS seventeenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=18, ${level}, 0)),0) AS eighteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=19, ${level}, 0)),0) AS nineteenHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=20, ${level}, 0)),0) AS twentyHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=21, ${level}, 0)),0) AS twentyoneHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=22, ${level}, 0)),0) AS twentytwoHour,
+        IFNULL(SUM(IF(HOUR(time_hour)=23, ${level}, 0)),0)AS twentythreeHour
+        FROM
+        ct_hour as a
+        LEFT JOIN
+        open_gateway.op_deal as b
+        ON a.deal_id = b.id
+        LEFT JOIN
+        open_gateway.op_pkg as c
+        ON b.pkg_id = c.id
+        <where>
+            a.time_hour between CONCAT(DATE_SUB(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),INTERVAL 1 DAY),' ','00:00:00') and  CONCAT(DATE_SUB(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),INTERVAL 1 DAY),' ','23:59:59')
+            <if test="ctDailySummary.dealId!=null ">
+                and a.deal_id = #{ctDailySummary.dealId}
+            </if>
+            <if test="ctDailySummary.channelId != null and ctDailySummary.channelId.length > 0">
+                AND a.channel_id IN
+                <foreach collection="ctDailySummary.channelId" item="channelId" open="(" separator="," close=")">
+                    #{channelId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.channelSubAccountId != null and ctDailySummary.channelSubAccountId > 0">
+                AND a.channel_sub_account_id IN
+                <foreach collection="ctDailySummary.channelSubAccountId" item="channelSubAccountId" open="(" separator="," close=")">
+                    #{channelSubAccountId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.channelTypeId != null and ctDailySummary.channelTypeId.length > 0">
+                AND a.channel_type_id IN
+                <foreach collection="ctDailySummary.channelTypeId" item="channelTypeId" open="(" separator="," close=")">
+                    #{channelTypeId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.gameId != null and ctDailySummary.gameId.length > 0">
+                AND a.game_id IN
+                <foreach collection="ctDailySummary.gameId" item="gameId" open="(" separator="," close=")">
+                    #{gameId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.subGameId != null and ctDailySummary.subGameId.length > 0">
+                AND a.sub_game_id IN
+                <foreach collection="ctDailySummary.subGameId" item="subGameId" open="(" separator="," close=")">
+                    #{subGameId}
+                </foreach>
+            </if>
+            <if test="ctDailySummary.pkgId != null and ctDailySummary.pkgId.length > 0">
+                AND a.pkg_id IN
+                <foreach collection="ctDailySummary.pkgId" item="pkgId" open="(" separator="," close=")">
+                    #{pkgId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

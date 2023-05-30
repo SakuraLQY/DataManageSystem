@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtOrderMapper">
+  <resultMap id="SummaryOrderBo" type="org.jeecg.modules.count.bo.summary.SummaryOrderBo">
+    <id column="id" property="id"/>
+    <id column="count_user" property="countUser"/>
+    <id column="sum_money" property="sumMoney"/>
+  </resultMap>
+
+  <resultMap id="SummaryOrderDevBo" type="org.jeecg.modules.count.bo.summary.SummaryOrderDevBo">
+    <id column="id" property="id"/>
+    <id column="count_device" property="countDevice"/>
+    <id column="sum_money" property="sumMoney"/>
+  </resultMap>
+
+  <resultMap id="OrderMoneyGroupBo" type="org.jeecg.modules.count.bo.OrderMoneyGroupBo">
+    <id column="money" property="money"/>
+    <id column="count" property="count"/>
+  </resultMap>
+
+  <resultMap id="OrderDateGroupBo" type="org.jeecg.modules.count.bo.OrderDateGroupBo">
+    <id column="date" property="date"/>
+    <id column="count" property="count"/>
+  </resultMap>
+
+  <resultMap type="org.jeecg.modules.count.vo.PayUserAndOrderVo" id="PayUserAndOrderVo">
+    <result column="deal_id" property="dealId"/>
+    <result column="user_id" property="userId"/>
+    <result column="totalMoney" property="totalMoney"/>
+  </resultMap>
+
+  <select id="selectOrderByDealIdAndUserId" resultMap="PayUserAndOrderVo">
+    SELECT deal_id, user_id, sum(money) as totalMoney
+    FROM `open_countly`.`ct_order`
+    ${ew.customSqlSegment}
+    GROUP BY deal_id, user_id
+  </select>
+
+
+  <select id="getSummaryOrder" resultMap="SummaryOrderBo">
+    select
+      ${groupBy} as id,
+      count(user_id) as count_user,
+      sum(money) as sum_money
+    from ct_order a
+      left join open_gateway.op_deal b on a.deal_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="getSummaryOrderDev" resultMap="SummaryOrderDevBo">
+    select
+      ${groupBy} as id,
+      count(unique_id) as count_device,
+      sum(money) as sum_money
+    from ct_order a
+      left join open_gateway.op_deal b on a.deal_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="selectMoneyGroup" resultMap = "OrderMoneyGroupBo">
+    SELECT
+      a.money,
+      count( * ) AS count
+    FROM
+      ct_order a
+      LEFT JOIN open_gateway.op_deal b ON ( b.id = a.deal_id )
+      LEFT JOIN open_gateway.op_pkg c ON ( a.pkg_id = c.id )
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="selectDateGroup" resultMap = "OrderDateGroupBo">
+    SELECT
+      a.user_create_time as day,
+      count( * ) AS count
+    FROM
+      ct_order a
+      LEFT JOIN open_gateway.op_deal b ON ( b.id = a.deal_id )
+      LEFT JOIN open_gateway.op_pkg c ON ( a.pkg_id = c.id )
+      ${ew.customSqlSegment}
+  </select>
+</mapper>

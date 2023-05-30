@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.RetainAnalyzeMapper">
+
+  <select id="queryCostList" resultType="org.jeecg.modules.count.bo.RetainCostBo">
+    SELECT DATE(cost_day) AS 'dateTime' ,IFNULL(SUM(cost_money),0) as 'costMoney' FROM open_gateway.op_cost as a
+      LEFT JOIN open_gateway.op_deal as f
+    ON a.deal_id = f.id
+      LEFT JOIN open_gateway.op_pkg as c
+      ON f.pkg_id = c.id
+      ${ew.customSqlSegment}
+    GROUP BY dateTime;
+  </select>
+  <select id="queryRetainList" resultType="org.jeecg.modules.count.bo.RetainAnalyzeBo">
+    SELECT * FROM (
+                    SELECT DATE(a.time_daily) as 'dateTime',
+      IFNULL(SUM(a.count_user),0) AS 'regCount',
+        IFNULL(SUM(a.first_payuser),0) AS 'firstPayUser'
+    FROM open_countly.ct_daily as a
+      LEFT JOIN open_gateway.op_channel as b ON a.channel_id = b.id
+      LEFT JOIN open_gateway.op_channel_type as c ON  a.channel_type_id = c.id
+      LEFT JOIN open_gateway.op_deal as f ON a.deal_id  = f.id
+      LEFT JOIN open_gateway.op_pkg AS d ON a.pkg_id = d.id
+      ${ew.customSqlSegment}
+    GROUP BY dateTime)
+      as t ORDER BY t.dateTime DESC;
+  </select>
+  <select id="queryOrderUser" resultType="org.jeecg.modules.count.bo.PayUserBo">
+    SELECT user_id as 'userId',IFNULL(SUM(money),0) as 'payMoney'
+    FROM open_countly.ct_order as a
+           LEFT JOIN open_gateway.op_deal as f
+                     ON a.deal_id = f.id
+           LEFT JOIN open_gateway.op_pkg as g
+                     ON a.pkg_id = g.id
+      ${ew.customSqlSegment} and DATE(a.create_time) = DATE(a.user_create_time)
+    GROUP BY userId;
+  </select>
+  <select id="queryPayRes" resultType="org.jeecg.modules.count.bo.PayResBo">
+    SELECT  DATE(register_time) AS dateTime,
+      a.id AS 'userId',
+      pay_user_login_mask AS payUserLoginMask,
+      DATE(first_pay_time) as 'firstPayTime'
+    FROM open_countly.`ct_user` as a
+      LEFT JOIN open_gateway.op_deal f ON(a.deal_id=f.id)
+      LEFT JOIN open_gateway.op_pkg g ON(f.pkg_id=g.id)
+      ${ew.customSqlSegment} and
+      DATE(register_time) = DATE(first_pay_time);
+  </select>
+  <select id="queryLoyalList" resultType="org.jeecg.modules.count.bo.RetainLoyalBo">
+    SELECT * FROM(
+      SELECT DATE(a.time_daily) as 'dateTime',
+	IFNULL(sum(a.count_user),0) as 'regCount',
+      ${loyalSql},
+      IFNULL(SUM(a.first_payuser),0) as 'firstPayUser'
+    FROM open_countly.ct_daily as a
+      LEFT JOIN open_countly.ct_daily_loyal as b
+    ON a.id = b.daily_id
+      LEFT JOIN open_gateway.op_deal as f
+      ON a.deal_id = f.id
+      LEFT JOIN open_gateway.op_pkg as g
+      ON f.pkg_id = g.id
+      ${ew.customSqlSegment}
+    GROUP BY dateTime
+      )as t ORDER BY t.dateTime desc;
+  </select>
+</mapper>

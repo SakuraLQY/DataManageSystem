@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.PayAnalysisMapper">
+
+  <select id="selectByDaily" resultType="org.jeecg.modules.count.bo.PayAnalysisBo">
+    select DATE(time_daily) as 'dateTime',
+      IFNULL(SUM(count_user),0) as 'countUser',
+      IFNULL(SUM(first_payuser),0) as 'firstPayUser',
+      IFNULL(SUM(first_money),0) as 'firstMoney'
+    FROM ct_daily
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectByTypeDaily" resultType="org.jeecg.modules.count.bo.PayAnalysisBo">
+    select ${type} as 'id',
+      IFNULL(SUM(count_user),0) as 'countUser',
+      IFNULL(SUM(first_payuser),0) as 'firstPayUser',
+      IFNULL(SUM(first_money),0) as 'firstMoney'
+    FROM ct_daily
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectByOrder" resultType="org.jeecg.modules.count.bo.PayAnalysisTempBo">
+    select DATE(create_time) as 'dateTime',
+      COUNT(distinct user_id) as 'payUserNum',
+      IFNULL(SUM(money),0) AS 'payMoney'
+    FROM ct_order
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectByTypeOrder" resultType="org.jeecg.modules.count.bo.PayAnalysisTempBo">
+    select ${type} as 'id',
+      COUNT(distinct user_id) as 'payUserNum',
+      IFNULL(SUM(money),0) AS 'payMoney'
+    FROM ct_order
+      ${ew.customSqlSegment}
+  </select>
+  <select id="selectByDealId" resultType="java.lang.String">
+    select deal_name as 'dealName' from open_gateway.op_deal where id = #{id};
+  </select>
+  <select id="selectByChannelId" resultType="java.lang.String">
+    select channel_name as 'channelName' from open_gateway.op_channel where id = #{id};
+  </select>
+  <select id="selectByGameId" resultType="java.lang.String">
+    select game_name as 'gameName' from open_gateway.op_game where id = #{id};
+  </select>
+  <select id="selectBySubGameId" resultType="java.lang.String">
+    select game_name as 'subGameName' from open_gateway.op_sub_game where id = #{id};
+  </select>
+</mapper>

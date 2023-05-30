@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.advert.mapper.OpXingtuDealMapper">
+
+  <resultMap id="OpXingtuDealVo" type="org.jeecg.modules.advert.vo.OpXingtuDealVo">
+    <id column="id" property="id"/>
+    <result column="deal_name" property="dealName"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="sub_game_type" property="subGameType"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="account_id" property="accountId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+    <result column="deal_args" property="dealArgs"/>
+    <result column="deal_desc" property="dealDesc"/>
+    <result column="pkg_url" property="pkgUrl"/>
+    <result column="pack_state" property="packState"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_by" property="updateBy"/>
+    <result column="update_time" property="updateTime"/>
+    <result column="game_name" property="gameName"/>
+    <result column="sub_game_name" property="subGameName"/>
+    <result column="pkg_name" property="pkgName"/>
+    <result column="account_name" property="accountName"/>
+    <result column="channel_sub_account_name" property="channelSubAccountName"/>
+    <result column="site_id" property="siteId"/>
+    <result column="site_name" property="siteName"/>
+    <result column="jrtt_site_id" property="jrttSiteId"/>
+    <result column="anchor_plan_id" property="anchorPlanId"/>
+    <result column="anchor_plan_name" property="anchorPlanName"/>
+    <result column="ios_url" property="iosUrl"/>
+    <result column="android_url" property="androidUrl"/>
+    <result column="bind_deal" property="anchorPlanBindDeal"/>
+  </resultMap>
+
+  <select id="dealInfoPage" resultMap="OpXingtuDealVo">
+    select d.id,
+           deal_name,
+           d.game_id,
+           d.sub_game_id,
+           d.sub_game_type,
+           d.pkg_id,
+           d.account_id,
+           d.channel_sub_account_id,
+           deal_args,
+           deal_desc,
+           d.pkg_url,
+           d.pack_state,
+           d.create_by,
+           d.create_time,
+           d.update_by,
+           d.update_time,
+           og.game_name,
+           osg.game_name         'sub_game_name',
+           opkg.nick_name        'pkg_name',
+           opa.nick_name         'account_name',
+           ocsa.sub_account_name 'channel_sub_account_name',
+           oxd.site_id           'site_id',
+           oxd.jrtt_site_id,
+           ojs.site_name,
+           oap.id                'anchor_plan_id',
+           oap.plan_name         'anchor_plan_name',
+           oxd.android_url       'android_url',
+           oxd.ios_url,
+           oap.deal_id           'bind_deal'
+
+    from op_xingtu_deal oxd
+           left join op_deal d on d.id = oxd.deal_id
+           left join op_game og on d.game_id = og.id
+           left join op_sub_game osg on d.sub_game_id = osg.id
+           left join op_pkg opkg on d.pkg_id = opkg.id
+           left join op_put_account opa on d.account_id = opa.id
+           left join op_channel_sub_account ocsa on d.channel_sub_account_id = ocsa.id
+           left join op_jrtt_site ojs on oxd.site_id = ojs.id
+           left join op_anchor_plan oap on oxd.anchor_plan_id = oap.id
+      ${ew.customSqlSegment}
+  </select>
+</mapper>

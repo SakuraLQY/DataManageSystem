@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.PayReportMapper">
+
+    <select id="queryNewList" resultType="org.jeecg.modules.count.vo.DayPayReportVo">
+        SELECT DATE_FORMAT(co.create_time,'%Y-%m-%d')  as createTime,
+        sum(co.money) as money,
+        count(distinct co.game_id,co.user_id) as countUser,
+        count(*) as countNum,
+        co.pay_type as payType,
+        og.game_name  as gameName
+        from `open_countly`.ct_order as co
+        left join `open_gateway`.op_game as og
+        on co.game_id = og.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="queryMonthList" resultType="org.jeecg.modules.count.vo.MonthPayReportVo">
+        SELECT DATE_FORMAT(co.create_time,'%Y-%m')  as createTime,
+        sum(co.money) as money,
+        count(distinct co.game_id,co.user_id) as countUser,
+        count(*) as countNum,
+        co.pay_type as payType,
+        og.game_name  as gameName
+        from `open_countly`.ct_order as co
+        left join `open_gateway`.op_game as og
+        on co.game_id = og.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="queryPayOrderList" resultType="org.jeecg.modules.count.vo.PayOrderVo">
+        select og.game_name as gameName,
+        co.deal_id as dealId,
+        oo.user_id as userId,
+        ou.user_name as userName,
+        co.server_id as serverId,
+        oo.order_id as orderId,
+        oo.game_order_id as gameOrderId,
+        oo.bank_order_id as bankOrderId,
+        oo.money as money,
+        oo.bank_type as bankType,
+        oo.open_time as openTime,
+        oo.order_type as orderType,
+        oo.bank_status as bankStatus,
+        oo.game_status as gameStatus,
+        oo.game_data as gameData,
+        oo.game_deliver_retry as gameDeliverRetry
+        from `open_gateway`.op_order as oo
+        left join `open_countly`.ct_order as co
+        on oo.order_id=co.order_id
+        left join `open_gateway`.op_sub_game as osg
+        on oo.sub_game_id=osg.id
+        left join `open_gateway`.op_game as og
+        on oo.game_id=og.id
+        left join `open_gateway`.op_user as ou
+        on oo.user_id=ou.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="getSumPayOrder" resultType="org.jeecg.modules.count.vo.PayOrderTotalVo">
+        select sum(oo.money) as totalMoney,
+        count(*) as sum
+        from `open_gateway`.op_order as oo
+        left join `open_countly`.ct_order as co
+        on oo.order_id=co.order_id
+        left join `open_gateway`.op_sub_game as osg
+        on oo.sub_game_id=osg.id
+        left join `open_gateway`.op_game as og
+        on oo.game_id=og.id
+        left join `open_gateway`.op_user as ou
+        on oo.user_id=ou.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="orderPurchaseVolumeList" resultType="org.jeecg.modules.count.vo.OrderPurchaseVolumeVo">
+        select og.game_name as gameName,
+        oc.channel_name as channelName,
+        od.deal_name as dealName,
+        co.deal_id as dealId,
+        ou.user_name as userName,
+        co.user_id as userId,
+        co.money as money,
+        co.user_create_time as userCreateTime,
+        co.pay_type as payType,
+        co.create_time as openTime,
+        co.client_ip as clientIp,
+        co.region as region
+        from `open_countly`.ct_order as co
+        left join `open_gateway`.op_game as og
+        on co.game_id=og.id
+        left join `open_gateway`.op_channel as oc
+        on co.channel_id=oc.id
+        left join `open_gateway`.op_deal as od
+        on co.deal_id=od.id
+        left join `open_gateway`.op_user as ou
+        on co.user_id=ou.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="userOrderSearch" resultType="org.jeecg.modules.count.vo.UserOrderVo">
+        select ou.user_name as userName,
+        co.user_id as userId,
+        co.game_id as gameId,
+        co.deal_id as dealId,
+        co.client_ip as clientIp,
+        co.order_id as orderId,
+        co.create_time as openTime,
+        co.money as money
+        from `open_countly`.ct_order as co
+        left join `open_gateway`.op_user as ou
+        on co.user_id=ou.id ${ew.customSqlSegment}
+    </select>
+
+    <select id="getUserOrderMoney" resultType="java.math.BigDecimal">
+        select sum(co.money)
+        from `open_countly`.ct_order as co
+        left join `open_gateway`.op_user as ou
+        on co.user_id=ou.id ${ew.customSqlSegment}
+    </select>
+</mapper>

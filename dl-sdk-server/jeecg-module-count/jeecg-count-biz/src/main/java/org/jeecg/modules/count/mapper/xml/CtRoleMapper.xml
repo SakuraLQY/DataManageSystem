@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.count.mapper.CtRoleMapper">
+
+  <resultMap type="org.jeecg.modules.count.vo.CtRoleVo" id="CtRoleVo">
+    <id column="id" property="id"/>
+    <result column="deal_id" property="dealId"/>
+    <result column="user_id" property="userId"/>
+    <result column="game_id" property="gameId"/>
+    <result column="sub_game_id" property="subGameId"/>
+    <result column="pkg_id" property="pkgId"/>
+    <result column="channel_id" property="channelId"/>
+    <result column="channel_type_id" property="channelTypeId"/>
+    <result column="channel_sub_account_id" property="channelSubAccountId"/>
+    <result column="server_id" property="serverId"/>
+    <result column="server_name" property="serverName"/>
+    <result column="role_id" property="roleId"/>
+    <result column="role_name" property="roleName"/>
+    <result column="role_level" property="roleLevel"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+    <result column="alive_time" property="aliveTime"/>
+    <result column="user_name" property="userName"/>
+    <result column="gameName" property="gameName"/>
+    <result column="subGameName" property="subGameName"/>
+    <result column="pkgName" property="pkgName"/>
+    <result column="dealName" property="dealName"/>
+    <result column="channelName" property="channelName"/>
+  </resultMap>
+
+  <select id="queryPageList" resultMap="CtRoleVo">
+    select a.*, b.user_name
+    from `open_countly`.`ct_role` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="queryAllList" resultMap="CtRoleVo">
+    select a.*,
+           b.user_name,
+           c.game_name gameName,
+           d.game_name subGameName,
+           e.pkg_name  pkgName,
+           f.deal_name dealName,
+           g.channel_name channelName
+    from `open_countly`.`ct_role` a
+           LEFT JOIN `open_gateway`.`op_user` b ON a.user_id = b.id
+           LEFT JOIN `open_gateway`.`op_game` c ON a.game_id = c.id
+           LEFT JOIN `open_gateway`.`op_sub_game` d ON a.sub_game_id = d.id
+           LEFT JOIN `open_gateway`.`op_pkg` e ON a.pkg_id = e.id
+           LEFT JOIN `open_gateway`.`op_deal` f ON a.deal_id = f.id
+           LEFT JOIN `open_gateway`.`op_channel` g ON a.channel_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+</mapper>

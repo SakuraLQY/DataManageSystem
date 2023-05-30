@@ -1,0 +1,102 @@
+<template>
+  <a-modal :title="title" :maskClosable="false" :width="width" :body-style="bodystyle" :visible="visible" @ok="handleOk" :okButtonProps="{ class: { 'jee-hidden': disableSubmit } }" @cancel="handleCancel" cancelText="关闭">
+    <OpJrttAudienceForm ref="registerForm"  @ok="submitCallback" :formDisabled="disableSubmit" :formBpm="false"></OpJrttAudienceForm>
+  </a-modal>
+</template>
+
+<script lang="ts" setup>
+  import { ref, nextTick, defineExpose } from 'vue';
+  import OpJrttAudienceForm from './OpJrttAudienceForm.vue'
+  
+  const title = ref<string>('');
+  const width = ref<number>(1400);
+  const visible = ref<boolean>(false);
+  const disableSubmit = ref<boolean>(false);
+  const registerForm = ref();
+  const emit = defineEmits(['register', 'success']);
+  const bodystyle = {
+    height: '700px',
+    overflow: 'hidden',
+    overflowY: 'scroll',
+  }
+  /**
+   * 新增
+   */
+  function add() {
+    title.value = '新增';
+    visible.value = true;
+    nextTick(() => {
+      registerForm.value.add();
+    });
+  }
+  
+  /**
+   * 编辑
+   * @param record
+   */
+  function edit(record) {
+    title.value = disableSubmit.value ? '详情' : '编辑';
+    visible.value = true;
+    record.accountId = record.accountId + '';
+    if(record.landingType === null) {
+      record.landingType = 'EXTERNAL';
+    }
+    if(record.deliveryRange === null) {
+      record.deliveryRange = 'DEFAULT';
+    }
+    if(record.filterAwemeAbnormalActive === null) {
+      record.filterAwemeAbnormalActive = '0';
+    }else {
+      record.filterAwemeAbnormalActive = record.filterAwemeAbnormalActive + '';
+    }
+    if(record.filterOwnAwemeFans === null) {
+      record.filterOwnAwemeFans = '0';
+    }else {
+      record.filterOwnAwemeFans = record.filterOwnAwemeFans + '';
+    }
+    if(record.filterAwemeFansCount === null) {
+      record.filterAwemeFansCount = '0';
+    }else {
+      record.filterAwemeFansCount = record.filterAwemeFansCount + '';
+    }
+    nextTick(() => {
+      registerForm.value.edit(record);
+    });
+  }
+  
+  /**
+   * 确定按钮点击事件
+   */
+  function handleOk() {
+    registerForm.value.submitForm();
+  }
+
+  /**
+   * form保存回调事件
+   */
+  function submitCallback() {
+    handleCancel();
+    emit('success');
+  }
+
+  /**
+   * 取消按钮回调事件
+   */
+  function handleCancel() {
+    visible.value = false;
+    registerForm.value.isCustomCrowdAction();
+  }
+
+  defineExpose({
+    add,
+    edit,
+    disableSubmit,
+  });
+</script>
+
+<style>
+  /**隐藏样式-modal确定按钮 */
+  .jee-hidden {
+    display: none !important;
+  }
+</style>

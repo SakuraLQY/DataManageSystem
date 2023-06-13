@@ -15,7 +15,7 @@
         </a-col>
         <a-col :span="24">
           <a-form-item label="备注" v-bind="validateInfos.descs">
-            <a-textarea v-model:value="formData.descs" showCount maxLength="255" rows="4" placeholder="长度限制至255位" :disabled="disabled"></a-textarea>
+            <a-textarea v-model:value="formData.descs" showCount maxLength="128" rows="4" placeholder="长度限制至128位" :disabled="disabled"></a-textarea>
           </a-form-item>
         </a-col>
       </a-row>

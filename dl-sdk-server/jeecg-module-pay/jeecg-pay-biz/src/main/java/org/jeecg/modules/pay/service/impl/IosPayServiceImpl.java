@@ -131,10 +131,12 @@ public class IosPayServiceImpl implements IIosPayService {
         OpOrder opOrder = opOrderService.getOne(
             queryWrapper.lambda().eq(OpOrder::getOrderId, iosPayCheckDto.getOrderId()));
         if (null == opOrder) {
+            log.error("订单不存在,orderId:{}", iosPayCheckDto.getOrderId());
             throw new IdeaRunTimeException(ErrorCode.ORDER_NOT_EXIST);
         }
         if (!OpenConstant.CREATE_ORDER_STATUS.equals(opOrder.getStatus())
             || !BankStatus.INIT.equals(opOrder.getBankStatus())) {
+            log.error("银行状态非法,orderId:{}", iosPayCheckDto.getOrderId());
             throw new IdeaRunTimeException(ErrorCode.BANK_STATUS_INVAID);
         }
         OpOrder update = new OpOrder();
@@ -173,19 +175,24 @@ public class IosPayServiceImpl implements IIosPayService {
                 BigDecimal quantity = app.getBigDecimal("quantity");
                 // 获取商品
                 OpCommodityModel opCommodityModel = gameApi.getOpCommdityByGoodId(iosPayCheckDto.getSubGameId(), iosPayCheckDto.getPkgId(), productId);
-                // 查看订单金额是否一致
-                BigDecimal bankMoney = opCommodityModel.getMoney().multiply(quantity)
-                    .setScale(2, BigDecimal.ROUND_HALF_UP);
-                BigDecimal orderMoney = opOrder.getMoney().setScale(2, BigDecimal.ROUND_HALF_UP);
-                if (bankMoney.compareTo(orderMoney) != 0) {
-                    log.info("ios订单金额不一致bankMoney:{}, orderMoney:{}", bankMoney, orderMoney);
-                    update.setBankStatus(BankStatus.MONEY_NE);
-                } else {
-                    update.setBankStatus(BankStatus.NORMAL);
+                if(opCommodityModel == null){
+                    log.error("ios商品不存在,subGameId:{}, pkgId:{}, productId:{}",
+                        iosPayCheckDto.getSubGameId(), iosPayCheckDto.getPkgId(), productId);
+                    update.setBankStatus(BankStatus.COMMODITY_NO_FOUND);
+                }else{
+                    // 查看订单金额是否一致
+                    BigDecimal bankMoney = opCommodityModel.getMoney().multiply(quantity)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal orderMoney = opOrder.getMoney().setScale(2, BigDecimal.ROUND_HALF_UP);
+                    if (bankMoney.compareTo(orderMoney) != 0) {
+                        log.error("ios订单金额不一致bankMoney:{}, orderMoney:{}", bankMoney, orderMoney);
+                        update.setBankStatus(BankStatus.MONEY_NE);
+                    } else {
+                        update.setBankStatus(BankStatus.NORMAL);
+                    }
                 }
                 update.setBankOrderId(transactionId);
                 update.setBankStatusTime(LocalDateTime.now());
-                update.setBankMoney(bankMoney);
                 update.setBankMoneyType(iosPayCheckDto.getMmmType());
                 update.setIosPkgVer(iosPayCheckDto.getPkgVer());
                 opOrderService.updateById(update);

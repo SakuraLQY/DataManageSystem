@@ -49,7 +49,7 @@ public class CtUserDto implements Serializable {
 	/**广告ID*/
     @ApiModelProperty(value = "广告ID")
     @Dict(dictTable = "open_gateway.op_deal", dicText = "deal_name", dicCode = "id")
-    private Integer dealId;
+    private List<Integer> dealId;
 	/**设备ID*/
     @ApiModelProperty(value = "设备ID")
     private String uniqueId;

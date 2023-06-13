@@ -11,7 +11,7 @@
           </a-col>
           <a-col :lg="6">
             <a-form-item label="支付渠道名称">
-              <a-input placeholder="请输入支付渠道名称" v-model:value="queryParam.payVendorName"></a-input>
+              <a-input placeholder="请输入支付渠道名称" v-model:value="queryParam.payVendorName" allowClear></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
@@ -40,8 +40,8 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button> -->
+        <!-- <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>

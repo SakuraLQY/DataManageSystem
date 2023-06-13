@@ -5,6 +5,8 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.advert.dto.OpDealDto;
 import org.jeecg.modules.advert.entity.OpDeal;
 import org.jeecg.modules.advert.mapper.OpDealMapper;
+import org.jeecg.modules.advert.modal.DealOptionResult;
 import org.jeecg.modules.advert.service.IOpDealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,25 @@ public class OpDealServiceImpl extends ServiceImpl<OpDealMapper, OpDeal> impleme
 
     @Resource
     private IGameApi gameApi;
+    @Resource
+    private OpDealMapper opDealMapper;
+
+    @Override
+    public DealOptionResult getOptionList(Page<OpDeal> page) {
+        IPage<OpDeal> pageList = page(page, null);
+        Integer total = list().size();
+        DealOptionResult dealOptionResult = new DealOptionResult();
+        dealOptionResult.setList(pageList);
+        dealOptionResult.setTotal(total);
+        return dealOptionResult;
+    }
+
+    @Override
+    public List<OpDeal> getListByText(String text) {
+        LambdaQueryWrapper<OpDeal> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(OpDeal::getDealName, text);
+        return opDealMapper.selectList(wrapper);
+    }
 
     @Override
     public QueryWrapper<OpDeal> baseQuery(OpDeal deal, String startDate, String endDate) {

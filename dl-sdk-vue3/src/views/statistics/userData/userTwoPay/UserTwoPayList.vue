@@ -227,7 +227,6 @@
 
     getPayUserTwoPay(queryParam.value).then((res: any) => {
       twoPayDataSource.value = res;
-      debugger;
     });
   }
 

@@ -26,6 +26,6 @@ public class DauDataVo implements Serializable {
     private String payTime;
     /**数量*/
     @ApiModelProperty(value = "数量")
-    private Integer counts;
+    private Integer counts=0;
 
 }

@@ -37,6 +37,7 @@
   {
     title: '其他数据',
     align: "center",
+    width:300,
     dataIndex: 'otherData'
   },
   {

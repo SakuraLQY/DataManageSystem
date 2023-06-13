@@ -32,6 +32,7 @@
    */
   function edit(record) {
     record.ruleType = record.ruleType + '';
+    record.ruleId = record.ruleId + '',
     title.value = disableSubmit.value ? '详情' : '编辑';
     visible.value = true;
     nextTick(() => {

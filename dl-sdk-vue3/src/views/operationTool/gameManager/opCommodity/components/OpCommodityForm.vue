@@ -86,7 +86,7 @@
           {
             goodsId: undefined,
             money: undefined,
-            currencyType: undefined
+            currencyType: '0'
           }
         ], 
     gameId: undefined,

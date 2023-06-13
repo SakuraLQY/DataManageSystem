@@ -65,6 +65,9 @@ public class OpFileChunkServiceImpl extends ServiceImpl<OpFileChunkMapper, OpFil
         HashMap<String, Object> data = new HashMap<>();
         List<Integer> uploadedChunks = chunks.stream().map(OpFileChunk::getChunkNumber)
             .collect(Collectors.toList());
+        String key =
+            gameId + "-" + subGameId + "-" + identifier + "-" + "successChunks";
+        redisTemplate.opsForValue().set(key, String.valueOf(chunks.size()), 10, TimeUnit.MINUTES);
         data.put("uploadedChunks", uploadedChunks);
         return Result.OK(data);
     }
@@ -89,7 +92,7 @@ public class OpFileChunkServiceImpl extends ServiceImpl<OpFileChunkMapper, OpFil
         if (uploadFileByRandomAccessFile(fullFileName, opFileChunk)) {
             save(opFileChunk);
             String key =
-                opFileChunk.getGameId() + "-" + opFileChunk.getSubGameId() + "-" + "successChunks";
+                opFileChunk.getGameId() + "-" + opFileChunk.getSubGameId() + "-" + opFileChunk.getIdentifier() + "-" + "successChunks";
             String s = redisTemplate.opsForValue().get(key);
             Long successChunks;
             if (s == null) {

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.jeecg.common.count.vo.CostModel;
 import org.jeecg.common.count.vo.CostMoneyModel;
 import org.jeecg.modules.advert.entity.OpCost;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -49,5 +50,14 @@ public interface OpCostMapper extends BaseMapper<OpCost> {
      **/
     List<CostMoneyModel> getSummaryCost(@Param("groupBy") String groupBy,
         @Param(Constants.WRAPPER) Wrapper<OpCost> queryWrapper);
+
+    /**
+     * @param queryWrapper
+     * @return java.util.List<org.jeecg.common.count.vo.CostMoneyModel>
+     * @author chenyw
+     * @description 获取广告成本
+     * @date 17:12 2023/5/22/022
+     **/
+    List<CostModel> getCostModel(@Param(Constants.WRAPPER) Wrapper<OpCost> queryWrapper);
 
 }

@@ -27,10 +27,17 @@ import func from '../../../vue-temp/vue-editor-bridge';
   const validatorRules = {
     pkgIdList: [{ required: true, message: '请选择渠道游戏包!'},],
   };
+  const props = defineProps({
+    // v-model:value
+    initData: {
+        type: Array,
+        default: () => []
+      }
+  });
   const { resetFields, validate, validateInfos } = useForm(formData, validatorRules, { immediate: true });
   getList();
   function getList() {
-    getOptionList({type:0}).then((res: any)=>{
+    getOptionList({type:0, channelId:props.initData}).then((res: any)=>{
         treeData.value = res
       })
   }

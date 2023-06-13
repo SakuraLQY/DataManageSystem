@@ -38,63 +38,63 @@ public class RoiVo implements Serializable {
     /**推广费用*/
     @Excel(name = "推广费用", width = 15)
     @ApiModelProperty(value = "推广费用")
-    private BigDecimal promotionCost;
+    private BigDecimal promotionCost=BigDecimal.ZERO;
     /**新增注册数*/
     @Excel(name = "新增注册数", width = 15)
     @ApiModelProperty(value = "新增注册数")
-    private Integer regCount;
+    private Integer regCount=0;
     /**剩余DAU*/
     @Excel(name = "剩余DAU", width = 15)
     @ApiModelProperty(value = "剩余DAU")
-    private Integer remainDAU;
+    private Integer remainDAU=0;
     /**付费DAU*/
     @Excel(name = "付费DAU", width = 15)
     @ApiModelProperty(value = "付费DAU")
-    private BigDecimal costDAU;
+    private BigDecimal costDAU=BigDecimal.ZERO;
 	/**注册单价*/
     @Excel(name = "注册单价", width = 15)
     @ApiModelProperty(value = "注册单价")
-    private BigDecimal regUnitPrice;
+    private BigDecimal regUnitPrice=BigDecimal.ZERO;
     /**新增付费人数*/
     @Excel(name = "新增付费人数", width = 15)
     @ApiModelProperty(value = "新增付费人数")
-    private Integer costCount;
+    private Integer costCount=0;
     /**付费率*/
     @Excel(name = "付费率", width = 15)
     @ApiModelProperty(value = "付费率")
-    private BigDecimal costProbability;
+    private BigDecimal costProbability=BigDecimal.ZERO;
     /**付费单价*/
     @Excel(name = "付费单价", width = 15)
     @ApiModelProperty(value = "付费单价")
-    private BigDecimal costUnitPrice;
+    private BigDecimal costUnitPrice=BigDecimal.ZERO;
     /**新增付费金额*/
     @Excel(name = "新增付费金额", width = 15)
     @ApiModelProperty(value = "新增付费金额")
-    private BigDecimal addCostPrice;
+    private BigDecimal addCostPrice=BigDecimal.ZERO;
     /**累计付费金额*/
     @Excel(name = "累计付费金额", width = 15)
     @ApiModelProperty(value = "累计付费金额")
-    private BigDecimal allCostPrice;
+    private BigDecimal allCostPrice=BigDecimal.ZERO;
     /**sdk分成所得*/
     @Excel(name = "sdk分成所得", width = 15)
     @ApiModelProperty(value = "sdk分成所得")
-    private BigDecimal sdkShare;
+    private BigDecimal sdkShare=BigDecimal.ZERO;
     /**利润*/
     @Excel(name = "利润", width = 15)
     @ApiModelProperty(value = "利润")
-    private BigDecimal profit;
+    private BigDecimal profit=BigDecimal.ZERO;
     /**预估ROI*/
     @Excel(name = "预估ROI", width = 15)
     @ApiModelProperty(value = "预估ROI")
-    private BigDecimal estimatedROI;
+    private BigDecimal estimatedROI=BigDecimal.ZERO;
     /**累计ROI*/
     @Excel(name = "累计ROI", width = 15)
     @ApiModelProperty(value = "累计ROI")
-    private BigDecimal allROI;
+    private BigDecimal allROI=BigDecimal.ZERO;
     /**首日ROI*/
     @Excel(name = "首日ROI", width = 15)
     @ApiModelProperty(value = "首日ROI")
-    private BigDecimal firstROI;
+    private BigDecimal firstROI=BigDecimal.ZERO;
     /**剩余ROI*/
     @Excel(name = "剩余ROI", width = 15)
     @ApiModelProperty(value = "剩余ROI")
@@ -102,7 +102,7 @@ public class RoiVo implements Serializable {
     /**真实ROI*/
     @Excel(name = "真实ROI", width = 15)
     @ApiModelProperty(value = "真实ROI")
-    private BigDecimal realROI;
+    private BigDecimal realROI=BigDecimal.ZERO;
 
 
 

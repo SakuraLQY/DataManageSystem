@@ -4,12 +4,7 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <a-col :lg="8">
-            <a-form-item label="广告列表">
-              <j-search-select placeholder="请输入广告列表" v-model:value="queryParam.dealId" dict="open_gateway.op_deal,deal_name,id" allowClear/>
-            </a-form-item>
-          </a-col>
-          <template v-if="toggleSearchStatus">
+          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="起始日期">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择起始日期" v-model:value="queryParam.startTime" />
@@ -21,20 +16,24 @@
               </a-form-item>
             </a-col>
             <a-col :lg="8">
+              <a-form-item label="常用日期">
+                <a href="#" @click="handleClick(1)">今天</a> <a href="#" @click="handleClick(2)">昨天</a> <a href="#" @click="handleClick(3)">最近三天</a> <a href="#" @click="handleClick(4)">最近一周</a> <a href="#" @click="handleClick(5)">最近两周</a>
+              </a-form-item>
+            </a-col>
+            <a-col :lg="8">
               <a-form-item label="归类方式">
                 <j-dict-select-tag placeholder="请输入归类方式" v-model:value="queryParam.type" :options = "typeOption"/>
               </a-form-item>
             </a-col>
-          </template>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
                 <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                <!-- <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
                   {{ toggleSearchStatus ? '收起' : '展开' }}
                   <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
+                </a> -->
               </a-col>
             </span>
           </a-col>
@@ -45,9 +44,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
+        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="exportXlS"> 导出</a-button>
+        <!-- <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -92,15 +91,17 @@
   import { queryList, deleteOne, batchDelete, getImportUrl, getExportUrl } from './StatDeal.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import StatDealModal from './components/StatDealModal.vue'
-  import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
+  import { useMethods } from '/@/hooks/system/useMethods';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import {formatToDate } from '/@/utils/dateUtil';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   const queryParam = ref<any>({startTime:formatToDate(new Date()),endTime:formatToDate(new Date()),type:'time_daily'});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
 
-
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   //   let getChannelVal = (e: any) => {
   //   queryParam.value.channelTypeId = e.channelTypeId;
   //   queryParam.value.channelId = e.channelId;
@@ -181,6 +182,7 @@
     exportConfig: {
       name: "stat_deal",
       url: getExportUrl,
+      params:queryParam.value
     },
 	  importConfig: {
 	    url: getImportUrl,
@@ -271,7 +273,6 @@
       }
     ]
   }
-
   /**
    * 查询
    */
@@ -346,8 +347,87 @@
     //刷新数据
     reload();
   }
-  
 
+  function handleClick(type) {
+    let date = new Date();
+    //今天
+    if(type === 1) {
+      // 创建Date对象，获取今天的年、月、日等信息
+      date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 2) {
+      //昨天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 3) {
+      //最近三天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 3);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 4) {
+      //最近一周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 7);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 5) {
+      //最近两周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }
+  }
+
+  //导入导出方法
+  const { handleExportXls, handleImportXls } = useMethods();
+
+  /**
+   * 导出事件
+   */
+  function exportXlS() {
+    return handleExportXls("Stat数据表", "/count/statDeal/exportExcel", queryParam.value);
+  }
 
 
 </script>

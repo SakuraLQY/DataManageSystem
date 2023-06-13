@@ -48,7 +48,7 @@
                 {{gameItem.gameName}}
                 </a-select-option>
               </a-select>
-              <a-select v-model:value="queryParam.id" placeholder="请选择子游戏名" v-if="gameId ==='' || gameId ===undefined">
+              <a-select v-model:value="subGameId" placeholder="请选择子游戏名" v-if="gameId ==='' || gameId ===undefined">
                 <a-select-option
                   v-for="(gameItem,index) in []"
                   :key="index"
@@ -179,10 +179,8 @@
   });
 
 
-  function handleChange(value) {
-    if(!value){
-      subGameId.value = undefined;
-    }
+  function handleChange() {
+    subGameId.value = undefined;
   }
 
   /**

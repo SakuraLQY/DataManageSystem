@@ -9,6 +9,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.modules.count.dto.ReportAccountDto;
 import org.jeecg.modules.count.entity.OpReport;
+import org.jeecg.modules.count.modal.ReportAccountModal;
 import org.jeecg.modules.count.service.IOpReportAccountService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -173,6 +174,15 @@ public class OpReportAccountController extends JeecgController<OpReport, IOpRepo
         return super.exportXls(request, opReport, OpReport.class, "数据报表");
     }
 
+	/**@param reportAccountDto
+	 * @author chenglin
+	 * @description 补充导出Excel功能
+	 * @date  16:26 2023/5/30
+	 **/
+	@RequestMapping(value = "/exportExcel")
+	public ModelAndView exportExcel(HttpServletRequest request, ReportAccountDto reportAccountDto) {
+		return OpReportAccountService.exportExcel(request,reportAccountDto, ReportAccountModal.class,"账号数据表");
+	}
     /**
       * 通过excel导入数据
     *

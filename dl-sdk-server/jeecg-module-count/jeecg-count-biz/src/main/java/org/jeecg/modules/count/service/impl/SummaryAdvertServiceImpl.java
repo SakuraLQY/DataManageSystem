@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.modules.count.bo.GetHourBo;
-import org.jeecg.modules.count.bo.GetOrderRateBo;
+import org.jeecg.modules.count.bo.GetOrderGroupBo;
 import org.jeecg.modules.count.bo.HourBo;
 import org.jeecg.modules.count.bo.SummaryAdvertDailyBo;
 import org.jeecg.modules.count.dto.SummaryAdvertDto;
@@ -16,12 +16,10 @@ import org.jeecg.modules.count.service.ICtDailyService;
 import org.jeecg.modules.count.service.ICtHourService;
 import org.jeecg.modules.count.service.ICtOrderService;
 import org.jeecg.modules.count.service.ISummaryAdvertService;
-import org.jeecg.modules.count.vo.OrderMoneyGroupRateVo;
 import org.jeecg.modules.count.vo.SummaryAdvertBarVo;
 import org.jeecg.modules.count.vo.SummaryAdvertVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -66,14 +64,15 @@ public class SummaryAdvertServiceImpl implements ISummaryAdvertService {
     @Override
     public SummaryAdvertBarVo getSummaryAdvertEChart(SummaryAdvertDto summaryAdvertDto) {
         SummaryAdvertBarVo result = new SummaryAdvertBarVo();
-        GetOrderRateBo getOrderRateBo = new GetOrderRateBo();
-        BeanUtils.copyProperties(summaryAdvertDto, getOrderRateBo);
-        result.setAliveMoneyRateGroup(ctOrderService.getAliveMoneyGroup(getOrderRateBo));
-        result.setFirstMoneyRateGroup(ctOrderService.getFirstMoneyGroup(getOrderRateBo));
-        result.setDateRateGroup(ctOrderService.getRegDateGroup(getOrderRateBo));
+        GetOrderGroupBo getOrderGroupBo = new GetOrderGroupBo();
+        BeanUtils.copyProperties(summaryAdvertDto, getOrderGroupBo);
+        result.setAliveMoneyRateGroup(ctOrderService.getAliveMoneyGroup(getOrderGroupBo));
+        result.setFirstMoneyRateGroup(ctOrderService.getFirstMoneyGroup(getOrderGroupBo));
+        result.setDateRateGroup(ctOrderService.getRegDateGroup(getOrderGroupBo));
         return result;
     }
 
+    @Override
     public Map<String, Map<String, BigDecimal>> getSummaryAdvertLine(
         SummaryAdvertDto summaryAdvertDto) {
         GetHourBo getHourBo = new GetHourBo();
@@ -81,8 +80,7 @@ public class SummaryAdvertServiceImpl implements ISummaryAdvertService {
         String[] levels = {"count_active", "count_active_dev", "count_user", "count_user_dev",
             "first_money", "first_payuser", "total_payuser", "total_money", "alive_payuser",
             "alive_money", "count_dau"};
-
-        Map<String, Map<String, BigDecimal>> result = new HashMap<>();
+            Map<String, Map<String, BigDecimal>> result = new HashMap<>();
         for (String level : levels) {
             getHourBo.setLevel(level);
             List<HourBo> hourBoList = ctHourService.getHourBo(getHourBo);

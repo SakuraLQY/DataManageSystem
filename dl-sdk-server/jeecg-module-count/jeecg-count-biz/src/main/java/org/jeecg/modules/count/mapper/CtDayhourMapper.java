@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.modules.count.vo.CtDayhour;
@@ -21,4 +22,6 @@ public interface CtDayhourMapper extends BaseMapper<CtDayhour> {
 
 
     IPage<CtDayhour>  getDayHourList(Page<T> page,@Param(Constants.WRAPPER)  QueryWrapper<CtDayhour> queryWrapper, @Param("level")String level);
+
+    List<CtDayhour> getDayHourListForAll(@Param(Constants.WRAPPER)QueryWrapper<CtDayhour> queryWrapper, @Param("level")String level);
 }

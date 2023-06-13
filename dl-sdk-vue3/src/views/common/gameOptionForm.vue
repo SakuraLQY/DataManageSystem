@@ -5,10 +5,10 @@
             <a-select-option
                 v-for="(gameItem,index) in faList"
                 :key="index"
-                :value="index"
-                :label="gameItem.gameName + '(' + index + ')'"
+                :value="gameItem.id"
+                :label="gameItem.gameName + '(' + gameItem.id + ')'"
             >
-            {{gameItem.gameName + '(' + index + ')'}}
+            {{gameItem.gameName + '(' + gameItem.id + ')'}}
             </a-select-option>
             </a-select>
         </a-form-item>

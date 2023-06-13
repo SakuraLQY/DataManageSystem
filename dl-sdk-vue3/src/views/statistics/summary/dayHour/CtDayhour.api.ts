@@ -5,6 +5,7 @@ const { createConfirm } = useMessage();
 
 enum Api {
   list = '/count/ctDayhour/list',
+  queryList = '/count/ctDayhour/queryList',
   save='/count/ctDayhour/add',
   edit='/count/ctDayhour/edit',
   deleteOne = '/count/ctDayhour/delete',
@@ -30,6 +31,8 @@ export const getImportUrl = Api.importExcel;
  */
 export const list = (params) => defHttp.get({ url: Api.list, params });
 
+
+export const queryList = (params) => defHttp.get({ url: Api.queryList, params });
 /**
  * 删除单个
  * @param params

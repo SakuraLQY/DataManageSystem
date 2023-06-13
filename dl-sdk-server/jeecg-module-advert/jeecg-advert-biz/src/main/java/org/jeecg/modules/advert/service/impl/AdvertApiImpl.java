@@ -7,18 +7,22 @@ import org.jeecg.common.advert.dto.OpCostDto;
 import org.jeecg.common.advert.vo.OpChannelSubAccountModel;
 import org.apache.commons.io.IOCase;
 import org.jeecg.common.advert.vo.OpChannelModel;
+import org.jeecg.common.advert.vo.OpChannelTypeModel;
 import org.jeecg.common.advert.vo.OpDealModel;
 import org.jeecg.common.advert.vo.OpPutAccountModel;
+import org.jeecg.common.count.vo.CostModel;
 import org.jeecg.common.count.vo.CostMoneyModel;
 import org.jeecg.common.game.api.IAdvertApi;
 import org.jeecg.modules.advert.entity.AtVisit;
 import org.jeecg.modules.advert.entity.OpChannelSubAccount;
 import org.jeecg.modules.advert.entity.OpChannel;
+import org.jeecg.modules.advert.entity.OpChannelType;
 import org.jeecg.modules.advert.entity.OpDeal;
 import org.jeecg.modules.advert.entity.OpPutAccount;
 import org.jeecg.modules.advert.service.IAtUniqueService;
 import org.jeecg.modules.advert.service.IAtVisitService;
 import org.jeecg.modules.advert.service.IOpChannelSubAccountService;
+import org.jeecg.modules.advert.service.IOpChannelTypeService;
 import org.jeecg.modules.advert.service.IOpCostService;
 import org.jeecg.modules.advert.service.IOpChannelService;
 import org.jeecg.modules.advert.service.IOpDealService;
@@ -38,6 +42,8 @@ public class AdvertApiImpl implements IAdvertApi {
     private IOpDealService opDealService;
     @Resource
     private IOpChannelService opChannelService;
+    @Resource
+    private IOpChannelTypeService opChannelTypeService;
     @Resource
     private IAtUniqueService atUniqueService;
     @Resource
@@ -69,6 +75,17 @@ public class AdvertApiImpl implements IAdvertApi {
         OpChannelModel opChannelModel = new OpChannelModel();
         BeanUtils.copyProperties(opChannel, opChannelModel);
         return opChannelModel;
+    }
+
+    @Override
+    public OpChannelTypeModel getOpChannelType(Integer id) {
+        OpChannelType opChannelType = opChannelTypeService.getById(id);
+        if (null == opChannelType) {
+            return null;
+        }
+        OpChannelTypeModel opChannelTypeModel = new OpChannelTypeModel();
+        BeanUtils.copyProperties(opChannelType, opChannelTypeModel);
+        return opChannelTypeModel;
     }
 
     @Override
@@ -112,6 +129,11 @@ public class AdvertApiImpl implements IAdvertApi {
             BeanUtils.copyProperties(opChannelSubAccount, result);
         }
         return result;
+    }
+
+    @Override
+    public List<CostModel> getCostModel(OpCostDto opCostDto) {
+        return opCostService.getCostModel(opCostDto);
     }
 
 }

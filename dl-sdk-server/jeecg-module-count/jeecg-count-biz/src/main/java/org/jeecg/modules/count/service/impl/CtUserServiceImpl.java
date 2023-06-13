@@ -30,6 +30,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.advert.vo.OpChannelModel;
+import org.jeecg.common.advert.vo.OpChannelSubAccountModel;
+import org.jeecg.common.advert.vo.OpChannelTypeModel;
 import org.jeecg.common.advert.vo.OpDealModel;
 import org.jeecg.common.constant.CloseTypeConstant;
 import org.jeecg.common.constant.RuleTypeConstant;
@@ -41,6 +43,7 @@ import org.jeecg.common.function.vo.GetNameByIdVo;
 import org.jeecg.common.game.api.IAdvertApi;
 import org.jeecg.common.game.api.IGameApi;
 import org.jeecg.common.game.vo.OpGameModel;
+import org.jeecg.common.game.vo.OpPkgModel;
 import org.jeecg.common.game.vo.OpSubGameModel;
 import org.jeecg.common.kafka.dto.ParseAliveDto;
 import org.jeecg.common.kafka.dto.ParseLoginDto;
@@ -147,14 +150,7 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
         return list;
     }
 
-    /**
-     * @param getNameByIdDto
-     * @return org.jeecg.common.function.vo.GetNameByIdVo
-     * @Author lili
-     * @Description 通过id得到名称（游戏，子游戏，渠道游戏包，广告）
-     * @Date 16:17 2023/5/9
-     **/
-    private GetNameByIdVo getNameById(GetNameByIdDto getNameByIdDto) {
+    public GetNameByIdVo getNameById(GetNameByIdDto getNameByIdDto) {
         if (null == getNameByIdDto.getId() || null == getNameByIdDto.getType()) {
             throw new JeecgBootException("参数不全");
         }
@@ -163,15 +159,25 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
         if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.GAME)) {
             OpGameModel opGame = gameApi.getOpGame(getNameByIdDto.getId());
             name = opGame.getGameName();
-        }else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.SUB_GAME)) {
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.SUB_GAME)) {
             OpSubGameModel opSubGame = gameApi.getOpSubGame(getNameByIdDto.getId());
             name = opSubGame.getGameName();
-        }else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.DEAL)) {
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.DEAL)) {
             OpDealModel opDealModel = advertApi.getOpDeal(getNameByIdDto.getId());
             name = opDealModel.getDealName();
-        }else {
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.CHANNEL)) {
             OpChannelModel opChannelModel = advertApi.getOpChannel(getNameByIdDto.getId());
             name = opChannelModel.getChannelName();
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.PKG)) {
+            OpPkgModel opPkgModel = gameApi.getOpPkgById(getNameByIdDto.getId());
+            name = opPkgModel.getPkgName();
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.CHANNEL_TYPE)) {
+            OpChannelTypeModel opChannelTypeModel = advertApi.getOpChannelType(getNameByIdDto.getId());
+            name = opChannelTypeModel.getTypeName();
+        } else if (Objects.equals(getNameByIdDto.getType(), RuleTypeConstant.SUB_CHANNEL)) {
+            OpChannelSubAccountModel opChannelSubAccount = advertApi.getOpChannelSubAccount(
+                getNameByIdDto.getId());
+            name = opChannelSubAccount.getSubAccountName();
         }
         getNameByIdVo.setName(name);
         return getNameByIdVo;
@@ -435,7 +441,7 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        q.ne("a.pay_time", "0000-00-00 00:00:00");
+        q.apply("a.pay_time is not null");
         if (Objects.equals(payUserDto.getType(), PayUserType.ADD_PAY_USER)) {
             q.apply(
                 "DATE_FORMAT(a.first_pay_time,'%m-%d-%Y') = DATE_FORMAT(a.register_time,'%m-%d-%Y')");
@@ -451,8 +457,6 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
                 if (null != payUserVo.getRegisterTime() && (
                     DateUtils.getTimestamp(payUserVo.getRegisterTime()).getTime()
                         < DateUtils.str3Timestamp(minTime).getTime())) {
-//                    SimpleDateFormat dateSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                    minTime = dateSdf.format(payUserVo.getRegisterTime());
                     minTime = DateUtils.date2Str(payUserVo.getRegisterTime(),
                         DateUtils.datetimeFormat.get());
                 }
@@ -547,7 +551,7 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        q.ne("a.pay_time", "0000-00-00 00:00:00");
+        q.apply("a.pay_time is not null");
         if (Objects.equals(payUserDto.getType(), PayUserType.ADD_PAY_USER)) {
             q.apply(
                 "DATE_FORMAT(a.first_pay_time,'%m-%d-%Y') = DATE_FORMAT(a.register_time,'%m-%d-%Y')");

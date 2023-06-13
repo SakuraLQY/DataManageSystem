@@ -18,7 +18,7 @@ enum Api {
  * 导出api
  * @param params
  */
-export const getExportUrl = Api.exportXls;
+export const getExportUrl =Api.exportXls;
 
 /**
  * 导入api

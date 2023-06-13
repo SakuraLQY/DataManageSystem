@@ -7,16 +7,23 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.jeecg.common.constant.enums.PayTypeEnum;
 import org.jeecg.common.exception.JeecgBootException;
 import org.apache.commons.lang3.StringUtils;
-import org.jeecg.modules.count.bo.GetOrderRateBo;
+import org.jeecg.common.util.DateUtil;
+import org.jeecg.modules.count.bo.GetOrderGroupBo;
 import org.jeecg.modules.count.bo.OrderDateGroupBo;
+import org.jeecg.modules.count.bo.OrderMoneyGroupRegTimeCreateTimeBo;
+import org.jeecg.modules.count.bo.OrderNumGroupRegTimeCreateTimeBo;
 import org.jeecg.modules.count.constant.enums.SummaryEnum;
 import org.jeecg.modules.count.bo.OrderMoneyGroupBo;
 import org.jeecg.modules.count.vo.OrderDateGroupRateVo;
@@ -26,8 +33,8 @@ import org.jeecg.common.kafka.dto.ParsePayDto;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.count.dto.OrderDetailDto;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.count.bo.summary.SummaryOrderBo;
-import org.jeecg.modules.count.bo.summary.SummaryOrderDevBo;
+import org.jeecg.modules.count.bo.SummaryOrderBo;
+import org.jeecg.modules.count.bo.SummaryOrderDevBo;
 import org.jeecg.modules.count.entity.CtDevice;
 import org.jeecg.modules.count.entity.CtOrder;
 import org.jeecg.modules.count.entity.CtRole;
@@ -178,26 +185,69 @@ public class CtOrderServiceImpl extends ServiceImpl<CtOrderMapper, CtOrder> impl
     }
 
     @Override
-    public List<OrderMoneyGroupRateVo> getFirstMoneyGroup(GetOrderRateBo getOrderRateBo) {
+    public List<OrderMoneyGroupRateVo> getFirstMoneyGroup(GetOrderGroupBo getOrderGroupBo) {
         QueryWrapper<CtOrder> wrapper = new QueryWrapper<>();
-        groupSelectWrapper(getOrderRateBo, wrapper);
+        groupSelectWrapper(getOrderGroupBo, wrapper);
         wrapper.apply("DATE(a.create_time) = DATE(a.user_create_time)");
         return getMoneyGroup(wrapper);
     }
 
     @Override
-    public List<OrderMoneyGroupRateVo> getAliveMoneyGroup(GetOrderRateBo getOrderRateBo) {
+    public List<OrderMoneyGroupRateVo> getAliveMoneyGroup(GetOrderGroupBo getOrderGroupBo) {
         QueryWrapper<CtOrder> wrapper = new QueryWrapper<>();
-        groupSelectWrapper(getOrderRateBo, wrapper);
+        groupSelectWrapper(getOrderGroupBo, wrapper);
         return getMoneyGroup(wrapper);
     }
 
     @Override
-    public List<OrderDateGroupRateVo> getRegDateGroup(GetOrderRateBo getOrderRateBo) {
+    public List<OrderDateGroupRateVo> getRegDateGroup(GetOrderGroupBo getOrderGroupBo) {
         QueryWrapper<CtOrder> wrapper = new QueryWrapper<>();
-        groupSelectWrapper(getOrderRateBo, wrapper);
+        groupSelectWrapper(getOrderGroupBo, wrapper);
         return getDateGroup(wrapper);
     }
+
+    @Override
+    public Map<String, Integer> getNumGroupRegTimeCreateTime(GetOrderGroupBo getOrderGroupBo) {
+        Map<String, Integer> result = new HashMap();
+        QueryWrapper queryWrapper = new QueryWrapper();
+        groupRegTimeCreateTimeSelectWrapper(getOrderGroupBo, queryWrapper);
+        List<OrderNumGroupRegTimeCreateTimeBo> orderNumGroupRegTimeCreateTimeBos = baseMapper.selectNumGroupRegTimeCreateTime(
+            queryWrapper);
+        for (OrderNumGroupRegTimeCreateTimeBo orderNumGroupRegTimeCreateTimeBo : orderNumGroupRegTimeCreateTimeBos) {
+            Integer dateDiff = DateUtils.dateToDiff('d',
+                orderNumGroupRegTimeCreateTimeBo.getCreateTime(),
+                orderNumGroupRegTimeCreateTimeBo.getUserCreateTime()
+            );
+            if (dateDiff > 0) {
+                result.put(DateUtils.date2Str(orderNumGroupRegTimeCreateTimeBo.getUserCreateTime(),
+                        DateUtils.date_sdf.get()) + "-" + dateDiff,
+                    orderNumGroupRegTimeCreateTimeBo.getNum());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, BigDecimal> getMoneyGroupRegTimeCreateTime(GetOrderGroupBo getOrderGroupBo) {
+        Map<String, BigDecimal> result = new HashMap();
+        QueryWrapper queryWrapper = new QueryWrapper();
+        groupRegTimeCreateTimeSelectWrapper(getOrderGroupBo, queryWrapper);
+        List<OrderMoneyGroupRegTimeCreateTimeBo> orderNumGroupRegTimeCreateTimeBos = baseMapper.selectMoneyGroupRegTimeCreateTime(
+            queryWrapper);
+        for (OrderMoneyGroupRegTimeCreateTimeBo orderMoneyGroupRegTimeCreateTimeBo : orderNumGroupRegTimeCreateTimeBos) {
+            Integer dateDiff = DateUtils.dateToDiff('d',
+                orderMoneyGroupRegTimeCreateTimeBo.getCreateTime(),
+                orderMoneyGroupRegTimeCreateTimeBo.getUserCreateTime());
+            if (dateDiff > 0) {
+                result.put(
+                    DateUtils.date2Str(orderMoneyGroupRegTimeCreateTimeBo.getUserCreateTime(),
+                        DateUtils.date_sdf.get()) + "-" + dateDiff,
+                    orderMoneyGroupRegTimeCreateTimeBo.getMoney());
+            }
+        }
+        return result;
+    }
+
 
     /**
      * @param wrapper
@@ -229,7 +279,7 @@ public class CtOrderServiceImpl extends ServiceImpl<CtOrderMapper, CtOrder> impl
     }
 
     private List<OrderDateGroupRateVo> getDateGroup(QueryWrapper<CtOrder> wrapper) {
-        wrapper.groupBy("a.user_create_time");
+        wrapper.groupBy("DATE(a.user_create_time)");
         List<OrderDateGroupRateVo> result = new ArrayList<>();
         List<OrderDateGroupBo> orderDateGroupBoList = baseMapper.selectDateGroup(wrapper);
         if (CollectionUtil.isNotEmpty(orderDateGroupBoList)) {
@@ -252,32 +302,104 @@ public class CtOrderServiceImpl extends ServiceImpl<CtOrderMapper, CtOrder> impl
     }
 
     /**
-     * @param getOrderRateBo
+     * @param getOrderGroupBo
      * @param wrapper
      * @author chenyw
      * @description 分布图统一queryWrapper
      * @date 19:17 2023/5/12/012
      **/
-    private void groupSelectWrapper(GetOrderRateBo getOrderRateBo, QueryWrapper<CtOrder> wrapper) {
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getGameId()), "a.game_id",
-            getOrderRateBo.getGameId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getSubGameId()), "a.sub_game_id",
-            getOrderRateBo.getSubGameId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getPkgId()), "a.pkg_id",
-            getOrderRateBo.getPkgId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getDealId()), "a.deal_id",
-            getOrderRateBo.getDealId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getChannelTypeId()), "a.channel_type_id",
-            getOrderRateBo.getChannelTypeId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getChannelId()), "a.channel_id",
-            getOrderRateBo.getChannelId());
-        wrapper.in(oConvertUtils.isNotEmpty(getOrderRateBo.getChannelSubAccountId()),
-            "a.channel_sub_account_id",
-            getOrderRateBo.getChannelSubAccountId());
-        wrapper.ge(oConvertUtils.isNotEmpty(getOrderRateBo.getRegStartTime()), "a.create_time",
-            getOrderRateBo.getRegStartTime());
-        wrapper.le(oConvertUtils.isNotEmpty(getOrderRateBo.getRegEndTime()), "a.create_time",
-            getOrderRateBo.getRegEndTime());
+    private void groupSelectWrapper(GetOrderGroupBo getOrderGroupBo,
+        QueryWrapper<CtOrder> wrapper) {
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getGameId()), "a.game_id",
+            getOrderGroupBo.getGameId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getSubGameId()), "a.sub_game_id",
+            getOrderGroupBo.getSubGameId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getPkgId()), "a.pkg_id",
+            getOrderGroupBo.getPkgId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getDealId()), "a.deal_id",
+            getOrderGroupBo.getDealId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelTypeId()),
+            "a.channel_type_id", getOrderGroupBo.getChannelTypeId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelId()), "a.channel_id",
+            getOrderGroupBo.getChannelId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelSubAccountId()),
+            "a.channel_sub_account_id", getOrderGroupBo.getChannelSubAccountId());
+        wrapper.ge(oConvertUtils.isNotEmpty(getOrderGroupBo.getRegStartTime()), "a.create_time",
+            getOrderGroupBo.getRegStartTime());
+        wrapper.le(oConvertUtils.isNotEmpty(getOrderGroupBo.getRegEndTime()), "a.create_time",
+            getOrderGroupBo.getRegEndTime());
+    }
+
+    /**
+     * @param getOrderGroupBo
+     * @param wrapper
+     * @author chenyw
+     * @description 统一构造器 查询按创建时间和注册时间归类的订单
+     * @date 15:02 2023/5/17/017
+     **/
+    private void groupRegTimeCreateTimeSelectWrapper(GetOrderGroupBo getOrderGroupBo,
+        QueryWrapper<CtOrder> wrapper) {
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getGameId()), "a.game_id",
+            getOrderGroupBo.getGameId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getSubGameId()), "a.sub_game_id",
+            getOrderGroupBo.getSubGameId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getPkgId()), "a.pkg_id",
+            getOrderGroupBo.getPkgId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getDealId()), "a.deal_id",
+            getOrderGroupBo.getDealId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelTypeId()),
+            "a.channel_type_id", getOrderGroupBo.getChannelTypeId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelId()), "a.channel_id",
+            getOrderGroupBo.getChannelId());
+        wrapper.in(oConvertUtils.isNotEmpty(getOrderGroupBo.getChannelSubAccountId()),
+            "a.channel_sub_account_id", getOrderGroupBo.getChannelSubAccountId());
+        Date start = DateUtils.str2Date(getOrderGroupBo.getRegStartTime(),
+            DateUtils.date_sdf.get());
+        Date end = DateUtils.str2Date(getOrderGroupBo.getRegEndTime(), DateUtils.date_sdf.get());
+        // 相差的天数
+        int diffDays = DateUtils.dateToDiff('d', end, start);
+        for (int i = 0; i <= diffDays; i++) {
+            String date = DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(),
+                "yyyy-MM-dd", i);
+            String date1 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i)
+                    + " 00:00:00";
+            String date2 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 6)
+                    + " 23:59:59";
+            String date3 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 14)
+                    + " 00:00:00";
+            String date4 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 14)
+                    + " 23:59:59";
+            String date5 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 29)
+                    + " 00:00:00";
+            String date6 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 29)
+                    + " 23:59:59";
+            String date7 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 44)
+                    + " 00:00:00";
+            String date8 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 44)
+                    + " 23:59:59";
+            String date9 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 59)
+                    + " 00:00:00";
+            String date10 =
+                DateUtils.formatAddDate(getOrderGroupBo.getRegStartTime(), "yyyy-MM-dd", i + 59)
+                    + " 23:59:59";
+            wrapper.or(w1 -> w1.eq("DATE(a.user_create_time)", date).and(
+                w2 -> w2.between("a.create_time", date1, date2)
+                    .or(w3 -> w3.between("a.create_time", date3, date4))
+                    .or(w3 -> w3.between("a.create_time", date5, date6))
+                    .or(w3 -> w3.between("a.create_time", date7, date8))
+                    .or(w3 -> w3.between("a.create_time", date9, date10))
+            ));
+        }
+        wrapper.groupBy("a.user_create_time, a.create_time");
     }
 
     /**

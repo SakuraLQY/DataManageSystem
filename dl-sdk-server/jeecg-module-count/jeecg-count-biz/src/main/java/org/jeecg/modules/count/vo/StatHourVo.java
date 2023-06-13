@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 /**
- * @description: TODO
+ * @description: 合作数据
  * @author: chenglin
  * @date: 2023年05月29日 10:54
  */

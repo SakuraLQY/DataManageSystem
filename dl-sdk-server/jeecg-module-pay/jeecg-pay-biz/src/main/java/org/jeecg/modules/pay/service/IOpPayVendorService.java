@@ -2,8 +2,6 @@ package org.jeecg.modules.pay.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import org.jeecg.modules.pay.bo.AlipayConf;
 import org.jeecg.modules.pay.entity.OpPayVendor;
 
 /**
@@ -29,4 +27,12 @@ public interface IOpPayVendorService extends IService<OpPayVendor> {
      * @param ids: ID集合
      */
     void deleteIds(List<String> ids);
+
+    /**
+     * @author xmh
+     * @description 添加
+     * @date 2023/6/12 11:46
+     * @param opPayVendor: 支付渠道
+     */
+    void insert(OpPayVendor opPayVendor);
 }

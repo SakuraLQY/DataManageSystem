@@ -176,9 +176,14 @@ public class StatDealController extends JeecgController<StatDeal, IStatDealServi
         return super.exportXls(request, statDeal, StatDeal.class, "stat_deal");
     }
 
+	/**@param statDealDto
+	 * @author chenglin
+	 * @description 自定义导出功能
+	 * @date 17:20 2023/5/30
+	 **/
 	@RequestMapping(value = "/exportExcel")
-	public ModelAndView exportExcel(HttpServletRequest request,StatDealVo statDealVo,StatDealDto statDealDto){
-		return statDealService.exportExcel(request,statDealVo,statDealDto,StatDealVo.class,"stat_deal");
+	public ModelAndView exportExcel(HttpServletRequest request,StatDealDto statDealDto){
+		return statDealService.exportExcel(request,statDealDto,StatDealVo.class,"Stat数据表");
 	}
     /**
       * 通过excel导入数据

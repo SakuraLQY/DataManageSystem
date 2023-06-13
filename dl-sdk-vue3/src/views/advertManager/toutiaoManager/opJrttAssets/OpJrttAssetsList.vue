@@ -9,7 +9,7 @@
               <a-input placeholder="请输入资产名" v-model:value="queryParam.assetName" maxLength="20" allowClear/>
             </a-form-item>
           </a-col>
-          <PkgOptionMoreSelect ref="selectForm" @handler="getGameVal" :disabled="disabled"></PkgOptionMoreSelect>
+          <PkgOptionMoreSelect ref="selectForm" @handler="getGameVal" :disabled="disabled" :initData="[4,5]"></PkgOptionMoreSelect>
           <template v-if="toggleSearchStatus">
             <a-col :lg="8">
               <a-form-item label="投放账号">

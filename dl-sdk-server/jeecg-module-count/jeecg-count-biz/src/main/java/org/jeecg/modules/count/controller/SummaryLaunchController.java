@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.count.modal.SummaryLaunchModal;
 import org.jeecg.modules.count.vo.SummaryLaunchVo;
 import org.jeecg.modules.count.service.ISummaryLaunchService;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description: 数据投放
@@ -93,5 +95,15 @@ public class SummaryLaunchController extends
         return Result.OK("批量删除成功!");
     }
 
+    /**@param summaryLaunchDto
+     * @author chenglin
+     * @description 投放数据导出
+     * @date 14:06 2023/6/13
+     **/
+    @ApiOperation(value = "数据投放数据展示", notes = "数据投放-列表查询")
+    @GetMapping(value = "exportExcel")
+    public ModelAndView exportExcel(HttpServletRequest request,SummaryLaunchDto summaryLaunchDto){
+        return summaryLaunchService.exportExcel(request,summaryLaunchDto, SummaryLaunchModal.class,"数据投放表");
+    }
 
 }

@@ -42,9 +42,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
+        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="exportXlS"> 导出</a-button>
+        <!-- <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -94,6 +94,7 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import GameThirdSingleOptionForm from '/@/views/common/gameThirdSingleOptionForm.vue';
   import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
+  import { useMethods } from '/@/hooks/system/useMethods';
   const queryParam = ref<any>({showType:'detail',startTime:formatToDate(new Date()),endTime:formatToDate(new Date())});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
@@ -115,6 +116,7 @@
       columns,
       canResize:false,
       useSearchForm: false,
+      showActionColumn:false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -158,6 +160,17 @@
     registerModal.value.edit(record);
   }
    
+    //导入导出方法
+ const { handleExportXls, handleImportXls } = useMethods();
+
+/**
+ * 导出事件
+ */
+function exportXlS() {
+  return handleExportXls( "渠道明细表", "/count/channelDetails/exportExcel", queryParam.value);
+
+}
+
   /**
    * 详情
    */

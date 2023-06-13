@@ -102,7 +102,38 @@ public class OpCost implements Serializable {
 	@Excel(name = "成本-描述", width = 15)
     @ApiModelProperty(value = "成本-描述")
     private java.lang.String costDesc;
-	/**创建-时间*/
+    /**主播id*/
+    @Excel(name = "主播id", width = 15)
+    @ApiModelProperty(value = "主播id")
+    private java.lang.String anchorPlanId;
+    @Excel(name = "直播间观看人数", width = 15)
+    @ApiModelProperty(value = "直播间观看人数")
+    private java.lang.Integer lubanLiveEnterCnt;
+    /**超过1分钟观看数*/
+    @Excel(name = "超过1分钟观看数", width = 15)
+    @ApiModelProperty(value = "超过1分钟观看数")
+    private java.lang.Integer liveWatchOneMinuteCount;
+    /**直播间打赏次数*/
+    @Excel(name = "直播间打赏次数", width = 15)
+    @ApiModelProperty(value = "直播间打赏次数")
+    private java.lang.Integer lubanLiveGiftCnt;
+    /**直播间评论数*/
+    @Excel(name = "直播间评论数", width = 15)
+    @ApiModelProperty(value = "直播间评论数")
+    private java.lang.Integer lubanLiveCommentCnt;
+    /**直播间关注数*/
+    @Excel(name = "直播间关注数", width = 15)
+    @ApiModelProperty(value = "直播间关注数")
+    private java.lang.Integer lubanLiveFollowCnt;
+    /**直播间加入粉丝团*/
+    @Excel(name = "直播间加入粉丝团", width = 15)
+    @ApiModelProperty(value = "直播间加入粉丝团")
+    private java.lang.Integer liveFansClubJoinCnt;
+    /**直播间分享数*/
+    @Excel(name = "直播间分享数", width = 15)
+    @ApiModelProperty(value = "直播间分享数")
+    private java.lang.Integer lubanLiveShareCnt;
+    /**创建-时间*/
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @ApiModelProperty(value = "创建-时间")

@@ -12,13 +12,13 @@
           <PkgOptionMoreSelect ref="selectForm" @handler="getGameVal" :disabled="disabled"></PkgOptionMoreSelect>
           <a-col :lg="8">
             <a-form-item label="游戏版本">
-              <a-input placeholder="请输入游戏版本" v-model:value="queryParam.gameVersion"></a-input>
+              <a-input placeholder="请输入游戏版本" v-model:value="queryParam.gameVersion" allowClear></a-input>
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :lg="8">
               <a-form-item label="游戏构建">
-                <a-input placeholder="请输入游戏构建" v-model:value="queryParam.gameBuild"></a-input>
+                <a-input placeholder="请输入游戏构建" v-model:value="queryParam.gameBuild" allowClear></a-input>
               </a-form-item>
             </a-col>
           </template>

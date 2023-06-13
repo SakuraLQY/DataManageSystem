@@ -421,7 +421,8 @@ third-app:
       client-secret: ??
       agent-id: ??
 
-list-retry-seconds: 15,15,30,30,60
+order:
+  retryTimes: 32
 # 微信支付轮询查单
 list-wechat-seconds: 30,60,180,600,1800,3600
 

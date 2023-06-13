@@ -13,6 +13,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.game.bo.GameSelectModal;
 import org.jeecg.modules.game.entity.OpPkg;
 import org.jeecg.modules.game.service.IOpPkgService;
 
@@ -58,15 +59,17 @@ public class OpPkgController extends JeecgController<OpPkg, IOpPkgService> {
     private IOpPkgService opPkgService;
 
     /**
+     * @return Result<List < Map < String, Object>>>
      * @author xmh
      * @description 获取指定渠道游戏包
      * @date 2023/2/14 14:35
-     * @return Result<List<Map<String,Object>>>
      */
-    @ApiOperation(value="获取指定渠道游戏包", notes="获取指定渠道游戏包")
+    @ApiOperation(value = "获取指定渠道游戏包", notes = "获取指定渠道游戏包")
     @GetMapping(value = "/option")
-    public Result<List<Map<String, Object>>> getJrttPkg(@RequestParam(name = "gameId", required = false)Integer gameId,
-                                @RequestParam(name = "subGameId", required = false)Integer subGameId, @RequestParam(name = "channelId", required = false)Integer channelId){
+    public Result<List<Map<String, Object>>> getJrttPkg(
+        @RequestParam(name = "gameId", required = false) Integer gameId,
+        @RequestParam(name = "subGameId", required = false) Integer subGameId,
+        @RequestParam(name = "channelId", required = false) Integer channelId) {
         List<Map<String, Object>> result = opPkgService.getJrttPkg(gameId, subGameId, channelId);
         return Result.ok(result);
     }
@@ -104,8 +107,9 @@ public class OpPkgController extends JeecgController<OpPkg, IOpPkgService> {
      **/
     @ApiOperation(value = "op_pkg-列表查询", notes = "op_pkg-列表查询")
     @GetMapping(value = "/getOptionList")
-    public Result<List<SubAndOpPackGameVo>> optionList(Integer type) {
-        List<SubAndOpPackGameVo> list = opPkgService.getOptionList(type);
+    public Result<List<SubAndOpPackGameVo>> optionList(
+        GameSelectModal gameSelectModal) {
+        List<SubAndOpPackGameVo> list = opPkgService.getOptionList(gameSelectModal);
         return Result.OK(list);
     }
 

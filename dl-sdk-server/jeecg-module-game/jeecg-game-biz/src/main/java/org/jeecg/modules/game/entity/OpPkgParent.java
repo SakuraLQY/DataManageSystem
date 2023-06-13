@@ -38,11 +38,13 @@ public class OpPkgParent implements Serializable {
     private Integer id;
 	/**游戏id*/
 	@Excel(name = "游戏id", width = 15)
+    @Dict(dictTable = "open_gateway.op_game", dicText = "game_name", dicCode = "id")
     @ApiModelProperty(value = "游戏id")
     private Integer gameId;
 	/**子游戏id*/
 	@Excel(name = "子游戏id", width = 15)
     @ApiModelProperty(value = "子游戏id")
+    @Dict(dictTable = "open_gateway.op_sub_game", dicText = "game_name", dicCode = "id")
     private Integer subGameId;
 	/**apk文件名*/
 	@Excel(name = "apk文件名", width = 15)

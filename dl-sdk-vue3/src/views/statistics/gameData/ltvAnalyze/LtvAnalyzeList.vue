@@ -7,11 +7,7 @@
           <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
-            <a-col :lg="8">
-            <a-form-item label="广告列表">
-              <j-search-select placeholder="请选择广告" v-model:value="queryParam.dealId"  dict="open_gateway.op_deal,deal_name,id" allowClear />
-            </a-form-item>
-          </a-col>
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="日期">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择起始日期" v-model:value="queryParam.startTime" />
@@ -48,9 +44,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
         <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -102,11 +98,15 @@
   import { useMethods } from '/@/hooks/system/useMethods';
   import {formatToDate } from '/@/utils/dateUtil';
   import {formatToDates } from '/@/utils/dateUtil';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   const lineMultiData = ref([]);
   const queryParam = ref<any>({startTime:formatToDates(new Date()),endTime:formatToDate(new Date())});
   //查询游戏、渠道等用来联动的
   const selectGameForm= ref();
   const selectChannelForm= ref();
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   let getGameVal = (e: any) => {
     queryParam.value.gameId = e.gameId;
     queryParam.value.subGameId = e.subGameId;

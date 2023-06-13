@@ -7,18 +7,26 @@
   import { basicProps } from './props';
   import { queryList } from '../CtDailySummary.api';
   import { Item } from '../CtDailySummary.data';
+
   
   const params = inject('params');
+  const dailyData = inject('data');
 
-  const responseData = ref<Item[]>([]);
+  const responseData:any = ref([]);
+  responseData.value = dailyData;
+
+
+
+  
   //拿到今天和昨天的数据
-  const fetchData = async()=>{
-  const todayData = await queryList(params);
-  responseData.value = todayData;
-  }
+  // const fetchData = async()=>{
+  // const todayData = await queryList(params);
+  // responseData.value = todayData;
+  // }
   //Echart数据的展示
-  const ToDayData = ref<number[]>([]);
-  const yesterDayData = ref<number[]>([]);
+  const ToDayData = ref([]);
+  const yesterDayData = ref([]);
+  
   watch(responseData,(newData)=>{
       if(newData[0][0].level==='充值金额'){
         ToDayData.value = [ parseInt(newData[0][0].zeroHour), parseInt(newData[0][0].oneHour),parseInt(newData[0][0].twoHour), parseInt(newData[0][0].threeHour),parseInt(newData[0][0].fourHour),parseInt(newData[0][0].fiveHour), parseInt(newData[0][0].sixHour),
@@ -119,7 +127,7 @@
   });
   const chartRef = ref<HTMLDivElement | null>(null);
   const { setOptions } = useECharts(chartRef as Ref<HTMLDivElement>);
-onMounted(()=>{
-  fetchData()
-});
+// onMounted(()=>{
+//   fetchData()
+// });
 </script>    

@@ -4,12 +4,7 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <a-col :lg="8">
-            <a-form-item label="广告列表">
-              <j-search-select placeholder="请输入广告列表" v-model:value="queryParam.dealId" dict="open_gateway.op_deal,deal_name,id" allowClear/>
-            </a-form-item>
-          </a-col>
-
+          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <template v-if="toggleSearchStatus">
             <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
             <a-col :lg="8">
@@ -47,9 +42,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
+        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="exportXlS"> 导出</a-button>
+        <!-- <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -97,11 +92,14 @@
   import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import {formatToDate } from '/@/utils/dateUtil';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import { useMethods } from '/@/hooks/system/useMethods';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   const queryParam = ref<any>({startTime:formatToDate(new Date()),endTime:formatToDate(new Date()),type:'time_daily'});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
-
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   let columns:any = ref([
   {
     title: '日期',
@@ -535,7 +533,16 @@
     //刷新数据
     reload();
   }
-  
+
+    //导入导出方法
+ const { handleExportXls, handleImportXls } = useMethods();
+
+/**
+ * 导出事件
+ */
+function exportXlS() {
+  return handleExportXls("合作商数据-渠道", "/count/statHour/exportExcel", queryParam.value);
+}
 
 
 

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.util.List;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,7 +45,7 @@ public class CtDailySummary implements Serializable {
      */
     @Excel(name = "广告列表", width = 15)
     @ApiModelProperty(value = "广告列表")
-    private Integer dealId;
+    private Integer[] dealId;
     /**
      * 游戏项目
      */
@@ -68,7 +69,7 @@ public class CtDailySummary implements Serializable {
      */
     @Excel(name = "渠道类型", width = 15)
     @ApiModelProperty(value = "渠道类型")
-    private Integer[] channelTypeId;
+    private Integer[]channelTypeId;
     /**
      * 渠道名称
      */

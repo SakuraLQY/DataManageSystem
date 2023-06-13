@@ -24,53 +24,71 @@ spring:
     props:
       sql-show: true
     datasource:
-      names: ds0
+      names: ds0,ds1
       #添加分库数据源
       ds0:
         driverClassName: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://192.168.1.76:3306/open_gateway?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+        url: jdbc:mysql://192.168.1.76:3306/open_attribution?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+        username: root
+        password: "8SGoGgCnunJQRjBz"
+        type: com.alibaba.druid.pool.DruidDataSource
+      ds1:
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.1.76:3306/open_log?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
         username: root
         password: "8SGoGgCnunJQRjBz"
         type: com.alibaba.druid.pool.DruidDataSource
     # 规则配置
     rules:
       sharding:
-        # 分布式序列算法配置
-        key-generators:
-          snowflake:
-            type: SNOWFLAKE
         # 分片算法配置
         sharding-algorithms:
-          user-inline:
+          visit-inline:
             props:
-              algorithm-expression: op_user_$->{id % 8 + 1}
-            type: inline
-          role-inline:
+              sharding-count: '2'
+            type: HASH_MOD
+          unique-inline:
             props:
-              algorithm-expression: op_role_$->{user_id % 8 + 1}
+              sharding-count: '2'
+            type: HASH_MOD
+          login-inline:
+            props:
+              algorithm-expression: lg_login_$->{user_id % 2}
             type: inline
         tables:
           # 逻辑表名称
-          op_user:
+          at_visit:
             #配置具体表的数据节点
-            actual-data-nodes: ds0.op_user_$->{1..8}
+            actual-data-nodes: ds0.at_visit_$->{0..1}
             # 分表策略
             table-strategy:
               standard:
                 # 分片算法名称
-                sharding-algorithm-name: user-inline
+                sharding-algorithm-name: visit-inline
                 # 分片列名称(对应数据库字段)
-                sharding-column: id
-          op_role:
+                sharding-column: unique_id
+            # 逻辑表名称
+          at_unique:
             #配置具体表的数据节点
-            actual-data-nodes: ds0.op_role_$->{1..8}
+            actual-data-nodes: ds0.at_unique_$->{0..1}
             # 分表策略
             table-strategy:
               standard:
                 # 分片算法名称
-                sharding-algorithm-name: role-inline
+                sharding-algorithm-name: unique-inline
+                # 分片列名称(对应数据库字段)
+                sharding-column: unique_id
+          lg_login:
+            #配置具体表的数据节点
+            actual-data-nodes: ds1.lg_login_$->{0..1}
+            # 分表策略
+            table-strategy:
+              standard:
+                # 分片算法名称
+                sharding-algorithm-name: login-inline
                 # 分片列名称(对应数据库字段)
                 sharding-column: user_id
+
   servlet:
     multipart:
       max-file-size: 1000MB
@@ -192,12 +210,43 @@ spring:
           username: root
           password: "8SGoGgCnunJQRjBz"
           driver-class-name: com.mysql.cj.jdbc.Driver
+        open_countly:
+          url: jdbc:mysql://192.168.1.76:3306/open_countly?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          username: root
+          password: "8SGoGgCnunJQRjBz"
+          driver-class-name: com.mysql.cj.jdbc.Driver
   #redis 配置
   redis:
     database: 0
     host: localhost
     port: 6379
     password: ''
+  # Kafka 配置项，对应 KafkaProperties 配置类
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
+    # Kafka Producer 配置项
+    producer:
+      acks: 1 # 0-不应答。1-leader 应答。all-所有 leader 和 follower 应答。
+      retries: 3 # 发送失败时，重试发送的次数
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer # 消息的 key 的序列化
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # 消息的 value 的序列化
+    # Kafka Consumer 配置项
+    consumer:
+      group-id: idealighter
+      auto-offset-reset: earliest # 设置消费者分组最初的消费进度为 earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: '*'
+      concurrency:
+        event-parse: 1
+  task:
+    scheduling:
+      pool:
+        size: 20
 #mybatis plus 设置
 mybatis-plus:
   mapper-locations: classpath*:org/jeecg/modules/**/xml/*Mapper.xml
@@ -243,8 +292,9 @@ jeecg:
     packMaterialFolder: packMaterial
     # 渠道素材文件夹
     materialFolder: material
+    pkgDealFolder: pkgDeal
   shiro:
-    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sdk/**,/game/opPackMaterial/readPhoto,/advert/opMaterial/upload,/advert/opMaterial/read,/opputaccount/opJrttPutAccount/callback,/advert/opKsPutAccount/callback
+    excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**,/category/**,/visual/**,/map/**,/jmreport/bigscreen2/**,/sdk/**,/game/opPackMaterial/readPhoto,/advert/opMaterial/upload,/advert/opMaterial/read,/opputaccount/opJrttPutAccount/callback,/advert/opKsPutAccount/callback,/pay/ali/backend,/advert/jrttVisit/click
   #阿里云oss存储和大鱼短信秘钥配置
   oss:
     accessKey: LTAI7oSSKqvSOJxW
@@ -296,15 +346,15 @@ jeecg:
 #sdk配置
 sdk:
   isDebug: true
-  checkUrls: /sdk/user/*,/sdk/pay/**,/sdk/ios/verifyReceipt
+  checkUrls: /sdk/user/*,/sdk/pay/**,/sdk/ios/verifyReceipt,/sdk/ios/getZtList
   checkPostUrls:
   loginSessionSalt: 346c2844386d77463ae227063f2c2b9e
   iosJumpUrl: /sdk/ios/jump
-  aliH5OpenUrl: /sdk/pay/open #支付宝支付地址
-  wxH5OpenUrl: /sdk/pay/open #微信支付地址
-  aliIcon: http://ali.icon #支付宝图标
-  wxIcon: http://wx.icon #微信图标
-  packToolPath: D:\workspace\remote\dl-sdk\dl-sdk-server\packtool\script
+  aliH5OpenUrl: /sdk/pay/alipay/h5/open #支付宝支付地址
+  wxH5OpenUrl: /sdk/pay/wechat/app/open #微信支付地址
+  aliIcon: http://gw.szml.booona.com/static/img/alipay.png #支付宝图标
+  wxIcon: http://gw.szml.booona.com/static/img/wxpay.png #微信图标
+  packToolPath: /data/dl-sdk/dl-sdk-server/server/packtool/script
 #cas单点登录
 cas:
   prefixUrl: http://cas.example.org:8443/cas

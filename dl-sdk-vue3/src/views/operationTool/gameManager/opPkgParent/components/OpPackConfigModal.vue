@@ -32,7 +32,7 @@
    * @param record
    */
   function edit(record, gameName) {
-    title.value = '编辑';
+    title.value = '游戏打包配置';
     visible.value = true;
     nextTick(() => {
       registerForm.value.edit(record, gameName);

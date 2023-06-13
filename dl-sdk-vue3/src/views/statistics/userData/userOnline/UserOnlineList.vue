@@ -7,7 +7,7 @@
           <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
-            <a-col :lg="8">
+          <a-col :lg="8">
             <a-form-item label="归类方式">
               <j-search-select placeholder="请选择归类方式" v-model:value="queryParam.type"  dict="user_online_type" allowClear />
             </a-form-item>

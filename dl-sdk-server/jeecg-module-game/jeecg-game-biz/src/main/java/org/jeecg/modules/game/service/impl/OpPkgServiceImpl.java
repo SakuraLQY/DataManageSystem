@@ -24,6 +24,7 @@ import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.game.bo.ApkComment;
 import org.jeecg.config.JeecgBaseConfig;
 import org.jeecg.config.SdkConfig;
+import org.jeecg.modules.game.bo.GameSelectModal;
 import org.jeecg.modules.game.bo.PackConfig;
 import org.jeecg.common.constant.PackStateConstant;
 import org.jeecg.modules.game.entity.OpGame;
@@ -80,8 +81,12 @@ public class OpPkgServiceImpl extends ServiceImpl<OpPkgMapper, OpPkg> implements
     private OpSubGameMapper opSubGameMapper;
 
     @Override
-    public List<SubAndOpPackGameVo> getOptionList(Integer type) {
-        List<OpPkgVo> list = opPkgMapper.getList();
+    public List<SubAndOpPackGameVo> getOptionList(GameSelectModal gameSelectModal) {
+        QueryWrapper<OpPkg> wrapper = new QueryWrapper<>();
+        if (null != gameSelectModal.getChannelId() && !gameSelectModal.getChannelId().isEmpty()) {
+            wrapper.in("a.channel_id", gameSelectModal.getChannelId());
+        }
+        List<OpPkgVo> list = opPkgMapper.getList(wrapper);
         Map<Integer, Map<Integer, List<OpPkgVo>>> map = list.stream()
             .collect(Collectors.groupingBy(OpPkgVo::getGameId,
                 Collectors.groupingBy(OpPkgVo::getSubGameId)));
@@ -92,7 +97,7 @@ public class OpPkgServiceImpl extends ServiceImpl<OpPkgMapper, OpPkg> implements
             List<SubAndOpPackGameVo> subList = new ArrayList<>();
             for (Integer key2 : listOne.keySet()) {
                 List<OpPkgVo> listTwo = listOne.get(key2);
-                if (type == 0) {
+                if (gameSelectModal.getType() == 0) {
                     subAndOpPackGameVo.setLabel(listTwo.get(0).getGameName());
                 } else {
                     subAndOpPackGameVo.setTitle(listTwo.get(0).getGameName());
@@ -101,14 +106,14 @@ public class OpPkgServiceImpl extends ServiceImpl<OpPkgMapper, OpPkg> implements
                 SubAndOpPackGameVo subAndOpPackGameVo2 = new SubAndOpPackGameVo();
                 List<SubAndOpPackGameVo> pkgList = new ArrayList<>();
                 for (OpPkgVo opPkgVo : listTwo) {
-                    if (type == 0) {
+                    if (gameSelectModal.getType() == 0) {
                         subAndOpPackGameVo2.setLabel(opPkgVo.getSubGameName());
                     } else {
                         subAndOpPackGameVo2.setTitle(opPkgVo.getSubGameName());
                     }
                     subAndOpPackGameVo2.setValue("subGame" + key2);
                     SubAndOpPackGameVo subAndOpPackGameVo3 = new SubAndOpPackGameVo();
-                    if (type == 0) {
+                    if (gameSelectModal.getType() == 0) {
                         subAndOpPackGameVo3.setLabel(opPkgVo.getPkgName());
                     } else {
                         subAndOpPackGameVo3.setTitle(opPkgVo.getPkgName());
@@ -154,15 +159,17 @@ public class OpPkgServiceImpl extends ServiceImpl<OpPkgMapper, OpPkg> implements
                         GameObjVo gameObjVo = new GameObjVo();
                         gameObjVo.setId(opSubGameVo.getId());
                         gameObjVo.setGameName(opSubGameVo.getGameName());
-                        if (opPkgCollect.get(opGame.getId()).containsKey(opSubGameVo.getId())) {
-                            List<GameObjVo> gameVoList = new ArrayList<>();
-                            for (OpPkgVo osg : opPkgCollect.get(opGame.getId()).get(opSubGameVo.getId())) {
-                                GameObjVo gv = new GameObjVo();
-                                gv.setId(osg.getId());
-                                gv.setGameName(osg.getPkgName());
-                                gameVoList.add(gv);
+                        if (opPkgCollect.containsKey(opGame.getId())) {
+                            if (opPkgCollect.get(opGame.getId()).containsKey(opSubGameVo.getId())) {
+                                List<GameObjVo> gameVoList = new ArrayList<>();
+                                for (OpPkgVo osg : opPkgCollect.get(opGame.getId()).get(opSubGameVo.getId())) {
+                                    GameObjVo gv = new GameObjVo();
+                                    gv.setId(osg.getId());
+                                    gv.setGameName(osg.getPkgName());
+                                    gameVoList.add(gv);
+                                }
+                                gameObjVo.setList(gameVoList);
                             }
-                            gameObjVo.setList(gameVoList);
                         }
                         gameVoCollect.put(opSubGameVo.getId(), gameObjVo);
                     }
@@ -258,6 +265,11 @@ public class OpPkgServiceImpl extends ServiceImpl<OpPkgMapper, OpPkg> implements
         LambdaQueryWrapper<OpPkg> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OpPkg::getPackageName, packageName);
         return opPkgMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public OpPkg getPkgById(Integer pkgId) {
+        return getById(pkgId);
     }
 
     @Override

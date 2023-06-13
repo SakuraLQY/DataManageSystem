@@ -1,11 +1,13 @@
 package org.jeecg.modules.count.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.count.dto.DayHourDto;
+import org.jeecg.modules.count.vo.CtDayHourVo;
 import org.jeecg.modules.count.vo.CtDayhour;
 import org.jeecg.modules.count.service.ICtDayhourService;
 
@@ -58,12 +60,24 @@ public class CtDayhourController extends JeecgController<CtDayhour, ICtDayhourSe
         return Result.OK(pageList);
     }
 
-//	 @ApiOperation(value = "op_sub_game-下拉框列表查询", notes = "op_sub_game-下拉框列表查询")
+    //	 @ApiOperation(value = "op_sub_game-下拉框列表查询", notes = "op_sub_game-下拉框列表查询")
 //	 @GetMapping(value = "/optionList")
 //	public Result<Map<Integer,DayHourDto>>optionList(CtDayhour ctDayhour){
 //		Map<Integer,DayHourDto>pageList = ctDayhourService.optionList(ctDayhour);
 //		return Result.OK(pageList);
 //	}
+    /**@param dayHourDto
+     * @author chenglin
+     * @description 补充汇总
+     * @date 10:42 2023/6/7
+     **/
+    @ApiOperation(value = "ct_dayHour查询", notes = "ct_dayHour列表查询")
+    @GetMapping(value = "/queryList")
+    public Result<List<CtDayHourVo>> queryList(DayHourDto dayHourDto) {
+        List<CtDayHourVo> list = ctDayhourService.queryList(dayHourDto);
+        return Result.OK(list);
+    }
+
 
     /**
      * 添加

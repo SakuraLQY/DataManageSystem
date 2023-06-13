@@ -47,7 +47,7 @@ public class OnlineUserDto implements Serializable {
 	/**广告ID*/
     @ApiModelProperty(value = "广告ID")
     @Dict(dictTable = "open_gateway.op_deal", dicText = "deal_name", dicCode = "id")
-    private Integer dealId;
+    private List<Integer> dealId;
 	/**渠道类型id*/
     @ApiModelProperty(value = "渠道类型id")
     @Dict(dictTable = "open_gateway.op_channel_type", dicText = "type_name", dicCode = "id")

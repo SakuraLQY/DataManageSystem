@@ -16,7 +16,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="24">
-            <a-form-item label="子游戏名">
+            <a-form-item label="子游戏名" v-bind="validateInfos.subGameId">
               <a-select v-model:value="formData.subGameId" allowClear placeholder="请选择子游戏名" v-if="formData.gameId !=='' && formData.gameId !==undefined" :disabled="disabled">
                 <a-select-option
                   v-for="(gameItem,index) in faList[formData.gameId].list"
@@ -39,7 +39,7 @@
         </a-col>
         <a-col :span="24">
           <a-form-item label="母包备注" v-bind="validateInfos.parentDesc">
-            <a-textarea v-model:value="formData.parentDesc" placeholder="请输入母包备注" :disabled="disabled"></a-textarea>
+            <a-textarea v-model:value="formData.parentDesc" placeholder="请输入母包备注" :disabled="disabled" :maxlength="150"></a-textarea>
           </a-form-item>
         </a-col>
       </a-row>

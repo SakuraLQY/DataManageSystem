@@ -303,7 +303,6 @@
    * @param record
    */
   function supplementaryOrder(record) {
-    debugger;
     if (queryParam.value.sendStatus == 1) {
       title.value = '手动补单';
     } else {

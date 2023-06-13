@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.count.mapper.CtDailyMapper">
-  <resultMap id="SummaryDailyBo" type="org.jeecg.modules.count.bo.summary.SummaryDailyBo">
+  <resultMap id="SummaryDailyBo" type="org.jeecg.modules.count.bo.SummaryDailyBo">
     <id column="id" property="id"/>
     <id column="name" property="name"/>
     <id column="count_active" property="countActive"/>
@@ -103,108 +104,229 @@
     <id column="payback7" property="payback7"/>
   </resultMap>
 
+  <resultMap id="UserPayRateDailyBo" type="org.jeecg.modules.count.bo.UserPayRateDailyBo">
+    <id column="day" property="day"/>
+    <id column="deal_id" property="dealId"/>
+    <id column="game_name" property="gameName"/>
+    <id column="deal_name" property="dealName"/>
+    <id column="channel_name" property="channelName"/>
+    <id column="count_user" property="countUser"/>
+    <id column="first_payuser" property="firstPayuser"/>
+    <id column="first_money" property="firstMoney"/>
+    <id column="loyal2" property="loyal2"/>
+    <id column="loyal3" property="loyal3"/>
+    <id column="loyal4" property="loyal4"/>
+    <id column="loyal5" property="loyal5"/>
+    <id column="loyal6" property="loyal6"/>
+    <id column="loyal7" property="loyal7"/>
+    <id column="loyal15" property="loyal15"/>
+    <id column="loyal30" property="loyal30"/>
+    <id column="loyal45" property="loyal45"/>
+    <id column="loyal60" property="loyal60"/>
+  </resultMap>
+
+  <resultMap id="WeekReportDailyBo" type="org.jeecg.modules.count.bo.WeekReportDailyBo">
+    <id column="game_id" property="gameId"/>
+    <id column="sub_game_id" property="subGameId"/>
+    <id column="pkg_id" property="pkgId"/>
+    <id column="time_daily" property="timeDaily"/>
+    <id column="channel_type_id" property="channelTypeId"/>
+    <id column="channel_id" property="channelId"/>
+    <id column="channel_sub_account_id" property="channelSubAccountId"/>
+    <id column="count_user" property="countUser"/>
+    <id column="count_dau" property="countDau"/>
+    <id column="first_payuser" property="firstpayuser"/>
+    <id column="first_money" property="firstMoney"/>
+    <id column="first_money_ios" property="firstMoneyIos"/>
+    <id column="alive_money" property="aliveMoney"/>
+    <id column="alive_money_ios" property="aliveMoneyIos"/>
+    <id column="total_money" property="totalMoney"/>
+    <id column="total_money_ios" property="totalMoneyIos"/>
+    <id column="payback1" property="payback1"/>
+    <id column="payback2" property="payback2"/>
+    <id column="payback3" property="payback3"/>
+    <id column="payback4" property="payback4"/>
+    <id column="payback5" property="payback5"/>
+    <id column="payback6" property="payback6"/>
+    <id column="payback7" property="payback7"/>
+    <id column="payback7" property="payback8"/>
+    <id column="payback7" property="payback9"/>
+    <id column="payback7" property="payback10"/>
+    <id column="payback7" property="payback11"/>
+    <id column="payback7" property="payback12"/>
+    <id column="payback7" property="payback13"/>
+    <id column="payback7" property="payback14"/>
+    <id column="payback7" property="payback15"/>
+  </resultMap>
+
 
   <select id="getSummaryDaily" resultMap="SummaryDailyBo">
-    select
-      ${groupBy} as id,
-      ${groupName} as name,
-      sum(a.count_active) as count_active,
-      sum(a.count_active_dev) as count_active_dev,
-      sum(a.count_user) as count_user,
-      sum(a.count_user_dev) as count_user_dev,
-      sum(a.count_valid_user) as count_valid_user,
-      sum(a.count_valid_user_dev) as count_valid_user_dev,
-      sum(a.first_money) as first_money,
-      sum(a.first_money_dev) as first_money_dev,
-      sum(a.first_payuser) as first_payuser,
-      sum(a.first_payuser_dev) as first_payuser_dev,
-      sum(a.first_order) as first_order,
-      sum(a.first_order_dev) as first_order_dev,
-      sum(a.total_money) as total_money,
-      sum(a.total_payuser) as total_payuser,
-      sum(a.total_payuser_dev) as total_payuser_dev,
-      sum(a.count_dau) as count_dau,
-      sum(a.count_dau_dev) as count_dau_dev,
-      sum(a.alive_payuser) as alive_payuser,
-      sum(a.alive_payuser_dev) as alive_payuser_dev,
-      sum(a.alive_money) as alive_money,
-      sum(a.alive_money_dev) as alive_money_dev,
-      sum(a.alive_order) as alive_order,
-      sum(a.alive_order_dev) as alive_order_dev,
-      IFNULL(sum(l.day2),0) as loyal2,
-      IFNULL(sum(l.day3),0) as loyal3,
-      IFNULL(sum(l.day4),0) as loyal4,
-      IFNULL(sum(l.day5),0) as loyal5,
-      IFNULL(sum(l.day6),0) as loyal6,
-      IFNULL(sum(l.day7),0) as loyal7,
-      IFNULL(sum(ld.day2),0) as loyal2_dev,
-      IFNULL(sum(ld.day3),0) as loyal3_dev,
-      IFNULL(sum(ld.day4),0) as loyal4_dev,
-      IFNULL(sum(ld.day5),0) as loyal5_dev,
-      IFNULL(sum(ld.day6),0) as loyal6_dev,
-      IFNULL(sum(ld.day7),0) as loyal7_dev,
-      IFNULL(sum(p.day1),0) as payback1,
-      IFNULL(sum(p.day2),0) as payback2,
-      IFNULL(sum(p.day3),0) as payback3,
-      IFNULL(sum(p.day4),0) as payback4,
-      IFNULL(sum(p.day5),0) as payback5,
-      IFNULL(sum(p.day6),0) as payback6,
-      IFNULL(sum(p.day7),0) as payback7,
-      IFNULL(sum(pd.day1),0) as payback1_dev,
-      IFNULL(sum(pd.day2),0) as payback2_dev,
-      IFNULL(sum(pd.day3),0) as payback3_dev,
-      IFNULL(sum(pd.day4),0) as payback4_dev,
-      IFNULL(sum(pd.day5),0) as payback5_dev,
-      IFNULL(sum(pd.day6),0) as payback6_dev,
-      IFNULL(sum(pd.day7),0) as payback7_dev
+    select ${groupBy}                  as id,
+           ${groupName}                as name,
+           sum(a.count_active)         as count_active,
+           sum(a.count_active_dev)     as count_active_dev,
+           sum(a.count_user)           as count_user,
+           sum(a.count_user_dev)       as count_user_dev,
+           sum(a.count_valid_user)     as count_valid_user,
+           sum(a.count_valid_user_dev) as count_valid_user_dev,
+           sum(a.first_money)          as first_money,
+           sum(a.first_money_dev)      as first_money_dev,
+           sum(a.first_payuser)        as first_payuser,
+           sum(a.first_payuser_dev)    as first_payuser_dev,
+           sum(a.first_order)          as first_order,
+           sum(a.first_order_dev)      as first_order_dev,
+           sum(a.total_money)          as total_money,
+           sum(a.total_payuser)        as total_payuser,
+           sum(a.total_payuser_dev)    as total_payuser_dev,
+           sum(a.count_dau)            as count_dau,
+           sum(a.count_dau_dev)        as count_dau_dev,
+           sum(a.alive_payuser)        as alive_payuser,
+           sum(a.alive_payuser_dev)    as alive_payuser_dev,
+           sum(a.alive_money)          as alive_money,
+           sum(a.alive_money_dev)      as alive_money_dev,
+           sum(a.alive_order)          as alive_order,
+           sum(a.alive_order_dev)      as alive_order_dev,
+           IFNULL(sum(l.day2), 0)      as loyal2,
+           IFNULL(sum(l.day3), 0)      as loyal3,
+           IFNULL(sum(l.day4), 0)      as loyal4,
+           IFNULL(sum(l.day5), 0)      as loyal5,
+           IFNULL(sum(l.day6), 0)      as loyal6,
+           IFNULL(sum(l.day7), 0)      as loyal7,
+           IFNULL(sum(ld.day2), 0)     as loyal2_dev,
+           IFNULL(sum(ld.day3), 0)     as loyal3_dev,
+           IFNULL(sum(ld.day4), 0)     as loyal4_dev,
+           IFNULL(sum(ld.day5), 0)     as loyal5_dev,
+           IFNULL(sum(ld.day6), 0)     as loyal6_dev,
+           IFNULL(sum(ld.day7), 0)     as loyal7_dev,
+           IFNULL(sum(p.day1), 0)      as payback1,
+           IFNULL(sum(p.day2), 0)      as payback2,
+           IFNULL(sum(p.day3), 0)      as payback3,
+           IFNULL(sum(p.day4), 0)      as payback4,
+           IFNULL(sum(p.day5), 0)      as payback5,
+           IFNULL(sum(p.day6), 0)      as payback6,
+           IFNULL(sum(p.day7), 0)      as payback7,
+           IFNULL(sum(pd.day1), 0)     as payback1_dev,
+           IFNULL(sum(pd.day2), 0)     as payback2_dev,
+           IFNULL(sum(pd.day3), 0)     as payback3_dev,
+           IFNULL(sum(pd.day4), 0)     as payback4_dev,
+           IFNULL(sum(pd.day5), 0)     as payback5_dev,
+           IFNULL(sum(pd.day6), 0)     as payback6_dev,
+           IFNULL(sum(pd.day7), 0)     as payback7_dev
     from ct_daily a
-    left join ct_daily_loyal l on a.id = l.daily_id
-    left join ct_daily_loyal_dev ld on a.id = ld.daily_id
-    left join ct_daily_payback p on a.id = p.daily_id
-    left join ct_daily_payback_dev pd on a.id = pd.daily_id
-    left join open_gateway.op_deal b on a.deal_id = b.id
-    left join open_gateway.op_pkg c on a.pkg_id = c.id
-    left join open_gateway.op_game d on a.game_id = d.id
-    left join open_gateway.op_sub_game e on a.sub_game_id = e.id
-    left join open_gateway.op_channel f on a.channel_id = f.id
-    left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
-    left join open_gateway.op_put_account h on b.account_id = h.id
+           left join ct_daily_loyal l on a.id = l.daily_id
+           left join ct_daily_loyal_dev ld on a.id = ld.daily_id
+           left join ct_daily_payback p on a.id = p.daily_id
+           left join ct_daily_payback_dev pd on a.id = pd.daily_id
+           left join open_gateway.op_deal b on a.deal_id = b.id
+           left join open_gateway.op_pkg c on a.pkg_id = c.id
+           left join open_gateway.op_game d on a.game_id = d.id
+           left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+           left join open_gateway.op_channel f on a.channel_id = f.id
+           left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+           left join open_gateway.op_put_account h on b.account_id = h.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="getStatCustom" resultType="org.jeecg.modules.count.bo.StatCustomBo">
+    select ${groupBy}                  as id,
+           ${groupName}
+           sum(a.count_active)         as countActive,
+           sum(a.count_user)           as countUser,
+           sum(a.count_user_dev)       as countUserDev,
+           sum(a.count_valid_user)     as countValidUser,
+           sum(a.first_money)          as firstMoney,
+           sum(a.first_payuser)        as firstPayuser,
+           sum(a.count_dau)            as countDau,
+           sum(a.alive_payuser)        as alivePayuser,
+           sum(a.alive_money)          as aliveMoney,
+           IFNULL(sum(l.day2), 0)      as loyal2,
+           IFNULL(sum(l.day3), 0)      as loyal3,
+           IFNULL(sum(l.day7), 0)      as loyal7,
+           IFNULL(sum(l.day15), 0)      as loyal15,
+           IFNULL(sum(l.day30), 0)      as loyal30,
+            ${paybackSql}
+    from `open_countly`.ct_daily a
+           left join `open_countly`.ct_daily_loyal l on a.id = l.daily_id
+           left join `open_countly`.ct_daily_payback p on a.id = p.daily_id
+           left join open_gateway.op_deal b on a.deal_id = b.id
+           left join open_gateway.op_pkg c on a.pkg_id = c.id
+           left join open_gateway.op_game d on a.game_id = d.id
+           left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+           left join open_gateway.op_channel f on a.channel_id = f.id
+           left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
       ${ew.customSqlSegment}
   </select>
 
   <select id="getDetailDaily" resultMap="DetailDailyBo">
     select
-      DATE(a.time_daily) as day,
-      sum(a.count_active) as count_active,
-      sum(a.count_user) as count_user,
-      sum(a.count_valid_user_dev) as count_valid_user_dev,
-      sum(a.first_money) as first_money,
-      sum(a.first_payuser) as first_payuser,
-      sum(a.total_money) as total_money,
-      sum(a.total_payuser) as total_payuser,
-      sum(a.count_dau) as count_dau,
-      sum(a.alive_payuser) as alive_payuser,
-      sum(a.alive_money) as alive_money
+      DATE (a.time_daily) as day,
+      sum (a.count_active) as count_active,
+      sum (a.count_user) as count_user,
+      sum (a.count_valid_user_dev) as count_valid_user_dev,
+      sum (a.first_money) as first_money,
+      sum (a.first_payuser) as first_payuser,
+      sum (a.total_money) as total_money,
+      sum (a.total_payuser) as total_payuser,
+      sum (a.count_dau) as count_dau,
+      sum (a.alive_payuser) as alive_payuser,
+      sum (a.alive_money) as alive_money
     from ct_daily a
-       left join open_gateway.op_deal b on a.deal_id = b.id
-       left join open_gateway.op_pkg c on a.pkg_id = c.id
-       left join open_gateway.op_game d on a.game_id = d.id
-       left join open_gateway.op_sub_game e on a.sub_game_id = e.id
-       left join open_gateway.op_channel f on a.channel_id = f.id
-       left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+      left join open_gateway.op_deal b
+    on a.deal_id = b.id
+      left join open_gateway.op_pkg c on a.pkg_id = c.id
+      left join open_gateway.op_game d on a.game_id = d.id
+      left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+      left join open_gateway.op_channel f on a.channel_id = f.id
+      left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
       ${ew.customSqlSegment}
   </select>
 
-  <resultMap type="org.jeecg.modules.count.vo.CostDataVo" id="CostDataVo">
-    <result column="costDay" property="costDay"/>
-    <result column="costMoney" property="costMoney"/>
-  </resultMap>
-
-  <select id="getCostData" resultMap="CostDataVo">
-    select DATE(cost_day) as costDay, SUM(cost_money) as costMoney
+  <select id="getCostData" resultType="org.jeecg.modules.count.vo.CostDataVo">
+    select DATE (cost_day) as costDay, SUM (cost_money) as costMoney
     from `open_gateway`.`op_cost` a left join `open_gateway`.`op_deal` f
     on a.deal_id=f.id ${ew.customSqlSegment}
     GROUP BY cost_day
+  </select>
+
+  <select id="getCostV2Data" resultType="org.jeecg.modules.count.vo.CostDataVo">
+    select pkg_id as pkgId ,
+           channel_id as channelId,
+           channel_sub_account_id as channelSubAccountId,
+      DATE (cost_day) as costDay,
+      SUM (cost_money) as costMoney,
+      SUM (download) as download,
+      SUM (exhibition) as exhibition
+    from `open_gateway`.`op_cost`  ${ew.customSqlSegment} ${sql}
+  </select>
+
+  <select id="getCostV3Data" resultType="org.jeecg.modules.count.vo.CostDataVo">
+    select DATE (a.cost_day) as costDay,
+      a.platform as platform,
+      IFNULL(SUM(a.cost_money), 0) as costMoney,
+      IFNULL(SUM(a.click), 0) as click,
+      IFNULL(SUM(a.download), 0) as download,
+      IFNULL(SUM(a.exhibition), 0) as exhibition,
+      IFNULL(SUM(a.luban_live_enter_cnt), 0) as luban_live_enter_cnt,
+      IFNULL(SUM(a.live_watch_one_minute_count), 0) as live_watch_one_minute_count,
+      IFNULL(SUM(a.luban_live_gift_cnt), 0) as luban_live_gift_cnt,
+      IFNULL(SUM(a.luban_live_comment_cnt), 0) as luban_live_comment_cnt,
+      IFNULL(SUM(a.luban_live_follow_cnt), 0) as luban_live_follow_cnt,
+      IFNULL(SUM(a.live_fans_club_join_cnt), 0) as live_fans_club_join_cnt,
+      IFNULL(SUM(a.luban_live_share_cnt), 0) as luban_live_share_cnt
+    from `open_gateway`.`op_cost` a left join `open_gateway`.`op_xingtu_deal` b
+    on a.deal_id=b.deal_id  ${ew.customSqlSegment}
+  </select>
+
+  <select id="getDailyData" resultType="org.jeecg.modules.count.bo.OverViewBo">
+    select DATE (a.time_daily) as timeDaily,
+      IFNULL(SUM(a.count_active), 0) as countActive,
+      IFNULL(SUM(a.count_user), 0) as countUser,
+      IFNULL(SUM(a.first_money), 0) as firstMoney,
+      IFNULL(SUM(a.first_payuser), 0) as firstPayuser,
+      IFNULL(SUM(a.alive_money), 0) as aliveMoney
+    from `open_countly`.`ct_daily` a
+      left join `open_gateway`.`op_xingtu_deal` b
+    on a.deal_id=b.deal_id ${ew.customSqlSegment}
   </select>
 
   <resultMap type="org.jeecg.modules.count.vo.RoiCostVo" id="RoiCostVo">
@@ -219,7 +341,7 @@
   </resultMap>
 
   <select id="getRoiCostData" resultMap="RoiCostVo">
-    select DATE(a.cost_day) as costDay,
+    select DATE (a.cost_day) as costDay,
       a.cost_money,
       a.game_id,
       a.sub_game_id,
@@ -239,66 +361,124 @@
   </resultMap>
 
   <select id="getDauCostData" resultMap="DauDataVo">
-    select DATE(a.register_time) as registerTime,
-      DATE(a.pay_time) as payTime,
-      count(a.id) as counts
+    select DATE (a.register_time) as registerTime,
+      DATE (a.pay_time) as payTime,
+      count (a.id) as counts
     from `open_countly`.`ct_user` a
       left join `open_gateway`.`op_deal` f
     on a.deal_id = f.id ${ew.customSqlSegment}
     GROUP BY register_time, pay_time
   </select>
 
+  <select id="getUserCostData" resultType="org.jeecg.modules.count.vo.DauDataVo">
+    select DATE (a.register_time) as registerTime,
+      count (a.id) as counts
+    from `open_countly`.`ct_user` a
+      left join `open_gateway`.`op_deal` f
+    on a.deal_id = f.id ${ew.customSqlSegment}
+  </select>
+
   <select id="getDailyPaybackData" resultType="org.jeecg.modules.count.vo.DailyPaybackVo">
     select *
-    from (select DATE(a.time_daily) as registerTime,
-                 SUM(a.total_money) as totalMoney,
-                 SUM(a.first_money) as firstMoney,
-                 SUM(a.count_user) as countUser,
-                 SUM(a.first_payuser) as firstPayuser,
-                 SUM(a.total_money_ios) as totalMoneyIos,
-                 SUM(a.total_money-a.total_money_discount) as remainTotalMoney,
-                 ${roiSql} from `open_countly`.`ct_daily` a
+    from (select DATE (a.time_daily) as registerTime,
+         SUM(a.total_money) as totalMoney,
+         SUM(a.first_money) as firstMoney,
+         SUM(a.count_user) as countUser,
+         SUM(a.first_payuser) as firstPayuser,
+         SUM(a.total_money_ios) as totalMoneyIos,
+         SUM(a.total_money - a.total_money_discount) as remainTotalMoney,
+         ${roiSql} from `open_countly`.`ct_daily` a
     left join `open_countly`.`ct_daily_payback` b
     on a.id = b.daily_id
-    left join `open_gateway`.`op_deal` f
+      left join `open_gateway`.`op_deal` f
+      on a.deal_id = f.id ${ew.customSqlSegment}
+    GROUP BY registerTime ) as t
+    order by t.registerTime desc
+  </select>
+
+
+
+  <select id="getOverViewData" resultType="org.jeecg.modules.count.bo.OverViewBo">
+    select *
+    from (select DATE (a.time_daily) as timeDaily,
+         SUM(a.count_dau) as countDau,
+         SUM(a.first_money) as firstMoney,
+         SUM(a.count_user) as countUser,
+         SUM(a.first_payuser) as firstPayuser,
+         SUM(a.alive_payuser) as alivePayuser,
+         SUM(a.alive_money) as aliveMoney,
+         SUM(a.total_payuser) as totalPayuser,
+         SUM(a.total_money) as totalMoney,
+         SUM(a.total_money_ios) as totalMoneyIos,
+         SUM(a.alive_money_ios) as aliveMoneyIos from `open_countly`.`ct_daily` a
+      left join `open_gateway`.`op_deal` f
     on a.deal_id = f.id ${ew.customSqlSegment}
-    GROUP BY registerTime ) as t order by t.registerTime desc
+    GROUP BY timeDaily ) as t
+    order by t.timeDaily desc
+  </select>
+
+  <select id="getDayReportData" resultType="org.jeecg.modules.count.bo.DayReportBo">
+    select DATE (time_daily) as timeDaily,
+         pkg_id as pkgId,
+         channel_id as channelId,
+         channel_sub_account_id as channelSubAccountId,
+         SUM(first_money) as firstMoney,
+         SUM(count_user) as countUser,
+         SUM(first_payuser) as firstPayuser,
+         SUM(alive_money_ios) as aliveMoneyIos,
+        SUM(first_money_ios) as firstMoneyIos,
+         SUM(alive_money) as aliveMoney from `open_countly`.`ct_daily`
+       ${ew.customSqlSegment}
+  </select>
+
+  <select id="getRetentionData" resultType="org.jeecg.modules.count.bo.RetentionBo">
+    select ${sql} AS id,
+           SUM(a.count_user) AS countUser,
+           SUM(b.day2) AS day2,
+           SUM(b.day3) AS day3,
+           SUM(b.day7) AS day7,
+           SUM(b.day15) AS day15,
+           SUM(b.day30) AS day30,
+           SUM(b.day45) AS day45,
+           SUM(b.day60) AS day60
+    from `open_countly`.`ct_daily` a
+      left join `open_countly`.`ct_daily_loyal` b
+    on a.id = b.daily_id ${ew.customSqlSegment} GROUP BY ${sql}
   </select>
 
   <select id="getSummaryAdvertDaily" resultMap="SummaryAdvertDailyBo">
-    select
-      ${day} as day,
-      ${dealId} as deal_id,
-      ${pkgName} as pkg_name,
-      ${dealName} as deal_name,
-      ${channelName} as channel_name,
-      sum(a.count_active) as count_active,
-      sum(a.count_active_dev) as count_active_dev,
-      sum(a.count_user) as count_user,
-      sum(a.count_user_dev) as count_user_dev,
-      sum(a.count_valid_user) as count_valid_user,
-      sum(a.first_payuser) as first_payuser,
-      sum(a.first_money) as first_money,
-      sum(a.total_money) as total_money,
-      sum(a.total_payuser) as total_payuser,
-      sum(a.count_dau) as count_dau,
-      sum(a.alive_payuser) as alive_payuser,
-      sum(a.alive_money) as alive_money,
-      IFNULL(sum(l.day2),0) as loyal2,
-      IFNULL(sum(l.day3),0) as loyal3,
-      IFNULL(sum(l.day4),0) as loyal4,
-      IFNULL(sum(l.day5),0) as loyal5,
-      IFNULL(sum(l.day6),0) as loyal6,
-      IFNULL(sum(l.day7),0) as loyal7,
-      IFNULL(sum(p.day1),0) as payback1,
-      IFNULL(sum(p.day2),0) as payback2,
-      IFNULL(sum(p.day3),0) as payback3,
-      IFNULL(sum(p.day4),0) as payback4,
-      IFNULL(sum(p.day5),0) as payback5,
-      IFNULL(sum(p.day6),0) as payback6,
-      IFNULL(sum(p.day7),0) as payback7
+    select ${day} as day, ${dealId} as deal_id,
+           ${pkgName} as pkg_name,
+           ${dealName} as deal_name,
+           ${channelName} as channel_name,
+      sum (a.count_active) as count_active,
+      sum (a.count_active_dev) as count_active_dev,
+      sum (a.count_user) as count_user,
+      sum (a.count_user_dev) as count_user_dev,
+      sum (a.count_valid_user) as count_valid_user,
+      sum (a.first_payuser) as first_payuser,
+      sum (a.first_money) as first_money,
+      sum (a.total_money) as total_money,
+      sum (a.total_payuser) as total_payuser,
+      sum (a.count_dau) as count_dau,
+      sum (a.alive_payuser) as alive_payuser,
+      sum (a.alive_money) as alive_money,
+      IFNULL(sum (l.day2), 0) as loyal2,
+      IFNULL(sum (l.day3), 0) as loyal3,
+      IFNULL(sum (l.day4), 0) as loyal4,
+      IFNULL(sum (l.day5), 0) as loyal5,
+      IFNULL(sum (l.day6), 0) as loyal6,
+      IFNULL(sum (l.day7), 0) as loyal7,
+      IFNULL(sum (p.day1), 0) as payback1,
+      IFNULL(sum (p.day2), 0) as payback2,
+      IFNULL(sum (p.day3), 0) as payback3,
+      IFNULL(sum (p.day4), 0) as payback4,
+      IFNULL(sum (p.day5), 0) as payback5,
+      IFNULL(sum (p.day6), 0) as payback6,
+      IFNULL(sum (p.day7), 0) as payback7
     from ct_daily a
-      left join ct_daily_loyal l on a.id = l.daily_id
+      left join ct_daily_loyal l
+    on a.id = l.daily_id
       left join ct_daily_payback p on a.id = p.daily_id
       left join open_gateway.op_deal b on a.deal_id = b.id
       left join open_gateway.op_pkg c on a.pkg_id = c.id
@@ -309,4 +489,77 @@
       ${ew.customSqlSegment}
   </select>
 
+  <select id="getWeekReportDaily" resultMap="WeekReportDailyBo">
+    select a.game_id                as game_id,
+           a.sub_game_id            as sub_game_id,
+           a.pkg_id                 as pkg_id,
+           a.channel_type_id        as channel_type_id,
+           a.channel_id             as channel_id,
+           a.channel_sub_account_id as channel_sub_account_id,
+           a.time_daily             as time_daily,
+           sum(a.count_user)        as count_user,
+           sum(a.count_dau)         as count_dau,
+           sum(a.first_payuser)     as first_payuser,
+           sum(a.first_money)       as first_money,
+           sum(a.first_money_ios)   as first_money_ios,
+           sum(a.alive_money)       as alive_money,
+           sum(a.alive_money_ios)   as alive_money_ios,
+           sum(a.total_money)       as total_money,
+           sum(a.total_money_ios)   as total_money_ios,
+           IFNULL(sum(p.day1), 0)   as payback1,
+           IFNULL(sum(p.day2), 0)   as payback2,
+           IFNULL(sum(p.day3), 0)   as payback3,
+           IFNULL(sum(p.day4), 0)   as payback4,
+           IFNULL(sum(p.day5), 0)   as payback5,
+           IFNULL(sum(p.day6), 0)   as payback6,
+           IFNULL(sum(p.day7), 0)   as payback7,
+           IFNULL(sum(p.day7), 0)   as payback8,
+           IFNULL(sum(p.day7), 0)   as payback9,
+           IFNULL(sum(p.day7), 0)   as payback10,
+           IFNULL(sum(p.day7), 0)   as payback11,
+           IFNULL(sum(p.day7), 0)   as payback12,
+           IFNULL(sum(p.day7), 0)   as payback13,
+           IFNULL(sum(p.day7), 0)   as payback14,
+           IFNULL(sum(p.day7), 0)   as payback15
+    from ct_daily a
+           left join ct_daily_loyal l on a.id = l.daily_id
+           left join ct_daily_payback p on a.id = p.daily_id
+           left join open_gateway.op_deal b on a.deal_id = b.id
+           left join open_gateway.op_pkg c on a.pkg_id = c.id
+           left join open_gateway.op_game d on a.game_id = d.id
+           left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+           left join open_gateway.op_channel f on a.channel_id = f.id
+           left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+      ${ew.customSqlSegment}
+  </select>
+
+
+  <select id="getUserPayRateDaily" resultMap="UserPayRateDailyBo">
+    select ${day} as day, ${pkgName} as game_name,
+           ${dealName} as deal_name,
+           ${channelName} as channel_name,
+      sum (a.count_user) as count_user,
+      sum (a.first_payuser) as first_payuser,
+      sum (a.first_money) as first_money,
+      IFNULL(sum (l.day2), 0) as loyal2,
+      IFNULL(sum (l.day3), 0) as loyal3,
+      IFNULL(sum (l.day4), 0) as loyal4,
+      IFNULL(sum (l.day5), 0) as loyal5,
+      IFNULL(sum (l.day6), 0) as loyal6,
+      IFNULL(sum (l.day7), 0) as loyal7,
+      IFNULL(sum (l.day7), 0) as loyal15,
+      IFNULL(sum (l.day7), 0) as loyal30,
+      IFNULL(sum (l.day7), 0) as loyal45,
+      IFNULL(sum (l.day7), 0) as loyal60
+    from ct_daily a
+      left join ct_daily_loyal l
+    on a.id = l.daily_id
+      left join open_gateway.op_deal b on a.deal_id = b.id
+      left join open_gateway.op_pkg c on a.pkg_id = c.id
+      left join open_gateway.op_game d on a.game_id = d.id
+      left join open_gateway.op_sub_game e on a.sub_game_id = e.id
+      left join open_gateway.op_channel f on a.channel_id = f.id
+      left join open_gateway.op_channel_sub_account g on a.channel_sub_account_id = g.id
+      ${ew.customSqlSegment}
+  </select>
 </mapper>

@@ -4,7 +4,7 @@
       <a-row>
         <a-col :span="24">
           <a-form-item label="支付类型" v-bind="validateInfos.payType">
-            <j-dict-select-tag v-model:value="formData.payType" :options="options" placeholder="请选择支付类型" :disabled="disabled" />
+            <j-dict-select-tag v-model:value="formData.payType" :options="options" placeholder="请选择支付类型" :disabled="disabled" @change="changePayType"/>
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -173,8 +173,8 @@
           </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-item label="备注" v-bind="validateInfos.note">
-            <a-input v-model:value="formData.note" placeholder="请输入备注" :disabled="disabled"></a-input>
+          <a-form-item label="备注">
+            <a-input v-model:value="formData.note" placeholder="请输入备注" :disabled="disabled" showCount :maxlength="255"></a-input>
           </a-form-item>
         </a-col>
       </a-row>
@@ -244,21 +244,10 @@
     nextTick(() => {
       resetFields();
       // 表单部分属性重置
-      formData.app_id = "";
-      formData.seller_id = "";
-      formData.seller_email = "";
-      formData.seller_pubkey = "";
-      formData.seller_prikey = "";
-      formData.alipay_pubkey = "";
-      formData.alipay_pubkey2 = "";
-      formData.seller_key = "";
-      formData.yeepay_pubkey = "";
-      formData.iapppay_pubkey = "";
-      formData.app_key = "";
-      formData.notify_url = "";
+      cancel();
       //赋值
       let vendorData = record;
-      if(vendorData.payVendorConf != ""){
+      if(vendorData.payVendorConf != "" && vendorData.payVendorConf != undefined){
         let payConf = JSON.parse(vendorData.payVendorConf);
         //表单赋值
         if(vendorData.payType == 1){
@@ -276,45 +265,30 @@
             formData.alipay_pubkey2 = payConf.alipay_pubkey2;
         }else if(vendorData.payType == 2) {
             // 汇付宝
-            formData.id = vendorData.id;
-            formData.payType = vendorData.payType;
-            formData.payVendorName = vendorData.payVendorName;
-            formData.note = vendorData.note;
+            Object.assign(formData, vendorData);
             formData.seller_id = payConf.seller_id;
             formData.seller_key = payConf.seller_key;
         } else if(vendorData.payType == 3) {
             // 易宝
-            formData.id = vendorData.id;
-            formData.payType = vendorData.payType;
-            formData.payVendorName = vendorData.payVendorName;
-            formData.note = vendorData.note;
+            Object.assign(formData, vendorData);
             formData.seller_id = payConf.seller_id;
             formData.seller_pubkey = payConf.seller_pubkey;
             formData.seller_prikey = payConf.seller_prikey;
             formData.yeepay_pubkey = payConf.yeepay_pubkey;
         } else if(vendorData.payType == 4) {
             // 爱贝
-            formData.id = vendorData.id;
-            formData.payType = vendorData.payType;
-            formData.payVendorName = vendorData.payVendorName;
-            formData.note = vendorData.note;
+            Object.assign(formData, vendorData);
             formData.app_id = payConf.app_id;
             formData.seller_prikey = payConf.seller_prikey;
             formData.iapppay_pubkey = payConf.iapppay_pubkey;
         } else if(vendorData.payType == 5 || vendorData.payType == 6) {
             // 现在支付
-            formData.id = vendorData.id;
-            formData.payType = vendorData.payType;
-            formData.payVendorName = vendorData.payVendorName;
-            formData.note = vendorData.note;
+            Object.assign(formData, vendorData);
             formData.app_id = payConf.app_id;
             formData.app_key = payConf.app_key;
         } else if(vendorData.payType == 7) {
             // 微信
-            formData.id = vendorData.id;
-            formData.payType = vendorData.payType;
-            formData.payVendorName = vendorData.payVendorName;
-            formData.note = vendorData.note;
+            Object.assign(formData, vendorData);
             formData.app_id = payConf.app_id;
             formData.mch_id = payConf.mch_id;
             formData.api_key = payConf.api_key;
@@ -422,10 +396,26 @@
       });
   }
 
+  function cancel() {
+    Object.keys(formData).forEach(key => {
+      formData[key] = undefined;
+    })
+  }
+
+  function changePayType() {
+    let excludeKeys = ['id', 'payType', 'payVendorName', 'payVendorConf', 'note', 'notify_url']
+    Object.keys(formData).forEach(key => {
+      if(!excludeKeys.includes(key)) {
+        formData[key] = undefined;
+      }
+    })
+  }
+
   defineExpose({
     add,
     edit,
     submitForm,
+    cancel
   });
 </script>
 

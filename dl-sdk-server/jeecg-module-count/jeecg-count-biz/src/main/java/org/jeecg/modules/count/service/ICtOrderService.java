@@ -1,14 +1,16 @@
 package org.jeecg.modules.count.service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import org.jeecg.modules.count.bo.GetOrderRateBo;
+import java.util.Map;
+import org.jeecg.modules.count.bo.GetOrderGroupBo;
 import org.jeecg.modules.count.vo.OrderDateGroupRateVo;
 import org.jeecg.modules.count.vo.OrderMoneyGroupRateVo;
 import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.common.kafka.dto.ParsePayDto;
 import org.jeecg.modules.count.dto.OrderDetailDto;
-import org.jeecg.modules.count.bo.summary.SummaryOrderBo;
-import org.jeecg.modules.count.bo.summary.SummaryOrderDevBo;
+import org.jeecg.modules.count.bo.SummaryOrderBo;
+import org.jeecg.modules.count.bo.SummaryOrderDevBo;
 import org.jeecg.modules.count.entity.CtDevice;
 import org.jeecg.modules.count.entity.CtOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -56,7 +58,7 @@ public interface ICtOrderService extends IService<CtOrder> {
 
     /**
      * @param summaryDto
-     * @return java.util.List<org.jeecg.modules.count.bo.summary.SummaryOrderBo>
+     * @return java.util.List<org.jeecg.modules.count.bo.SummaryOrderBo>
      * @author chenyw
      * @description 获取汇总表 周期订单数据 按设备
      * @date 17:27 2023/5/5/005
@@ -65,7 +67,7 @@ public interface ICtOrderService extends IService<CtOrder> {
 
     /**
      * @param summaryDto
-     * @return java.util.List<org.jeecg.modules.count.bo.summary.SummaryOrderBo>
+     * @return java.util.List<org.jeecg.modules.count.bo.SummaryOrderBo>
      * @author chenyw
      * @description 获取汇总表 周期订单数据
      * @date 17:27 2023/5/5/005
@@ -73,30 +75,46 @@ public interface ICtOrderService extends IService<CtOrder> {
     List<SummaryOrderBo> getSummaryOrder(SummaryDto summaryDto);
 
     /**
-     * @param getOrderRateBo
+     * @param getOrderGroupBo
      * @return java.util.List<org.jeecg.modules.count.bo.OrderMoneyGroupBo>
      * @author chenyw
      * @description  新增充值比例
      * @date 21:13 2023/5/10/010
      **/
-    List<OrderMoneyGroupRateVo> getFirstMoneyGroup(GetOrderRateBo getOrderRateBo);
+    List<OrderMoneyGroupRateVo> getFirstMoneyGroup(GetOrderGroupBo getOrderGroupBo);
 
     /**
-     * @param getOrderRateBo
+     * @param getOrderGroupBo
      * @return java.util.List<org.jeecg.modules.count.vo.OrderMoneyGroupRateVo>
      * @author chenyw
      * @description 活跃充值比例
      * @date 10:25 2023/5/11/011
      **/
-    List<OrderMoneyGroupRateVo> getAliveMoneyGroup(GetOrderRateBo getOrderRateBo);
+    List<OrderMoneyGroupRateVo> getAliveMoneyGroup(GetOrderGroupBo getOrderGroupBo);
 
     /**
-     * @param getOrderRateBo
+     * @param getOrderGroupBo
      * @return java.util.List<org.jeecg.modules.count.vo.OrderDateGroupRateVo>
      * @author chenyw
      * @description 获取用户注册日期比例
      * @date 18:46 2023/5/12/012
      **/
-    List<OrderDateGroupRateVo> getRegDateGroup(GetOrderRateBo getOrderRateBo);
+    List<OrderDateGroupRateVo> getRegDateGroup(GetOrderGroupBo getOrderGroupBo);
+
+    /**
+     * @return java.util.Map<java.lang.String,java.lang.Integer>
+     * @author chenyw
+     * @description 获取数量 按注册日期和创建日期归类
+     * @date 14:56 2023/5/17/017
+     **/
+    Map<String, Integer> getNumGroupRegTimeCreateTime(GetOrderGroupBo getOrderGroupBo);
+
+    /**
+     * @return java.util.Map<java.lang.String,java.math.BigDecimal>
+     * @author chenyw
+     * @description 获取金额 按注册日期和创建日期归类
+     * @date 14:56 2023/5/17/017
+     **/
+    Map<String, BigDecimal> getMoneyGroupRegTimeCreateTime(GetOrderGroupBo getOrderGroupBo);
 
 }

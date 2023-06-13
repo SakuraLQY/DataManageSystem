@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 /**
  * @Description: ct_user
  * @Author: jeecg-boot
- * @Date:   2023-04-25
+ * @Date: 2023-04-25
  * @Version: V1.0
  */
 @Repository
@@ -67,5 +67,15 @@ public interface CtUserMapper extends BaseMapper<CtUser> {
      **/
     List<PayUserVo> getAllPayUserList(@Param(Constants.WRAPPER) QueryWrapper<CtUserVo> wrapper);
 
-    List<OnlineUserVo> getOnlineUserList(@Param(Constants.WRAPPER) QueryWrapper<OnlineUserDto> wrapper, @Param("typeName") String typeName);
+    /**
+     * @param wrapper
+     * @param typeName
+     * @return java.util.List<org.jeecg.modules.count.vo.OnlineUserVo>
+     * @Author lili
+     * @Description 用户数据-在线统计
+     * @Date 14:58 2023/5/16
+     **/
+    List<OnlineUserVo> getOnlineUserList(
+        @Param(Constants.WRAPPER) QueryWrapper<OnlineUserDto> wrapper,
+        @Param("typeName") String typeName);
 }

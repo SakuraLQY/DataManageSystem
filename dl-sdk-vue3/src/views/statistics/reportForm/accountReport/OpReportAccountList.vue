@@ -42,9 +42,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
+        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="exportXlS"> 导出</a-button>
+        <!-- <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -106,7 +106,7 @@ import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
 import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
 import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
 import { message } from 'ant-design-vue';
-
+  import { useMethods } from '/@/hooks/system/useMethods';
 const showItem = ref();
 const queryParam = ref<any>({});
 const toggleSearchStatus = ref<boolean>(false);
@@ -147,6 +147,7 @@ const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
   exportConfig: {
     name: "数据报表",
     url: getExportUrl,
+    params:queryParam.value
   },
   importConfig: {
     url: getImportUrl,
@@ -213,7 +214,15 @@ async function handleDelete(record) {
 async function batchHandleDelete() {
   await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
 }
+  //导入导出方法
+ const { handleExportXls, handleImportXls } = useMethods();
 
+  /**
+   * 导出事件
+   */
+  function exportXlS() {
+    return handleExportXls("账号数据表", "/count/opReport/exportExcel", queryParam.value);
+  }
 /**
  * 成功回调
  */

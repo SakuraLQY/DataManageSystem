@@ -188,7 +188,6 @@
    */
   function getPayUserStructData() {
     if (userTime.value != null && userTime.value.length > 0) {
-      debugger;
       queryParam.value.userStartTime = userTime.value[0].format('YYYY-MM-DD') + ' 00:00:00';
       queryParam.value.userEndTime = userTime.value[1].format('YYYY-MM-DD') + ' 23:59:59';
     } else {

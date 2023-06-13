@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.advert.dto.OpCostDto;
 import org.jeecg.common.constant.ChannelConstant;
 import org.jeecg.common.constant.ChannelTypeConstant;
+import org.jeecg.common.count.vo.CostModel;
 import org.jeecg.common.count.vo.CostMoneyModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.oConvertUtils;
@@ -98,7 +99,8 @@ public class OpCostServiceImpl extends ServiceImpl<OpCostMapper, OpCost> impleme
             opCostDto.getChannelTypeId());
         wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelId()), "a.channel_id",
             opCostDto.getChannelId());
-        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelSubAccountId()), "a.channel_sub_account_id",
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelSubAccountId()),
+            "a.channel_sub_account_id",
             opCostDto.getChannelSubAccountId());
         wrapper.ge(oConvertUtils.isNotEmpty(opCostDto.getRegStartTime()), "a.cost_day",
             opCostDto.getRegStartTime());
@@ -108,13 +110,40 @@ public class OpCostServiceImpl extends ServiceImpl<OpCostMapper, OpCost> impleme
         wrapper.eq(oConvertUtils.isNotEmpty(opCostDto.getCreateUser()), "b.create_by",
             opCostDto.getCreateUser());
         String groupBy = "DATE(a.cost_day)";
-        if(StringUtils.isNotEmpty(opCostDto.getGroupType())){
+        if (StringUtils.isNotEmpty(opCostDto.getGroupType())) {
             groupBy = opCostDto.getGroupType();
         }
         wrapper.groupBy(groupBy);
         List<CostMoneyModel> costMoneyModelList = baseMapper.getSummaryCost(groupBy, wrapper);
         return costMoneyModelList;
     }
+
+    @Override
+    public List<CostModel> getCostModel(OpCostDto opCostDto) {
+        QueryWrapper<OpCost> wrapper = new QueryWrapper<>();
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getGameId()), "a.game_id",
+            opCostDto.getGameId());
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getSubGameId()), "a.sub_game_id",
+            opCostDto.getSubGameId());
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getPkgId()), "a.pkg_id",
+            opCostDto.getPkgId());
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelTypeId()), "a.channel_type_id",
+            opCostDto.getChannelTypeId());
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelId()), "a.channel_id",
+            opCostDto.getChannelId());
+        wrapper.in(CollectionUtil.isNotEmpty(opCostDto.getChannelSubAccountId()),
+            "a.channel_sub_account_id",
+            opCostDto.getChannelSubAccountId());
+        wrapper.ge(oConvertUtils.isNotEmpty(opCostDto.getRegStartTime()), "a.cost_day",
+            opCostDto.getRegStartTime());
+        wrapper.le(oConvertUtils.isNotEmpty(opCostDto.getRegEndTime()), "a.cost_day",
+            opCostDto.getRegEndTime());
+        wrapper.groupBy("a.game_id", "a.sub_game_id", "a.pkg_id", "a.channel_type_id",
+            "a.channel_id", "a.channel_sub_account_id","a.cost_day");
+        List<CostModel> costModelList = baseMapper.getCostModel(wrapper);
+        return costModelList;
+    }
+
 
     /**
      * @param opCost
@@ -328,6 +357,7 @@ public class OpCostServiceImpl extends ServiceImpl<OpCostMapper, OpCost> impleme
                             campaignList.getCampaignId()).eq(OpCost::getCostDay, date));
                     opCost.setChannelTypeId(ChannelTypeConstant.MEDIA);
                     // 旧版头条渠道默认为星图
+                    // TODO 补充星图参数 主播id、直播间观看人数等
                     opCost.setChannelId(ChannelConstant.XING_TU);
                     opCost.setCostDay(date);
                     opCost.setCostMoney(campaignList.getCost());

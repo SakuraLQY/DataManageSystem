@@ -27,4 +27,17 @@ public class SdkIosConfRes {
     @ApiModelProperty(value = "活动状态")
     private Integer activityState = 0;
 
+    @ApiModelProperty(value = "隐私政策")
+    private String privacyPolicyUrl;
+
+    @ApiModelProperty(value = "隐私政策开关")
+    private Integer privacyPolicyOpen;
+
+    @ApiModelProperty(value = "用户协议")
+    private String userProtocolUrl;
+
+    @ApiModelProperty(value = "客服")
+    private String customerServiceUrl;
+
+
 }

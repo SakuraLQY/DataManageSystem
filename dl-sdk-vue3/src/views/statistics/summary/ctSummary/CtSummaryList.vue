@@ -7,11 +7,7 @@
           <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
-            <a-col :lg="8">
-              <a-form-item label="广告">
-                <j-select-multiple placeholder="请选择广告" v-model:value="queryParam.dealId"  dictCode="open_gateway.op_deal,deal_name,id" allowClear />
-              </a-form-item>
-            </a-col>
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="统计日期">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择开始时间" v-model:value="queryParam.regStartTime" allowClear/>至
@@ -83,6 +79,7 @@
   import {formatToDate} from  '/@/utils/dateUtil'
   import {ProfileTwoTone} from '@ant-design/icons-vue'
   import CtDealInfoDataModal from './components/CtDealInfoDataModal.vue';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   const selectGameForm= ref();
   const selectChannelForm= ref();
   const queryParam = ref<any>({
@@ -140,7 +137,9 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
-
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   /**
    * 新增事件
    */

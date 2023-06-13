@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.modules.count.bo.GetOrderRateBo;
+import org.jeecg.modules.count.bo.GetOrderGroupBo;
 import org.jeecg.modules.count.dto.DetailDto;
 import org.jeecg.modules.count.service.ICtOrderService;
 import org.jeecg.modules.count.service.IDetailService;
@@ -44,20 +44,20 @@ public class DetailController {
     @ApiOperation(value = "首次付费比率", notes = "首次付费比率")
     @GetMapping(value = "/firstMoneyRate")
     public Result<List<OrderMoneyGroupRateVo>> firstMoneyRate(DetailDto detailDto) {
-        GetOrderRateBo getOrderRateBo = new GetOrderRateBo();
-        BeanUtils.copyProperties(detailDto, getOrderRateBo);
+        GetOrderGroupBo getOrderGroupBo = new GetOrderGroupBo();
+        BeanUtils.copyProperties(detailDto, getOrderGroupBo);
         List<OrderMoneyGroupRateVo> orderMoneyGroupRateVos = ctOrderService.getFirstMoneyGroup(
-            getOrderRateBo);
+            getOrderGroupBo);
         return Result.ok(orderMoneyGroupRateVos);
     }
 
     @ApiOperation(value = "活跃付费比率", notes = "活跃付费比率")
     @GetMapping(value = "/aliveMoneyRate")
     public Result<List<OrderMoneyGroupRateVo>> aliveMoneyRate(DetailDto detailDto) {
-        GetOrderRateBo getOrderRateBo = new GetOrderRateBo();
-        BeanUtils.copyProperties(detailDto, getOrderRateBo);
+        GetOrderGroupBo getOrderGroupBo = new GetOrderGroupBo();
+        BeanUtils.copyProperties(detailDto, getOrderGroupBo);
         List<OrderMoneyGroupRateVo> orderMoneyGroupRateVos = ctOrderService.getAliveMoneyGroup(
-            getOrderRateBo);
+            getOrderGroupBo);
         return Result.ok(orderMoneyGroupRateVos);
     }
 }

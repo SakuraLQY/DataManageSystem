@@ -4,15 +4,18 @@
       <a-row>
         <a-col :span="24">
           <a-form-item label="规则类型" v-bind="validateInfos.ruleType">
-	          <j-search-select v-model:value="formData.ruleType" dict="pay_rule_type" placeholder="请选择规则类型" :disabled="disabled"/>
+	          <j-search-select v-model:value="formData.ruleType" dict="pay_rule_type" placeholder="请选择规则类型" :disabled="isEdit"/>
           </a-form-item>
         </a-col>
         <a-col :span="24">
           <a-form-item label="游戏" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '0'">
-            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_game,game_name,id"  placeholder="请选择游戏" :disabled="disabled" />
+            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_game,game_name,id"  placeholder="请选择游戏" :disabled="isEdit" />
           </a-form-item>
           <a-form-item label="子游戏" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '1'">
-            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_sub_game,game_name,id"  placeholder="请选择子游戏" :disabled="disabled" />
+            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_sub_game,game_name,id"  placeholder="请选择子游戏" :disabled="isEdit" />
+          </a-form-item>
+          <a-form-item label="渠道游戏包" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '2'">
+            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_pkg,pkg_name,id"  placeholder="请选择渠道游戏包" :disabled="isEdit" />
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -64,6 +67,7 @@
     formBpm: { type: Boolean, default: true }
   });
   const formRef = ref();
+  let isEdit = ref(false);
   // let selectType = ref<number>(0)
   const useForm = Form.useForm;
   const emit = defineEmits(['register', 'ok']);
@@ -78,26 +82,13 @@
     payLimitDevice: '',   
     descs: '',   
   });
-  // getGameAndSubGameList();
-  // // 下拉框取值
-  // function getGameAndSubGameList() {
-  //   gameAndSubGameList({}).then((res: any)=>{
-  //     gameList.value = res['gameList']
-  //     subGameList.value = res['subGameList']
-  //   })
-  // };
   watch(
       () => formData.ruleType,
       val => {
-         formData.ruleId = undefined; 
+        if(formData.id === '') {
+          formData.ruleId = undefined; 
+        }
       })
-  // watch(formData, (newName, oldName) => {
-  //   if(formData.ruleType === '0') {
-  //     selectType.value = 0
-  //   }else{
-  //     selectType.value = 1
-  //   }
-  // },{deep:false});
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
@@ -137,17 +128,22 @@
       resetFields();
       //赋值
       Object.assign(formData, record);
+      if(formData.id !== '') {
+        isEdit.value = true
+      }else {
+        isEdit.value = false
+      }
     });
   }
 
   /**
    * 监控限制的那三个条件
    */
-  function checkRule() {
-    if(formData.payLimitUserId === '' && formData.payLimitIp === '' && formData.payLimitDevice === '' ) {
-      message.warning('限制条件必填一个');
-    }
-  }
+  // function checkRule() {
+  //   if(formData.payLimitUserId === '' && formData.payLimitIp === '' && formData.payLimitDevice === '' ) {
+  //     message.warning('限制条件必填一个');
+  //   }
+  // }
 
 
   /**
@@ -158,6 +154,7 @@
     await validate();
     if(formData.payLimitUserId === '' && formData.payLimitIp === '' && formData.payLimitDevice === '' ) {
       message.warning('限制条件必填一个');
+      
     }else{
       confirmLoading.value = true;
     const isUpdate = ref<boolean>(false);

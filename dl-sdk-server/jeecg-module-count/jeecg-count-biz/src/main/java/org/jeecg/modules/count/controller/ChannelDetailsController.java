@@ -13,7 +13,10 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.ChannelDetailDto;
+import org.jeecg.modules.count.dto.ReportAccountDto;
 import org.jeecg.modules.count.entity.ChannelDetails;
+import org.jeecg.modules.count.modal.ChannelDetailModal;
+import org.jeecg.modules.count.modal.ReportAccountModal;
 import org.jeecg.modules.count.service.IChannelDetailsService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -92,6 +95,17 @@ public class ChannelDetailsController extends
         return Result.OK(list);
     }
 
+
+
+    /**@param channelDetailDto
+     * @author chenglin
+     * @description 补充导出Excel功能
+     * @date  14:52 2023/6/13
+     **/
+    @GetMapping(value = "/exportExcel")
+    public ModelAndView exportExcel(HttpServletRequest request, ChannelDetailDto channelDetailDto) {
+        return channelDetailsService.exportExcel(request,channelDetailDto, ChannelDetailModal.class,"渠道明细表");
+    }
     /**
      * 添加
      *

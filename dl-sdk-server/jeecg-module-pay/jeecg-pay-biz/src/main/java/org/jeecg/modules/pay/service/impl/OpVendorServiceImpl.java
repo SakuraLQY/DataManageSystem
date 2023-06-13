@@ -3,12 +3,14 @@ package org.jeecg.modules.pay.service.impl;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.game.api.IGameApi;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.OpPayVendor;
 import org.jeecg.modules.pay.entity.OpVendor;
 import org.jeecg.modules.pay.mapper.OpPayVendorMapper;
@@ -83,6 +85,40 @@ public class OpVendorServiceImpl extends ServiceImpl<OpVendorMapper, OpVendor> i
         if(!removeByIds(ids)){
             throw new JeecgBootException("删除失败");
         }
+    }
+
+    @Override
+    public void insert(OpVendor opVendor) {
+        System.out.println(opVendor);
+        LambdaQueryWrapper<OpVendor> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OpVendor::getVendorName, opVendor.getVendorName());
+        OpVendor notNull = getOne(wrapper);
+        if(oConvertUtils.isNotEmpty(notNull)){
+            throw new JeecgBootException("已存在相同名称的支付厂商");
+        }
+        save(opVendor);
+    }
+
+    @Override
+    public void update(OpVendor opVendor) {
+        System.out.println(opVendor);
+        LambdaUpdateWrapper<OpVendor> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(OpVendor::getId, opVendor.getId());
+
+        wrapper.set(OpVendor::getVendorName, opVendor.getVendorName());
+        wrapper.set(OpVendor::getAliPayVendor, opVendor.getAliPayVendor());
+        wrapper.set(OpVendor::getHeePayVendor, opVendor.getHeePayVendor());
+        wrapper.set(OpVendor::getYeePayVendor, opVendor.getYeePayVendor());
+        wrapper.set(OpVendor::getIappPayVendor, opVendor.getIappPayVendor());
+        wrapper.set(OpVendor::getIpaynowPayVendor, opVendor.getIpaynowPayVendor());
+        wrapper.set(OpVendor::getIpaynowappPayVendor, opVendor.getIpaynowappPayVendor());
+        wrapper.set(OpVendor::getWxPayVendor, opVendor.getWxPayVendor());
+        wrapper.set(OpVendor::getCreateBy, opVendor.getCreateBy());
+        wrapper.set(OpVendor::getCreateTime, opVendor.getCreateTime());
+        wrapper.set(OpVendor::getUpdateBy, opVendor.getUpdateBy());
+        wrapper.set(OpVendor::getUpdateTime, opVendor.getUpdateTime());
+        wrapper.set(OpVendor::getNote, opVendor.getNote());
+        update(wrapper);
     }
 
     /**

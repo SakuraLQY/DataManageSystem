@@ -4,11 +4,7 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <a-col :lg="8">
-            <a-form-item label="广告列表">
-              <j-search-select placeholder="请选择广告列表" v-model:value="queryParam.dealId" dict="open_gateway.op_deal,deal_name,id" allowClear/>
-            </a-form-item>
-          </a-col>
+          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
@@ -20,6 +16,11 @@
             <a-col :lg="8">
               <a-form-item label="结束日期">
                 <a-date-picker  valueFormat="YYYY-MM-DD"  placeholder="请选择结束日期" v-model:value="queryParam.endTime" />
+              </a-form-item>
+            </a-col>
+            <a-col :lg="8">
+              <a-form-item label="常用日期">
+                <a href="#" @click="handleClick(1)">今天</a> <a href="#" @click="handleClick(2)">昨天</a> <a href="#" @click="handleClick(3)">最近三天</a> <a href="#" @click="handleClick(4)">最近一周</a> <a href="#" @click="handleClick(5)">最近两周</a>
               </a-form-item>
             </a-col>
             <a-col :lg="8">
@@ -95,11 +96,11 @@
   import { BasicTable, useTable, TableAction } from '/@/components/Table';
   import { useListPage } from '/@/hooks/system/useListPage';
   import { columns } from './CtDayhour.data';
-  import { list, deleteOne, batchDelete, getImportUrl, getExportUrl } from './CtDayhour.api';
+  import { queryList, deleteOne, batchDelete, getImportUrl, getExportUrl } from './CtDayhour.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   import CtDayhourModal from './components/CtDayhourModal.vue'
   import {compareLevelOption} from './CtDayhour.data';
-  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import {formatToDate } from '/@/utils/dateUtil';
   import GameThirdSingleOptionForm from '/@/views/common/gameThirdSingleOptionForm.vue';
@@ -107,28 +108,13 @@
   const queryParam = ref<any>({level:'count_active',startTime:formatToDate(new Date()),endTime:formatToDate(new Date())});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+  let date = new Date();
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+  // 格式化年月日信息，回填到时间控件上
+  let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
 
-  // //获取游戏项目
-  // function getGameName(gameId){
-  //   let games = faList.value;
-  //   return games[gameId].gameName;
-  // }
-
-  // //获取子游戏名
-  // function getSubGameName(gameId,subGameId){
-  //   let games = faList.value;
-  //   for(let subgame of games[gameId].list){
-  //     if(subgame.subId==subGameId){
-  //       return subgame.subName;
-  //     }
-  //   }
-  // }
-  // //获取广告列表
-  // function getDealId(dealId){
-  //   let deals = faList.value;
-  //   return deals[dealId].dealName;
-  // }
-  // //
   //注册table数据
   let getGameVal = (e: any) => {
     queryParam.value.gameId = e.gameId;
@@ -140,10 +126,85 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
+
+  function handleClick(type) {
+    let date = new Date();
+    //今天
+    if(type === 1) {
+      // 创建Date对象，获取今天的年、月、日等信息
+      date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 2) {
+      //昨天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 3) {
+      //最近三天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 3);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 4) {
+      //最近一周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 7);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 5) {
+      //最近两周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }
+  }
+
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
       title: 'ct_dayHour',
-      api: list,
+      api: queryList,
       columns,
       canResize:false,
       useSearchForm: false,

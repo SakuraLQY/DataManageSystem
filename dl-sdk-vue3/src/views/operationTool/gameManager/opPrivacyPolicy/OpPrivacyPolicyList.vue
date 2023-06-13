@@ -16,7 +16,7 @@
           </a-col> -->
           <a-col :lg="8">
               <a-form-item label="名称">
-                <a-input placeholder="请输入名称" v-model:value="queryParam.name"  allowClear/>
+                <a-input placeholder="请输入名称" v-model:value="queryParam.name" :maxLength="30"  allowClear/>
               </a-form-item>
             </a-col>
             <a-col :lg="8">
@@ -35,10 +35,10 @@
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
                 <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                <!-- <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
                   {{ toggleSearchStatus ? '收起' : '展开' }}
                   <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
+                </a> -->
               </a-col>
             </span>
           </a-col>

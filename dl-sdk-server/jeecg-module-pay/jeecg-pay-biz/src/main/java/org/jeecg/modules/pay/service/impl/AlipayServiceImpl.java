@@ -239,14 +239,12 @@ public class AlipayServiceImpl implements IOpAlipayService {
         // 发货
         if (opOrder.getBankStatus() < BankStatus.NORMAL
             && bankStatus >= BankStatus.NORMAL) {
-            // 异步发货
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                try {
-                    opOrderService.deliverOnce(opOrder.getOrderId());
-                } catch (Exception e) {
-                    log.error("支付宝支付发货异常{}", e.getMessage());
-                }
-            });
+            // 发货
+            try {
+                opOrderService.deliverOnce(opOrder.getOrderId());
+            } catch (Exception e) {
+                log.error("支付宝支付发货异常{}", e.getMessage());
+            }
         }
 
         return "success";

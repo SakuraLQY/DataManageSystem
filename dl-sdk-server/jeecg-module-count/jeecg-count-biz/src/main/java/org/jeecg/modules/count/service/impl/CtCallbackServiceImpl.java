@@ -3,19 +3,22 @@ package org.jeecg.modules.count.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.ws.spi.http.HttpHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.C;
 import org.jeecg.common.advert.dto.JrttVisitDto;
 import org.jeecg.common.constant.ChannelConstant;
 import org.jeecg.common.constant.SubGameTypeConstant;
+import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.game.api.IAdvertApi;
 import org.jeecg.common.game.api.IGameApi;
 import org.jeecg.common.game.bo.PkgChannelConfJrtt;
@@ -34,11 +37,15 @@ import org.jeecg.modules.count.bo.callback.JrttPaySdkHeader;
 import org.jeecg.modules.count.bo.callback.JrttPaySdkUser;
 import org.jeecg.modules.count.constant.CallBackChannelConstant;
 import org.jeecg.modules.count.constant.CallBackEventType;
+import org.jeecg.modules.count.constant.CallBackOperationType;
 import org.jeecg.modules.count.constant.CallBackState;
 import org.jeecg.modules.count.constant.CallBackUrlConstant;
+import org.jeecg.modules.count.dto.CallbackOperationDto;
+import org.jeecg.modules.count.dto.CtCallbackDto;
 import org.jeecg.modules.count.entity.CtCallback;
 import org.jeecg.modules.count.mapper.CtCallbackMapper;
 import org.jeecg.modules.count.service.ICtCallbackService;
+import org.jeecg.modules.count.vo.CtCallbackVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -124,6 +131,64 @@ public class CtCallbackServiceImpl extends ServiceImpl<CtCallbackMapper, CtCallb
         }
     }
 
+    @Override
+    public IPage<CtCallbackVo> getDeviceCallbackData(Page page, CtCallbackDto ctCallbackDto) {
+        QueryWrapper queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getGameId()), "a.game_id",
+            ctCallbackDto.getGameId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getSubGameId()), "a.sub_game_id",
+            ctCallbackDto.getSubGameId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getPkgId()), "a.pkg_id",
+            ctCallbackDto.getPkgId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getChannelId()), "a.channel_id",
+            ctCallbackDto.getChannelId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getChannelSubAccountId()),
+            "a.channel_sub_account_id", ctCallbackDto.getChannelSubAccountId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getCallbackState()),
+            "a.callback_state", ctCallbackDto.getCallbackState());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getDealId()), "a.deal_id",
+            ctCallbackDto.getDealId());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(ctCallbackDto.getChannelTypeId()),
+            "c.type_id", ctCallbackDto.getChannelTypeId());
+        queryWrapper.ge(ObjectUtils.isNotEmpty(ctCallbackDto.getStartTime()), "a.create_time",
+            ctCallbackDto.getStartTime());
+        queryWrapper.le(ObjectUtils.isNotEmpty(ctCallbackDto.getEndTime()), "a.create_time",
+            ctCallbackDto.getEndTime());
+        List<CtCallbackVo> ctCallbackVoList = baseMapper.getCtCallbackPage(page, queryWrapper);
+        return page.setRecords(ctCallbackVoList);
+    }
+
+    @Override
+    public void callbackOperation(CallbackOperationDto callbackOperationDto) {
+        CtCallback ctCallback = getById(callbackOperationDto.getId());
+        if (ctCallback == null) {
+            throw new JeecgBootException("未找到回调数据");
+        }
+
+        if (ChannelConstant.JRTT.equals(ctCallback.getChannelId())
+            || ChannelConstant.XING_TU.equals(ctCallback.getChannelId())) {
+            String callbackData = ctCallback.getCallbackData();
+            CallbackDataJrtt callBackDataJrtt = JSONObject.parseObject(callbackData,
+                CallbackDataJrtt.class);
+            String[] arr = callBackDataJrtt.getUrl().split("&event_type");
+            if(arr.length == 0){
+                throw new JeecgBootException("回调url为空");
+            }
+            String url = arr[0];
+            if (CallBackOperationType.START.equals(callbackOperationDto.getOperationType())) {
+                CtCallback push = getCtCallback(CallBackEventType.JRTT_START, null, url);
+                handleJrtt(push);
+            } else if (CallBackOperationType.REGISTER.equals(callbackOperationDto.getOperationType())) {
+                CtCallback push = getCtCallback(CallBackEventType.JRTT_REGISTER, null, url);
+                handleJrtt(push);
+            } else if (CallBackOperationType.PAY.equals(callbackOperationDto.getOperationType())) {
+                // 金额默认为6
+                CtCallback push = getCtCallback(CallBackEventType.JRTT_SDK_PAY, BigDecimal.valueOf(6), url);
+                handleJrtt(push);
+            }
+        }
+    }
+
     /**
      * @param eventType
      * @param visitData
@@ -134,7 +199,22 @@ public class CtCallbackServiceImpl extends ServiceImpl<CtCallbackMapper, CtCallb
      **/
     private void pushToJrtt(Integer eventType, String visitData, BigDecimal money) {
         JrttVisitDto jrttVisitDto = JSONObject.parseObject(visitData, JrttVisitDto.class);
-        String url = jrttVisitDto.getCallbackUrl() + "&event_type=" + eventType;
+        String callbackUrl = jrttVisitDto.getCallbackUrl();
+        CtCallback insert = getCtCallback(eventType, money, callbackUrl);
+        save(insert);
+    }
+
+    /**
+     * @param eventType
+     * @param money
+     * @param callbackUrl
+     * @return org.jeecg.modules.count.entity.CtCallback
+     * @author chenyw
+     * @description 获取callback对象
+     * @date 19:52 2023/5/15/015
+     **/
+    private CtCallback getCtCallback(Integer eventType, BigDecimal money, String callbackUrl) {
+        String url = callbackUrl + "&event_type=" + eventType;
         if (CallBackEventType.JRTT_PAY.equals(eventType)) {
             // 支付加上金额
             money = money.multiply(BigDecimal.valueOf(100)).setScale(0, RoundingMode.HALF_UP);
@@ -148,12 +228,12 @@ public class CtCallbackServiceImpl extends ServiceImpl<CtCallbackMapper, CtCallb
         }
         CallbackDataJrtt callBackDataJrtt = new CallbackDataJrtt(url);
         CtCallback insert = new CtCallback();
+        insert.setCallbackData(JSONObject.toJSONString(callBackDataJrtt));
         insert.setCallbackChannel(CallBackChannelConstant.JRTT);
         insert.setEventType(eventType);
-        insert.setCallbackData(JSONObject.toJSONString(callBackDataJrtt));
         insert.setCallbackNum(0);
         insert.setCallbackState(CallBackState.WAIT);
-        save(insert);
+        return insert;
     }
 
     /**

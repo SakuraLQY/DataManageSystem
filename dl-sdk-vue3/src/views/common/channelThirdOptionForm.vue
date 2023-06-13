@@ -5,10 +5,10 @@
             <a-select-option
                 v-for="(gameItem,index) in faList"
                 :key="index"
-                :value="index"
-                :label="gameItem.name + '(' + index + ')'"
+                :value="gameItem.id"
+                :label="gameItem.name + '(' + gameItem.id + ')'"
             >
-            {{gameItem.name + '(' + index + ')'}}
+            {{gameItem.name + '(' + gameItem.id + ')'}}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -19,10 +19,10 @@
             <a-select-option
                 v-for="(gameItem,index) in faList[queryParam.channelTypeId].map"
                 :key="index"
-                :value="index"
-                :label="gameItem.name + '(' + index + ')'"
+                :value="gameItem.id"
+                :label="gameItem.name + '(' + gameItem.id + ')'"
             >
-            {{gameItem.name + '(' + index + ')'}}
+            {{gameItem.name + '(' + gameItem.id + ')'}}
             </a-select-option>
             </a-select>
             <a-select v-model:value="queryParam.channelId" placeholder="请选择渠道" v-if="queryParam.channelTypeId ==='' || queryParam.channelTypeId ===undefined">

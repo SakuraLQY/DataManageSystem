@@ -47,6 +47,18 @@ public class OpPayVendorServiceImpl extends ServiceImpl<OpPayVendorMapper, OpPay
         }
     }
 
+    @Override
+    public void insert(OpPayVendor opPayVendor) {
+        LambdaQueryWrapper<OpPayVendor> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OpPayVendor::getPayVendorName, opPayVendor.getPayVendorName());
+        wrapper.eq(OpPayVendor::getPayType, opPayVendor.getPayType());
+        OpPayVendor notNull = getOne(wrapper);
+        if(oConvertUtils.isNotEmpty(notNull)) {
+            throw new JeecgBootException("已存在相同名称的支付渠道");
+        }
+        save(opPayVendor);
+    }
+
     /**
      * @author xmh
      * @description 判断渠道是否被绑定

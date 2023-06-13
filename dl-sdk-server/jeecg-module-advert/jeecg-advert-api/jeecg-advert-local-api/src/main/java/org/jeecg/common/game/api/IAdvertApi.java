@@ -3,13 +3,14 @@ package org.jeecg.common.game.api;
 import java.util.List;
 import org.jeecg.common.advert.dto.OpCostDto;
 import org.jeecg.common.advert.vo.OpChannelSubAccountModel;
-import org.jeecg.common.advert.api.AdvertApi;
 import org.jeecg.common.advert.vo.OpChannelModel;
+import org.jeecg.common.advert.vo.OpChannelTypeModel;
 import org.jeecg.common.advert.vo.OpDealModel;
 import org.jeecg.common.advert.vo.OpPutAccountModel;
+import org.jeecg.common.count.vo.CostModel;
 import org.jeecg.common.count.vo.CostMoneyModel;
 
-public interface IAdvertApi extends AdvertApi {
+public interface IAdvertApi{
 
     /**
      * @param id
@@ -27,6 +28,15 @@ public interface IAdvertApi extends AdvertApi {
      * @Date 15:00 2023/5/9
      **/
     OpChannelModel getOpChannel(Integer id);
+
+    /**
+     * @param id
+     * @return org.jeecg.common.advert.vo.OpChannelTypeModel
+     * @Author lili
+     * @Description 根据id得到渠道类型对象
+     * @Date 15:48 2023/5/16
+     **/
+    OpChannelTypeModel getOpChannelType(Integer id);
 
     /**
      * @param dealId
@@ -80,5 +90,14 @@ public interface IAdvertApi extends AdvertApi {
      * @date 20:46 2023/5/8/008
      **/
     OpChannelSubAccountModel getOpChannelSubAccount(Integer channelSubAccountId);
+
+    /**
+     * @param opCostDto
+     * @return java.util.List<org.jeecg.common.count.vo.CostModel>
+     * @author chenyw
+     * @description 获取成本
+     * @date 17:17 2023/5/22/022
+     **/
+    List<CostModel> getCostModel(OpCostDto opCostDto);
 
 }

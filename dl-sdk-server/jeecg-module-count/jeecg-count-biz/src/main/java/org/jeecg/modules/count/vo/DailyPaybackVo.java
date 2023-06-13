@@ -45,22 +45,22 @@ public class DailyPaybackVo implements Serializable {
 	private Integer channelSubAccountId;
 	/**累积-付费金额*/
 	@ApiModelProperty(value = "累积-付费金额")
-	private BigDecimal totalMoney;
+	private BigDecimal totalMoney=BigDecimal.ZERO;
 	/**首日-付费金额*/
 	@ApiModelProperty(value = "首日-付费金额")
-	private BigDecimal firstMoney;
+	private BigDecimal firstMoney=BigDecimal.ZERO;
 	/**新增-注册数*/
 	@ApiModelProperty(value = "新增-注册数")
-	private Integer countUser;
+	private Integer countUser=0;
 	/**首日-付费人数*/
 	@ApiModelProperty(value = "首日-付费人数")
-	private Integer firstPayuser;
+	private Integer firstPayuser=0;
 	/**累计付费ios*/
 	@ApiModelProperty(value = "累计付费ios")
-	private BigDecimal totalMoneyIos;
+	private BigDecimal totalMoneyIos=BigDecimal.ZERO;
 	/**成本*/
 	@ApiModelProperty(value = "成本")
-	private BigDecimal remainTotalMoney;
+	private BigDecimal remainTotalMoney=BigDecimal.ZERO;
 	/**回本-1天*/
 	@Excel(name = "回本-1天", width = 15)
 	@ApiModelProperty(value = "回本-1天")

@@ -7,6 +7,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.GameApi;
+import org.jeecg.common.constant.PkgParentConstant;
 import org.jeecg.common.exception.ErrorCode;
 import org.jeecg.common.exception.IdeaRunTimeException;
 import org.jeecg.common.game.vo.OpPkgModel;
@@ -59,8 +60,8 @@ public class SdkCheckInputInterceptor implements HandlerInterceptor {
         if(null == opSubGameModel){
             throw new IdeaRunTimeException(ErrorCode.NO_FOUND_SUB_GAME);
         }
-        OpPkgModel opPkgModel = null;
-        if (!pkgId.equals("0")) {
+        OpPkgModel opPkgModel = new OpPkgModel();
+        if (!PkgParentConstant.DEFAULT_PKG_ID.toString().equals(pkgId)){
             opPkgModel = gameApi.getOpPkgById(Integer.valueOf(pkgId));
         }
 

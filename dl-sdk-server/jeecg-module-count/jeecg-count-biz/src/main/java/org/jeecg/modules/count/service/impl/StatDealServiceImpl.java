@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +15,9 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.bo.StatDealBo;
 import org.jeecg.modules.count.dto.StatDealDto;
 import org.jeecg.modules.count.entity.StatDeal;
@@ -163,7 +160,7 @@ public class StatDealServiceImpl extends ServiceImpl<StatDealMapper, StatDeal> i
     }
 
     @Override
-    public ModelAndView exportExcel(HttpServletRequest request, StatDealVo statDealVo,StatDealDto statDealDto, Class name,
+    public ModelAndView exportExcel(HttpServletRequest request,StatDealDto statDealDto, Class<StatDealVo> name,
         String title) {
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         String  username = JwtUtil.getUserNameByToken(request);

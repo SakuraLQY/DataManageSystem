@@ -6,9 +6,9 @@
                 v-for="(gameItem,index) in resList[1]"
                 :key="index"
                 :value="gameItem.id"
-                :label="gameItem.gameName + '(' + index + ')'"
+                :label="gameItem.gameName + '(' + gameItem.id + ')'"
             >
-            {{gameItem.gameName + '(' + index + ')'}}
+            {{gameItem.gameName + '(' + gameItem.id + ')'}}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -20,9 +20,9 @@
                 v-for="(gameItem,index) in subGameList"
                 :key="index"
                 :value="gameItem.id"
-                :label="gameItem.gameName + '(' + index + ')'"
+                :label="gameItem.gameName + '(' + gameItem.id + ')'"
             >
-            {{gameItem.gameName + '(' + index + ')'}}
+            {{gameItem.gameName + '(' + gameItem.id + ')'}}
             </a-select-option>
             </a-select>
             <a-select v-model:value="queryParam.subGameId" placeholder="请选择子游戏名" v-if="queryParam.gameId === [] || queryParam.gameId ===undefined">

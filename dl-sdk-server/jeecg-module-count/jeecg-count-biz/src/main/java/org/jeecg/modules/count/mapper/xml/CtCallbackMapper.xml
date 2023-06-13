@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.count.mapper.CtCallbackMapper">
-
+  <select id="getCtCallbackPage" resultType="org.jeecg.modules.count.vo.CtCallbackVo">
+    select a.id               as id,
+           b.pkg_name         as pkgName,
+           c.channel_name     as channelName,
+           a.callback_channel as callbackChannel,
+           a.deal_id          as dealId,
+           a.event_type       as eventType,
+           a.callback_data    as callbackData,
+           a.callback_num     as callbackNum,
+           a.callback_state   as callbackState,
+           a.update_time      as updateTime
+    from ct_callback as a
+           left join `open_gateway`.op_pkg as b on a.pkg_id = b.id
+           left join `open_gateway`.op_channel as c on a.channel_id = c.id
+      ${ew.customSqlSegment}
+  </select>
 </mapper>

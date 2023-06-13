@@ -13,8 +13,11 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.count.dto.ChannelDetailDto;
 import org.jeecg.modules.count.dto.StatHourDto;
 import org.jeecg.modules.count.entity.StatHour;
+import org.jeecg.modules.count.modal.ChannelDetailModal;
+import org.jeecg.modules.count.modal.StatHourModal;
 import org.jeecg.modules.count.service.IStatHourService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -81,7 +84,7 @@ public class StatHourController extends JeecgController<StatHour, IStatHourServi
 	/**@param statHourDto
 	 * @author chenglin
 	 * @description 查询合作商数据-渠道
-	 * @date 11:14 2023/5/29
+	 * @date 11:37 2023/5/29
 	 **/
 	 @ApiOperation(value="cooperator_stat-自定义列表查询", notes="cooperate-渠道分页列表查询")
 	 @GetMapping(value = "/queryList")
@@ -89,6 +92,18 @@ public class StatHourController extends JeecgController<StatHour, IStatHourServi
 		 String  username = JwtUtil.getUserNameByToken(request);
 		return Result.OK(statHourService.queryList(statHourDto,username));
 	}
+
+
+	 /**@param statHourDto
+	  * @author chenglin
+	  * @description 补充导出Excel功能
+	  * @date  16:12 2023/6/13
+	  **/
+	 @GetMapping(value = "/exportExcel")
+	 public ModelAndView exportExcel(HttpServletRequest request, StatHourDto statHourDto) {
+		 return statHourService.exportExcel(request,statHourDto, StatHourModal.class,"合作商数据-渠道信息表");
+	 }
+
 	/**
 	 *   添加
 	 *

@@ -2,20 +2,19 @@ package org.jeecg.modules.count.controller;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
-import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.common.util.DateUtils;
+import org.jeecg.modules.count.dto.OverViewDto;
+import org.jeecg.modules.count.dto.RetentionDto;
 import org.jeecg.modules.count.dto.RoiDto;
+import org.jeecg.modules.count.dto.XingtuDayReportDto;
 import org.jeecg.modules.count.entity.CtDaily;
-import org.jeecg.modules.count.modal.ROIListResult;
+import org.jeecg.modules.count.modal.DayReportResultModal;
 import org.jeecg.modules.count.modal.RoiModal;
+import org.jeecg.modules.count.modal.XingtuDayReportModal;
 import org.jeecg.modules.count.service.ICtDailyService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,25 +22,22 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.count.vo.FinanceUserVo;
+import org.jeecg.modules.count.vo.OverViewVo;
+import org.jeecg.modules.count.vo.RecoveryVo;
+import org.jeecg.modules.count.vo.RetentionVo;
 import org.jeecg.modules.count.vo.RoiVo;
-import org.jeecgframework.poi.excel.ExcelImportUtil;
-import org.jeecgframework.poi.excel.def.NormalExcelConstants;
-import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.jeecgframework.poi.excel.entity.ImportParams;
-import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.modules.count.vo.StatCustomVo;
+import org.jeecg.modules.count.vo.XingtuDayReportVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.aspect.annotation.AutoLog;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 
- /**
+/**
  * @Description: ct_daily
  * @Author: jeecg-boot
  * @Date:   2023-04-13
@@ -77,6 +73,36 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 		return Result.OK(pageList);
 	}
 
+	@ApiOperation(value="ct_daily-发行合作商数据统计-留存数据统计", notes="ct_daily-发行合作商数据统计-留存数据统计")
+	@GetMapping(value = "/queryRetentionList")
+	public Result<List<RetentionVo>> queryRetentionList(RetentionDto retentionDto) {
+		return Result.OK(ctDailyService.queryRetentionList(retentionDto));
+	}
+
+	@ApiOperation(value="ct_daily-合作商数据统计 合作商数据【数据】", notes="ct_daily-合作商数据统计 合作商数据【数据】")
+	@GetMapping(value = "/queryStatCustomList")
+	public Result<List<StatCustomVo>> queryStatCustomList(RetentionDto retentionDto) {
+		return Result.OK(ctDailyService.queryStatCustomList(retentionDto));
+	}
+
+	@ApiOperation(value="ct_daily-数据日报", notes="ct_daily-数据日报")
+	@GetMapping(value = "/queryDayReportList")
+	public Result<DayReportResultModal> queryDayReportList(OverViewDto overViewDto) {
+		return Result.OK(ctDailyService.queryDayReportList(overViewDto));
+	}
+
+	@ApiOperation(value="ct_daily-星图日报", notes="ct_daily-星图日报")
+	@GetMapping(value = "/queryXingtuDayReportList")
+	public Result<List<XingtuDayReportVo>> queryXingtuDayReportList(XingtuDayReportDto xingtuDayReportDto) {
+		return Result.OK(ctDailyService.queryXingtuDayReportList(xingtuDayReportDto));
+	}
+
+	@ApiOperation(value="ct_daily-星图日报导出", notes="ct_daily-星图日报导出")
+	@RequestMapping(value = "/xingtuDayReportExportXls")
+	public ModelAndView xingtuDayReportExportXls(XingtuDayReportDto xingtuDayReportDto) {
+		return ctDailyService.xingtuDayReportExportXls(xingtuDayReportDto, XingtuDayReportModal.class, "星图日报");
+	}
+
 	/**
 	 * @param roiDto
 	 * @return org.jeecg.common.api.vo.Result<java.util.List < org.jeecg.modules.count.vo.RoiVo>>
@@ -91,16 +117,65 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	 }
 
 	 /**
+	  * @param overViewDto
+	  * @return org.jeecg.common.api.vo.Result<java.util.List < org.jeecg.modules.count.vo.RecoveryVo>>
+	  * @Author lili
+	  * @Description 财务数据-回收数据
+	  * @Date 16:34 2023/5/16
+	  **/
+	@ApiOperation(value="ct_daily-财务数据-回收数据", notes="ct_daily-财务数据-回收数据")
+	@GetMapping(value = "/queryRecoveryList")
+	public Result<List<RecoveryVo>> queryRecoveryList(OverViewDto overViewDto) {
+		return Result.OK(ctDailyService.queryRecoveryList(overViewDto));
+	}
+
+	 /**
+	  * @param overViewDto
+	  * @return org.jeecg.common.api.vo.Result<java.util.List < org.jeecg.modules.count.vo.OverViewListVo>>
+	  * @Author lili
+	  * @Description 游戏数据概况查询
+	  * @Date 15:52 2023/5/15
+	  **/
+	 @ApiOperation(value="游戏数据概况查询", notes="游戏数据概况查询")
+	 @GetMapping(value = "/queryOverViewList")
+	 public Result<List<OverViewVo>> queryOverViewList(OverViewDto overViewDto) {
+		 return Result.OK(ctDailyService.queryOverViewList(overViewDto));
+	 }
+
+	 /**
+	  * @param overViewDto
+	  * @return org.jeecg.common.api.vo.Result<java.util.List < org.jeecg.modules.count.vo.FinanceUserVo>>
+	  * @Author lili
+	  * @Description 财务数据-用户数据查询
+	  * @Date 14:54 2023/5/17
+	  **/
+	@ApiOperation(value="财务数据-用户数据查询", notes="财务数据-用户数据查询")
+	@GetMapping(value = "/queryFinanceUserList")
+	public Result<List<FinanceUserVo>> queryFinanceUserList(OverViewDto overViewDto) {
+		return Result.OK(ctDailyService.queryFinanceUserList(overViewDto));
+	}
+
+	 /**
 	  * 导出excel
 	  *
-	  * @param request
-	  * @param ctDaily
+	  * @param roiDto
 	  */
 	 //@RequiresPermissions("count:ct_daily:exportXls")
 	 @RequestMapping(value = "/roiExportXls")
 	 public ModelAndView roiExportXls(RoiDto roiDto) {
 		 return ctDailyService.exportXls(roiDto, RoiModal.class, "ROI数据表");
 	 }
+
+	/**
+	 * 导出excel
+	 *
+	 * @param overViewDto
+	 */
+	//@RequiresPermissions("count:ct_daily:exportXls")
+	@RequestMapping(value = "/recoveryExportXls")
+	public ModelAndView recoveryExportXls(OverViewDto overViewDto) {
+		return ctDailyService.recoveryExportXls(overViewDto, RecoveryVo.class, "回收数据表" + DateUtils.formatDate());
+	}
 
 	/**
 	 *   添加

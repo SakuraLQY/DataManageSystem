@@ -63,15 +63,17 @@ public class OpChannelSubAccountServiceImpl extends ServiceImpl<OpChannelSubAcco
                         ChannelObjModal channelObjModal = new ChannelObjModal();
                         channelObjModal.setId(opChannel.getId());
                         channelObjModal.setName(opChannel.getChannelName());
-                        if (opChannelSubAccountCollect.get(opChannelType.getId()).containsKey(opChannel.getId())) {
-                            List<ChannelObjModal> channelList = new ArrayList<>();
-                            for (OpChannelSubAccount osg : opChannelSubAccountCollect.get(opChannelType.getId()).get(opChannel.getId())) {
-                                ChannelObjModal gv = new ChannelObjModal();
-                                gv.setId(osg.getId());
-                                gv.setName(osg.getSubAccountName());
-                                channelList.add(gv);
+                        if (opChannelSubAccountCollect.containsKey(opChannelType.getId())) {
+                            if (opChannelSubAccountCollect.get(opChannelType.getId()).containsKey(opChannel.getId())) {
+                                List<ChannelObjModal> channelList = new ArrayList<>();
+                                for (OpChannelSubAccount osg : opChannelSubAccountCollect.get(opChannelType.getId()).get(opChannel.getId())) {
+                                    ChannelObjModal gv = new ChannelObjModal();
+                                    gv.setId(osg.getId());
+                                    gv.setName(osg.getSubAccountName());
+                                    channelList.add(gv);
+                                }
+                                channelObjModal.setList(channelList);
                             }
-                            channelObjModal.setList(channelList);
                         }
                         channelCollect.put(opChannel.getId(), channelObjModal);
                     }

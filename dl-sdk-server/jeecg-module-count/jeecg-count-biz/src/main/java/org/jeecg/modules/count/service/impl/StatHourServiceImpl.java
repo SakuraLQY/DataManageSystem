@@ -15,17 +15,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.util.JwtUtil;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.count.bo.StatHourBo;
 import org.jeecg.modules.count.dto.StatHourDto;
 import org.jeecg.modules.count.entity.StatHour;
 import org.jeecg.modules.count.mapper.StatHourMapper;
+import org.jeecg.modules.count.modal.StatHourModal;
 import org.jeecg.modules.count.service.IStatHourService;
 import org.jeecg.modules.count.vo.StatHourVo;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description: cooperator_stat
@@ -40,6 +51,8 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
 
     @Resource
     private StatHourMapper statHourMapper;
+    @Value("${jeecg.path.upload}")
+    private String upLoadPath;
 
     @Override
     public List<StatHourVo> queryList(StatHourDto statHourDto, String username) {
@@ -532,5 +545,33 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
         allStatHourVo.setGameName("全部游戏");
         resList.add(allStatHourVo);
         return resList;
+    }
+
+    @Override
+    public ModelAndView exportExcel(HttpServletRequest request, StatHourDto statHourDto,
+        Class<StatHourModal> statHourModalClass, String title) {
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String  username = JwtUtil.getUserNameByToken(request);
+
+        List<StatHourVo>resList = this.queryList(statHourDto,username);
+        List<StatHourModal>exportList = new ArrayList<>();
+        for (StatHourVo statHourVo : resList) {
+            StatHourModal statHourModal = new StatHourModal();
+            BeanUtils.copyProperties(statHourVo,statHourModal);
+            exportList.add(statHourModal);
+        }
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.FILE_NAME, title);
+        mv.addObject(NormalExcelConstants.CLASS, statHourModalClass);
+        //update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+        ExportParams exportParams=new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(), title);
+        exportParams.setImageBasePath(upLoadPath);
+        //update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+        mv.addObject(NormalExcelConstants.PARAMS,exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
+
     }
 }

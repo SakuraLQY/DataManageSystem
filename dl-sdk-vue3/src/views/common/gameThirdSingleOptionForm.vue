@@ -19,10 +19,10 @@
             <a-select-option
                 v-for="(gameItem,index) in faList[queryParam.gameId].map"
                 :key="index"
-                :value="index"
-                :label="gameItem.gameName + '(' + index + ')'"
+                :value="gameItem.id"
+                :label="gameItem.gameName + '(' + gameItem.id + ')'"
             >
-            {{gameItem.gameName + '(' + index + ')'}}
+            {{gameItem.gameName + '(' + gameItem.id + ')'}}
             </a-select-option>
             </a-select>
             <a-select v-model:value="queryParam.subGameId" placeholder="请选择子游戏名" v-if="queryParam.gameId ==='' || queryParam.gameId ===undefined">

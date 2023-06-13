@@ -37,7 +37,7 @@
            b.real_number
     from op_user a
            LEFT JOIN op_user_realname_info b ON a.id = b.user_id
-      ${ew.customSqlSegment}
+      ${ew.customSqlSegment} order by a.signup_time desc
   </select>
 
 </mapper>

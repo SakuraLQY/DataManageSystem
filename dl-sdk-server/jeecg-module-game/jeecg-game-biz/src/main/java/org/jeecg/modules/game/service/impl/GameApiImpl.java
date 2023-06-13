@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.advert.api.AdvertApi;
 import org.jeecg.common.advert.vo.OpChannelModel;
 import org.jeecg.common.advert.vo.OpDealModel;
 import org.jeecg.common.constant.ChannelConstant;
@@ -21,7 +20,6 @@ import org.jeecg.common.exception.IdeaRunTimeException;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.function.bo.GetNameByIdDto;
 import org.jeecg.common.function.vo.GetNameByIdVo;
-import org.jeecg.common.game.api.IAdvertApi;
 import org.jeecg.common.game.api.IGameApi;
 import org.jeecg.common.game.bo.PkgChannelConfJrtt;
 import org.jeecg.common.game.vo.OpCommodityModel;
@@ -89,6 +87,7 @@ public class GameApiImpl implements IGameApi {
         }
         for(OpCommodityBo opCommodityBo : opCommodityBos){
             if(Objects.equals(opCommodityBo.getGoodsId(), goodsId)){
+                result = new OpCommodityModel();
                 BeanUtils.copyProperties(opCommodityBo, result);
                 break;
             }

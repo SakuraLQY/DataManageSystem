@@ -60,7 +60,7 @@
             <j-search-select v-model:value="formData.phoneSwitch" dict="game_is_open" placeholder="请选择绑定手机开关" :disabled="disabled"/>
           </a-form-item>
         </a-col>
-        <a-col :span="24">
+        <a-col :span="24" v-show="false">
           <a-form-item label="隐私政策开关" v-bind="validateInfos.privacySwitch">
             <j-search-select v-model:value="formData.privacySwitch" dict="game_is_open" placeholder="请选择隐私政策开关" :disabled="disabled"/>
           </a-form-item>
@@ -88,6 +88,21 @@
         <a-col :span="24">
           <a-form-item label="防沉迷开关" v-bind="validateInfos.antiIndulgeSwitch">
             <j-search-select v-model:value="formData.antiIndulgeSwitch" dict="game_is_open" placeholder="请选择防沉迷开关" :disabled="disabled"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="隐私政策地址" >
+            <a-input v-model:value="formData.privacyPolicyUrl" placeholder="请输入隐私政策地址" maxLength="200" :disabled="disabled"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="用户协议地址" >
+            <a-input v-model:value="formData.userAgreementUrl" placeholder="请输入用户协议地址" maxLength="200" :disabled="disabled"></a-input>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="客服地址" >
+            <a-input v-model:value="formData.customerServiceUrl" placeholder="请输入客服地址" maxLength="200" :disabled="disabled"></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -141,6 +156,9 @@
     officialAntiIndulgeSwitch: '0',
     officialBizId: undefined,
     antiIndulgeSwitch: '0',
+    privacyPolicyUrl:"",
+    userAgreementUrl:"",
+    customerServiceUrl:"",
     // gameKey: '',   
     descs: '',   
   });

@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.count.mapper.CtOrderMapper">
-  <resultMap id="SummaryOrderBo" type="org.jeecg.modules.count.bo.summary.SummaryOrderBo">
+  <resultMap id="SummaryOrderBo" type="org.jeecg.modules.count.bo.SummaryOrderBo">
     <id column="id" property="id"/>
     <id column="count_user" property="countUser"/>
     <id column="sum_money" property="sumMoney"/>
   </resultMap>
 
-  <resultMap id="SummaryOrderDevBo" type="org.jeecg.modules.count.bo.summary.SummaryOrderDevBo">
+  <resultMap id="SummaryOrderDevBo" type="org.jeecg.modules.count.bo.SummaryOrderDevBo">
     <id column="id" property="id"/>
     <id column="count_device" property="countDevice"/>
     <id column="sum_money" property="sumMoney"/>
@@ -20,8 +20,20 @@
   </resultMap>
 
   <resultMap id="OrderDateGroupBo" type="org.jeecg.modules.count.bo.OrderDateGroupBo">
-    <id column="date" property="date"/>
+    <id column="day" property="day"/>
     <id column="count" property="count"/>
+  </resultMap>
+
+  <resultMap type="org.jeecg.modules.count.bo.OrderMoneyGroupRegTimeCreateTimeBo" id="OrderMoneyGroupRegTimeCreateTimeBo">
+    <result column="money" property="money"/>
+    <result column="user_create_time" property="userCreateTime"/>
+    <result column="create_time" property="createTime"/>
+  </resultMap>
+
+  <resultMap type="org.jeecg.modules.count.bo.OrderNumGroupRegTimeCreateTimeBo" id="OrderNumGroupRegTimeCreateTimeBo">
+    <result column="num" property="num"/>
+    <result column="user_create_time" property="userCreateTime"/>
+    <result column="create_time" property="createTime"/>
   </resultMap>
 
   <resultMap type="org.jeecg.modules.count.vo.PayUserAndOrderVo" id="PayUserAndOrderVo">
@@ -71,12 +83,32 @@
 
   <select id="selectDateGroup" resultMap = "OrderDateGroupBo">
     SELECT
-      a.user_create_time as day,
+      DATE(a.user_create_time) as day,
       count( * ) AS count
     FROM
       ct_order a
       LEFT JOIN open_gateway.op_deal b ON ( b.id = a.deal_id )
       LEFT JOIN open_gateway.op_pkg c ON ( a.pkg_id = c.id )
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="selectNumGroupRegTimeCreateTime" resultMap = "OrderNumGroupRegTimeCreateTimeBo">
+    SELECT
+      count(distinct a.user_id) as num,
+      DATE(a.user_create_time) as user_create_time,
+      DATE(a.create_time) as create_time
+    FROM
+      ct_order a
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="selectMoneyGroupRegTimeCreateTime" resultMap = "OrderMoneyGroupRegTimeCreateTimeBo">
+    SELECT
+      sum(a.money) as money,
+      DATE(a.user_create_time) as user_create_time,
+      DATE(a.create_time) as create_time
+    FROM
+      ct_order a
       ${ew.customSqlSegment}
   </select>
 </mapper>

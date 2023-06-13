@@ -8,7 +8,7 @@
     labelInValue
     allowClear
     :getPopupContainer="getParentContainer"
-    :placeholder="placeholder"
+    :placeholder="checkOptions() ? '暂无可选项' : placeholder"
     :filterOption="false"
     :notFoundContent="loading ? undefined : null"
     @search="loadData"
@@ -26,7 +26,7 @@
     v-bind="attrs"
     showSearch
     :getPopupContainer="getParentContainer"
-    :placeholder="placeholder"
+    :placeholder="checkOptions() ? '暂无可选项' : placeholder"
     :filterOption="filterOption"
     :notFoundContent="loading ? undefined : null"
     @change="handleChange"
@@ -300,6 +300,9 @@
       }
       //update-end-author:taoyan date:2022-8-15 for: VUEN-1971 【online 专项测试】关联记录和他表字段 1
       
+      function checkOptions() {
+        return options.value.length === 0;
+      }
       return {
         attrs,
         options,
@@ -311,6 +314,7 @@
         filterOption,
         handleChange,
         handleAsyncChange,
+        checkOptions
       };
     },
   });

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 import java.util.Map;
 import org.jeecg.common.game.vo.OpPkgModel;
+import org.jeecg.modules.game.bo.GameSelectModal;
 import org.jeecg.modules.game.entity.OpPkg;
 import org.jeecg.modules.game.vo.GameObjVo;
 import org.jeecg.modules.game.vo.GameVo;
@@ -33,13 +34,12 @@ public interface IOpPkgService extends IService<OpPkg> {
     List<Map<String, Object>> getJrttPkg(Integer gameId, Integer subGameId, Integer channelId);
 
     /**
-     * @param type
      * @return java.util.List<org.jeecg.modules.game.vo.SubAndOpPackGameVo>
      * @Author lili
      * @Description 查询游戏+子游戏+一级游戏包的下拉框的值
      * @Date 14:37 2023/2/14
      **/
-    List<SubAndOpPackGameVo> getOptionList(Integer type);
+    List<SubAndOpPackGameVo> getOptionList(GameSelectModal gameSelectModal);
 
     /**
      * @return java.util.List<org.jeecg.modules.game.vo.SubAndOpPackGameVo>
@@ -108,5 +108,14 @@ public interface IOpPkgService extends IService<OpPkg> {
      * @Date 9:52 2023/2/15
      **/
     OpPkg getPkgByPackageName(String packageName);
+
+    /**
+     * @param pkgId
+     * @return org.jeecg.modules.game.entity.OpPkg
+     * @author chenyw
+     * @description 根据id获取pkg
+     * @date 10:40 2023/6/13/013
+     **/
+    OpPkg getPkgById(Integer pkgId);
 
 }

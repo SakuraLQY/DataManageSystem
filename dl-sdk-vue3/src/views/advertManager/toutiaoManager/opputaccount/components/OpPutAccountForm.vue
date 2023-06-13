@@ -24,7 +24,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="账号所属应用" v-bind="validateInfos.appId">
-	          <j-search-select v-model:value="formData.appId" dict="open_gateway.op_ks_put_account_app,app_name,id" placeholder="请选择账号所属应用" :disabled="disabled"/>
+	          <j-search-select v-model:value="formData.appId" dict="open_gateway.op_jrtt_put_account_app,app_name,id" placeholder="请选择账号所属应用" :disabled="disabled"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -89,8 +89,8 @@
           </a-form-item>
         </a-col>
         <a-col :span="12" v-if="props.formDisabled">
-          <a-form-item label="token过期时间" v-bind="validateInfos.refreshTokenTime">
-            <a-input v-model:value="formData.refreshTokenTime"  :disabled="disabled"></a-input>
+          <a-form-item label="token过期时间" v-bind="validateInfos.accessTokenTime">
+            <a-input v-model:value="formData.accessTokenTime"  :disabled="disabled"></a-input>
           </a-form-item>
         </a-col>
         <a-col :span="12" v-if="props.formDisabled">
@@ -125,13 +125,13 @@
     levelId: '',
     appId: undefined,
     pid:'',
-    account: '',   
-    nickName: '',   
-    password: '',   
-    subGameIds: '',   
+    account: '',
+    nickName: '',
+    password: '',
+    subGameIds: '',
     putUser: '',
-    channelId:9,  
-    accountDesc: '',   
+    channelId:4,
+    accountDesc: '',
     state: '1',
     accessToken: '',
     refreshToken: '',
@@ -223,7 +223,7 @@
     return props.formDisabled;
   });
 
-  
+
   /**
    * 新增
    */

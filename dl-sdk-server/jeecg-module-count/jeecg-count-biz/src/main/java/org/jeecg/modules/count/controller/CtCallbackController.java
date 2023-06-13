@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.count.dto.CallbackOperationDto;
+import org.jeecg.modules.count.dto.CtCallbackDto;
 import org.jeecg.modules.count.entity.CtCallback;
 import org.jeecg.modules.count.service.ICtCallbackService;
 
@@ -20,6 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.count.vo.CtCallbackVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -54,23 +57,20 @@ public class CtCallbackController extends JeecgController<CtCallback, ICtCallbac
 	/**
 	 * 分页列表查询
 	 *
-	 * @param ctCallback
+	 * @param ctCallbackDto
 	 * @param pageNo
 	 * @param pageSize
-	 * @param req
 	 * @return
 	 */
 	//@AutoLog(value = "ct_callback-分页列表查询")
 	@ApiOperation(value="ct_callback-分页列表查询", notes="ct_callback-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<CtCallback>> queryPageList(CtCallback ctCallback,
+	public Result<IPage<CtCallbackVo>> queryPageList(CtCallbackDto ctCallbackDto,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-								   HttpServletRequest req) {
-		QueryWrapper<CtCallback> queryWrapper = QueryGenerator.initQueryWrapper(ctCallback, req.getParameterMap());
-		Page<CtCallback> page = new Page<CtCallback>(pageNo, pageSize);
-		IPage<CtCallback> pageList = ctCallbackService.page(page, queryWrapper);
-		return Result.OK(pageList);
+								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+		Page<CtCallback> page = new Page<>(pageNo, pageSize);
+		IPage<CtCallbackVo> iPage = ctCallbackService.getDeviceCallbackData(page, ctCallbackDto);
+		return Result.OK(iPage);
 	}
 	
 	/**
@@ -174,5 +174,20 @@ public class CtCallbackController extends JeecgController<CtCallback, ICtCallbac
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, CtCallback.class);
     }
+
+	 /**
+	  * 操作
+	  *
+	  * @param callbackOperationDto
+	  * @return
+	  */
+	 @AutoLog(value = "操作")
+	 @ApiOperation(value="ct_callback-操作", notes="ct_callback-操作")
+	 //@RequiresPermissions("count:ct_callback:add")
+	 @PostMapping(value = "/callbackOperation")
+	 public Result<String> callbackOperation(@RequestBody CallbackOperationDto callbackOperationDto) {
+		 ctCallbackService.callbackOperation(callbackOperationDto);
+		 return Result.OK("操作成功");
+	 }
 
 }

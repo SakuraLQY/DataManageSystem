@@ -122,6 +122,9 @@ public class OpPkg implements Serializable {
     /**用户协议地址*/
     @ApiModelProperty(value = "用户协议地址")
     private java.lang.String userAgreementUrl;
+    /**客服地址*/
+    @ApiModelProperty(value = "客服地址")
+    private java.lang.String customerServiceUrl;
 	/**创建人*/
     @ApiModelProperty(value = "创建人")
     private java.lang.String createBy;

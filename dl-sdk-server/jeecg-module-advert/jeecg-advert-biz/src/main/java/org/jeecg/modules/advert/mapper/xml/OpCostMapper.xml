@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.advert.mapper.OpCostMapper">
 
   <resultMap id="OpCostVo" type="org.jeecg.modules.advert.vo.OpCostVo">
@@ -22,6 +23,7 @@
     <id column="cost_desc" property="costDesc"/>
     <id column="create_time" property="createTime"/>
     <id column="update_time" property="updateTime"/>
+    <id column="game_name" property="gameName"/>
     <id column="sub_game_name" property="subGameName"/>
     <id column="pkg_name" property="pkgName"/>
     <id column="channel_name" property="channelName"/>
@@ -40,6 +42,16 @@
   <resultMap id="SummaryCostVo" type="org.jeecg.common.count.vo.CostMoneyModel">
     <id column="id" property="id"/>
     <id column="cost_money" property="costMoney"/>
+  </resultMap>
+
+  <resultMap id="CostModel" type="org.jeecg.common.count.vo.CostModel">
+    <id column="game_id" property="gameId"/>
+    <id column="sub_game_id" property="subGameId"/>
+    <id column="pkg_id" property="pkgId"/>
+    <id column="channel_type_id" property="channelTypeId"/>
+    <id column="channel_id" property="channelId"/>
+    <id column="channel_sub_account_id" property="channelSubAccountId"/>
+    <id column="cost_day" property="costDay"/>
   </resultMap>
 
   <select id="costInfoPage" resultMap="OpCostVo">
@@ -63,11 +75,7 @@
            oc.create_time,
            oc.update_time,
            og.game_name,
-           osg.game_name         'sub_game_name',
-           opkg.nick_name        'pkg_name',
-           opa.nick_name         'account_name',
-           ocsa.sub_account_name 'channel_sub_account_name',
-           och.channel_name,
+           osg.game_name 'sub_game_name', opkg.pkg_name 'pkg_name', opa.nick_name 'account_name', ocsa.sub_account_name 'channel_sub_account_name', och.channel_name,
            od.deal_name
     from op_cost oc
            left join op_game og on oc.game_id = og.id
@@ -81,21 +89,31 @@
   </select>
 
   <select id="costTotal" resultMap="OpCostTotalVo">
-    select
-           sum(cost_money) as total_cost_money,
+    select sum(cost_money) as total_cost_money,
            sum(exhibition) as total_exhibition,
-           sum(click) as total_click,
-           sum(download) as total_download
+           sum(click)      as total_click,
+           sum(download)   as total_download
     from op_cost oc ${ew.customSqlSegment}
   </select>
 
   <select id="getSummaryCost" resultMap="SummaryCostVo">
-    select
-      ${groupBy} as id,
-      sum(a.cost_money) as cost_money
+    select ${groupBy}        as id,
+           sum(a.cost_money) as cost_money
     from op_cost a
-    left join op_deal b on a.deal_id = b.id
-    ${ew.customSqlSegment}
+           left join op_deal b on a.deal_id = b.id
+      ${ew.customSqlSegment}
+  </select>
+
+  <select id="getCostModel" resultMap="CostModel">
+    select a.game_id                as game_id,
+           a.sub_game_id            as sub_game_id,
+           a.pkg_id                 as pkg_id,
+           a.channel_type_id        as channel_type_id,
+           a.channel_id             as channel_id,
+           a.cost_day               as cost_day,
+           a.channel_sub_account_id as channel_sub_account_id,
+           sum(a.cost_money)        as cost_money
+    from op_cost a ${ew.customSqlSegment}
   </select>
 
 </mapper>

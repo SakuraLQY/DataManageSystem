@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.List;
 import org.jeecg.common.advert.dto.OpCostDto;
+import org.jeecg.common.count.vo.CostModel;
 import org.jeecg.common.count.vo.CostMoneyModel;
 import org.jeecg.modules.advert.entity.OpCost;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -50,4 +51,13 @@ public interface IOpCostService extends IService<OpCost> {
      * @date 10:56 2023/5/5/005
      **/
     List<CostMoneyModel> getSummaryCost(OpCostDto opCostDto);
+
+    /**
+     * @param opCostDto
+     * @return java.util.List<org.jeecg.common.count.vo.CostModel>
+     * @author chenyw
+     * @description 获取成本
+     * @date 17:15 2023/5/22/022
+     **/
+    List<CostModel> getCostModel(OpCostDto opCostDto);
 }

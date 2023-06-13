@@ -36,5 +36,7 @@ public class PayTypeConstant {
     public static final List<Integer> WECAHT_PAY = Arrays.asList(PAY_TYPE_WEIXIN, PAY_TYPE_WEIXIN_WEB, PAY_TYPE_WEIXIN_JS, PAY_TYPE_WEIXIN_NATIVE);
     // 属于支付宝的支付方式
     public static final List<Integer> ALI_PAY = Arrays.asList(PAY_TYPE_SDK_ALI, PAY_TYPE_H5_ALI);
+    // 母包支付方式
+    public static final List<Integer> DEFAULT_PAY = Arrays.asList(PAY_TYPE_H5_ALI, PAY_TYPE_WEIXIN_WEB,PAY_TYPE_APPLE);
 
 }

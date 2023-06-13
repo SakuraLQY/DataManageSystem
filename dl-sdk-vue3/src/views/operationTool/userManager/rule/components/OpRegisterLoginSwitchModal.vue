@@ -38,12 +38,13 @@
    */
   function edit(record) {
     title.value = disableSubmit.value ? '详情' : '编辑';
-    visible.value = true;
     record.ruleType = record.ruleType + '',
+    // record.ruleId = record.ruleId + '',
     record.registerCloseType = record.registerCloseType + '',
     record.registerLimitSwitch = record.registerLimitSwitch + '',
     record.loginCloseType = record.loginCloseType + '',
     record.limitCrossLoginSwitch = record.limitCrossLoginSwitch + '',
+    visible.value = true;
     nextTick(() => {
       registerForm.value.edit(record);
     });

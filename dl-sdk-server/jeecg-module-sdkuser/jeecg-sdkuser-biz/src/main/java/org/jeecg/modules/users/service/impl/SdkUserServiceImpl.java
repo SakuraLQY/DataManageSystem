@@ -17,10 +17,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.advert.vo.OpDealModel;
 import org.jeecg.common.constant.KafkaKeyConstant;
 import org.jeecg.common.constant.KafkaTopicConstant;
+import org.jeecg.common.constant.PkgParentConstant;
 import org.jeecg.common.constant.SwitchConstant;
 import org.jeecg.common.exception.ErrorCode;
 import org.jeecg.common.exception.IdeaRunTimeException;
 import org.jeecg.common.game.api.IAdvertApi;
+import org.jeecg.common.game.api.IGameApi;
+import org.jeecg.common.game.vo.OpGameModel;
+import org.jeecg.common.game.vo.OpPkgModel;
+import org.jeecg.common.game.vo.OpSubGameModel;
 import org.jeecg.common.kafka.dto.ParseAliveDto;
 import org.jeecg.common.kafka.dto.ParseLoginDto;
 import org.jeecg.common.kafka.dto.ParseRegisterDto;
@@ -57,7 +62,6 @@ import org.jeecg.modules.users.entity.OpUserRealnameInfo;
 import org.jeecg.modules.users.entity.OpUserRealnamedGame;
 import org.jeecg.modules.users.mapper.OpUserOnlineMapper;
 import org.jeecg.modules.users.service.IOpRegisterLoginSwitchService;
-import org.jeecg.modules.users.service.IOpRoleService;
 import org.jeecg.modules.users.service.IOpUserOnlineService;
 import org.jeecg.modules.users.service.IOpUserRealnameInfoService;
 import org.jeecg.modules.users.service.IOpUserRealnamedGameService;
@@ -84,8 +88,6 @@ public class SdkUserServiceImpl implements SdkUserService {
     @Autowired
     private IOpUserService opUserService;
     @Autowired
-    private IOpRoleService opRoleService;
-    @Autowired
     private IOpUserOnlineService opUserOnlineService;
     @Autowired
     private OpUserOnlineMapper opUserOnlineMapper;
@@ -101,6 +103,8 @@ public class SdkUserServiceImpl implements SdkUserService {
     private KafkaTemplate kafkaTemplate;
     @Autowired
     private IAdvertApi advertApi;
+    @Autowired
+    private IGameApi gameApi;
 
     // 单日 注册设备最大限制
     private final static Integer REGISTER_LIMIT_DEVICE = 10;
@@ -139,13 +143,14 @@ public class SdkUserServiceImpl implements SdkUserService {
         sdkUserRegisterRes.setUserId(insert.getId());
         // 3、新增注册限制（同一个ip、设备号的注册限制）
         addRegisterLimit(sdkRegisterDto.getDevice(), sdkInfo.getIp(), dateStr);
-
         OpDealModel opDeal = advertApi.getOpDeal(sdkRegisterDto.getDealId());
         ParseRegisterDto parseRegisterDto = new ParseRegisterDto();
-        parseRegisterDto.setChannelId(opDeal.getChannelId());
-        parseRegisterDto.setChannelSubAccountId(opDeal.getChannelSubAccountId());
-        parseRegisterDto.setChannelTypeId(opDeal.getChannelTypeId());
-        parseRegisterDto.setGameId(opDeal.getGameId());
+        parseRegisterDto.setChannelId(opDeal.getChannelId() == null ? 0 : opDeal.getChannelId());
+        parseRegisterDto.setChannelSubAccountId(
+            opDeal.getChannelSubAccountId() == null ? 0 : opDeal.getChannelSubAccountId());
+        parseRegisterDto.setChannelTypeId(
+            opDeal.getChannelTypeId() == null ? 0 : opDeal.getChannelTypeId());
+        parseRegisterDto.setGameId(sdkInfo.getOpSubGameModel().getGameId());
         parseRegisterDto.setDealId(sdkRegisterDto.getDealId());
         parseRegisterDto.setPkgId(sdkRegisterDto.getPkgId());
         parseRegisterDto.setSubGameId(sdkRegisterDto.getSubGameId());
@@ -226,10 +231,9 @@ public class SdkUserServiceImpl implements SdkUserService {
         CheckAdultData checkAdultData = new CheckAdultData();
         // 如果已实名 上报中宣部
         if (opUserRealnamedGame != null) {
-            if (oConvertUtils.isNotEmpty(sdkInfo.getOpPkgModel())) {
+            if (PkgParentConstant.DEFAULT_PKG_ID.equals(sdkLoginDto.getPkgId())) {
                 if (SwitchConstant.OPEN.equals(sdkInfo.getOpPkgModel().getIdAuthSwitch())
-                    && SwitchConstant.OPEN.equals(
-                    sdkInfo.getOpPkgModel().getAntiIndulgeSwitch())) {
+                    && SwitchConstant.OPEN.equals(sdkInfo.getOpPkgModel().getAntiIndulgeSwitch())) {
                     // 上报中宣部
                     opUserOnlineService.saveOpUserOnline(sdkLoginDto.getSubGameId(),
                         sdkLoginDto.getPkgId(), opUser.getId(),
@@ -259,18 +263,25 @@ public class SdkUserServiceImpl implements SdkUserService {
         result.setIsIdAuth(
             opUserRealnamedGame != null ? SwitchConstant.OPEN : SwitchConstant.CLOSE);
         result.setIsAdult(checkAdultData.getIsAdult());
-        result.setIdAuthSwitch(sdkInfo.getOpSubGameModel().getIdAuthSwitch());
-        if (oConvertUtils.isNotEmpty(sdkInfo.getOpPkgModel())) {
+        result.setRemainingTime(checkAdultData.getRemainingTime());
+        if(PkgParentConstant.DEFAULT_PKG_ID.equals(sdkLoginDto.getPkgId())){
+            result.setAntiIndulgeSwitch(sdkInfo.getOpSubGameModel().getAntiIndulgeSwitch());
+            result.setIsPhonePop(sdkInfo.getOpSubGameModel().getPhoneSwitch());
+            result.setIdAuthSwitch(sdkInfo.getOpSubGameModel().getIdAuthSwitch());
+        }else{
+            result.setAntiIndulgeSwitch(sdkInfo.getOpPkgModel().getAntiIndulgeSwitch());
+            result.setIsPhonePop(sdkInfo.getOpPkgModel().getPhoneSwitch());
             result.setIdAuthSwitch(sdkInfo.getOpPkgModel().getIdAuthSwitch());
         }
-        result.setRemainingTime(checkAdultData.getRemainingTime());
         // 登录成功 向队列发送数据
         OpDealModel opDeal = advertApi.getOpDeal(sdkLoginDto.getDealId());
         ParseLoginDto parseLoginDto = new ParseLoginDto();
-        parseLoginDto.setChannelId(opDeal.getChannelId());
-        parseLoginDto.setChannelSubAccountId(opDeal.getChannelSubAccountId());
-        parseLoginDto.setChannelTypeId(opDeal.getChannelTypeId());
-        parseLoginDto.setGameId(opDeal.getGameId());
+        parseLoginDto.setChannelId(opDeal.getChannelId() == null ? 0 : opDeal.getChannelId());
+        parseLoginDto.setChannelSubAccountId(
+            opDeal.getChannelSubAccountId() == null ? 0 : opDeal.getChannelSubAccountId());
+        parseLoginDto.setChannelTypeId(
+            opDeal.getChannelTypeId() == null ? 0 : opDeal.getChannelTypeId());
+        parseLoginDto.setGameId(sdkInfo.getOpSubGameModel().getGameId());
         parseLoginDto.setUniqueId(sdkLoginDto.getDevice());
         parseLoginDto.setDealId(sdkLoginDto.getDealId());
         parseLoginDto.setClientIp(sdkInfo.getIp());
@@ -348,35 +359,14 @@ public class SdkUserServiceImpl implements SdkUserService {
     @Override
     public void alive(SdkAliveDto sdkAliveDto) {
         SdkInfo sdkInfo = SdkContext.getSdkInfo();
+        if(null == sdkAliveDto.getPkgId()){
+            // 如果pkgId为空不执行
+            return;
+        }
         // 2、入库
-        OpRole opRole = opRoleService.getOpRole(sdkAliveDto.getSubGameId(), sdkAliveDto.getPkgId(),
-            Integer.valueOf(sdkAliveDto.getUserId()),
-            sdkAliveDto.getServerId(), sdkAliveDto.getRoleId());
-        OpRole res = new OpRole();
-        if (null == opRole) {
-            opRole = new OpRole();
-            opRole.setSubGameId(sdkAliveDto.getSubGameId());
-            opRole.setPkgId(sdkAliveDto.getPkgId());
-            opRole.setUserId(Integer.valueOf(sdkAliveDto.getUserId()));
-            opRole.setServerId(sdkAliveDto.getServerId());
-            opRole.setServerName(sdkAliveDto.getServerName());
-            opRole.setRoleId(sdkAliveDto.getRoleId());
-            opRole.setRoleName(sdkAliveDto.getRoleName());
-            opRole.setRoleLevel(sdkAliveDto.getRoleLevel());
-            opRole.setCreateIp(sdkInfo.getIp());
-            opRole.setCreateDevice(sdkAliveDto.getDevice());
-            res = opRoleService.insertOpRoleById(opRole);
-        } else if (!Objects.equals(sdkAliveDto.getRoleLevel(), opRole.getRoleLevel())) {
-            opRole.setRoleLevel(sdkAliveDto.getRoleLevel());
-            res = opRoleService.updateOpRoleById(opRole);
-        }
-        if (oConvertUtils.isEmpty(res)) {
-            throw new IdeaRunTimeException(ErrorCode.ADD_OR_UPDATE_ROLE_ERROR);
-        }
-
         //开启实名验证
         QueryWrapper<OpUserOnline> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", opRole.getUserId())
+        queryWrapper.eq("user_id", sdkAliveDto.getUserId())
             .eq("sub_game_id", sdkAliveDto.getSubGameId())
             .eq("pkg_id", sdkAliveDto.getPkgId());
         List<OpUserOnline> list = opUserOnlineService.list(queryWrapper);
@@ -384,7 +374,7 @@ public class SdkUserServiceImpl implements SdkUserService {
             if (SwitchConstant.OPEN.equals(sdkInfo.getOpPkgModel().getOfficialAntiIndulgeSwitch())
                 && oConvertUtils.isNotEmpty(sdkInfo.getOpPkgModel().getOfficialBizId())) {
                 if (list != null && !list.isEmpty()) {
-                    opUserOnlineMapper.updateLogoutTime(opRole.getUserId(),
+                    opUserOnlineMapper.updateLogoutTime(sdkAliveDto.getUserId(),
                         sdkAliveDto.getSubGameId(), sdkAliveDto.getPkgId(),
                         LocalDateTime.now().plusSeconds(400));
                 }
@@ -393,19 +383,21 @@ public class SdkUserServiceImpl implements SdkUserService {
             SwitchConstant.OPEN.equals(sdkInfo.getOpSubGameModel().getOfficialAntiIndulgeSwitch())
                 && oConvertUtils.isNotEmpty(sdkInfo.getOpSubGameModel().getOfficialBizId())) {
             if (list != null && !list.isEmpty()) {
-                opUserOnlineMapper.updateLogoutTime(opRole.getUserId(), sdkAliveDto.getSubGameId(),
+                opUserOnlineMapper.updateLogoutTime(sdkAliveDto.getUserId(),
+                    sdkAliveDto.getSubGameId(),
                     sdkAliveDto.getPkgId(),
                     LocalDateTime.now().plusSeconds(400));
             }
         }
-
+        OpSubGameModel opSubGameModel = gameApi.getOpSubGame(sdkAliveDto.getSubGameId());
         OpDealModel opDeal = advertApi.getOpDeal(sdkAliveDto.getDealId());
-        OpUser opUser = opUserService.getOpUserByUserName(sdkAliveDto.getUserName());
         ParseAliveDto parseAliveDto = new ParseAliveDto();
-        parseAliveDto.setChannelId(opDeal.getChannelId());
-        parseAliveDto.setChannelSubAccountId(opDeal.getChannelSubAccountId());
-        parseAliveDto.setChannelTypeId(opDeal.getChannelTypeId());
-        parseAliveDto.setGameId(opDeal.getGameId());
+        parseAliveDto.setChannelId(opDeal.getChannelId() == null ? 0 : opDeal.getChannelId());
+        parseAliveDto.setChannelSubAccountId(
+            opDeal.getChannelSubAccountId() == null ? 0 : opDeal.getChannelSubAccountId());
+        parseAliveDto.setChannelTypeId(
+            opDeal.getChannelTypeId() == null ? 0 : opDeal.getChannelTypeId());
+        parseAliveDto.setGameId(opSubGameModel.getGameId());
         parseAliveDto.setUniqueId(sdkAliveDto.getDevice());
         parseAliveDto.setDealId(sdkAliveDto.getDealId());
         parseAliveDto.setClientIp(sdkInfo.getIp());
@@ -416,10 +408,10 @@ public class SdkUserServiceImpl implements SdkUserService {
         parseAliveDto.setServerName(sdkAliveDto.getServerName());
         parseAliveDto.setTime(System.currentTimeMillis());
         parseAliveDto.setSubGameId(sdkAliveDto.getSubGameId());
-        parseAliveDto.setUserId(opUser.getId());
+        parseAliveDto.setUserId(sdkAliveDto.getUserId());
         parseAliveDto.setPkgId(sdkAliveDto.getPkgId());
-        kafkaTemplate.send(KafkaTopicConstant.TOPIC_EVENT_PARSE,
-            KafkaKeyConstant.GROUP_SDK_ALIVE, parseAliveDto);
+        kafkaTemplate.send(KafkaTopicConstant.TOPIC_EVENT_PARSE, KafkaKeyConstant.GROUP_SDK_ALIVE,
+            parseAliveDto);
     }
 
     @Override
@@ -431,9 +423,6 @@ public class SdkUserServiceImpl implements SdkUserService {
             throw new IdeaRunTimeException(ErrorCode.SDK_USER_EMPTY_SESSION);
         }
         if (!Objects.equals(sdkVerifyDto.getSubGameId(), session.getSubGameId())) {
-            throw new IdeaRunTimeException(ErrorCode.SDK_USER_INVALID_APP_ID);
-        }
-        if (!Objects.equals(sdkVerifyDto.getPkgId(), session.getPkgId())) {
             throw new IdeaRunTimeException(ErrorCode.SDK_USER_INVALID_APP_ID);
         }
         if (!Objects.equals(sdkVerifyDto.getUserId(), session.getUserId())) {
@@ -653,16 +642,15 @@ public class SdkUserServiceImpl implements SdkUserService {
         if (!RegularUtils.checkPassword(sdkRegisterDto.getUserPassword())) {
             throw new IdeaRunTimeException(ErrorCode.PASSWD_ILLEGAL);
         }
-        // 验证用户名和手机号是已经存在
-        OpUser opUser = opUserService.getOpUserByUserName(sdkRegisterDto.getUserName());
-        if (opUser != null) {
-            throw new IdeaRunTimeException(ErrorCode.SDK_USER_ALREADY_EXIT);
-        }
+        // 验证手机号是否已经存在
         if (StringUtils.isNotEmpty(sdkRegisterDto.getUserPhone())) {
-            opUser = opUserService.getOpUserByUserPhone(sdkRegisterDto.getUserPhone());
-            if (opUser != null) {
+            if (opUserService.getOpUserByUserPhone(sdkRegisterDto.getUserPhone()) != null) {
                 throw new IdeaRunTimeException(ErrorCode.SDK_USER_PHONE_ALREADY_EXIT);
             }
+        }
+        // 验证用户名是否已经存在
+        if (opUserService.getOpUserByUserName(sdkRegisterDto.getUserName()) != null) {
+            throw new IdeaRunTimeException(ErrorCode.SDK_USER_ALREADY_EXIT);
         }
         // 验证 register_switch
         List<OpRegisterLoginSwitch> opRegisterLoginSwitchList = opRegisterLoginSwitchService.getAllSwitchList();

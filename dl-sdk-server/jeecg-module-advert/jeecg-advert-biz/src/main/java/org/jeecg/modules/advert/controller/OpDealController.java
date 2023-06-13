@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.advert.entity.OpDeal;
+import org.jeecg.modules.advert.modal.DealOptionResult;
 import org.jeecg.modules.advert.service.IOpDealService;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,22 @@ public class OpDealController extends JeecgController<OpDeal, IOpDealService> {
 		IPage<OpDeal> pageList = jrttDealService.page(page, queryWrapper);
 		return Result.OK(pageList);
 	}
+
+	@ApiOperation(value="op_deal-分页下拉框列表查询", notes="op_deal-分页下拉框列表查询")
+	@GetMapping(value = "/optionList")
+	public Result<DealOptionResult> optionList(
+		@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+		@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+		Page<OpDeal> page = new Page<OpDeal>(pageNo, pageSize);
+		return Result.OK(jrttDealService.getOptionList(page));
+	}
+
+	@ApiOperation(value="op_deal-模糊下拉框列表查询", notes="op_deal-模糊下拉框列表查询")
+	@GetMapping(value = "/selectVagueList")
+	public Result<List<OpDeal>> selectVagueList(@RequestParam(name="text", defaultValue="1") String text) {
+		return Result.OK(jrttDealService.getListByText(text));
+	}
+
 
 	/**
 	 *   添加

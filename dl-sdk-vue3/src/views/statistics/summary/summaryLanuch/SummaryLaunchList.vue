@@ -7,11 +7,7 @@
           <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
-            <a-col :lg="8">
-              <a-form-item label="广告编号">
-                <j-select-multiple placeholder="请选择广告编号" v-model:value="queryParam.dealId" dictCode="open_gateway.op_deal,deal_name,id" allowClear/>
-              </a-form-item>
-            </a-col>
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="投放账号">
                 <j-select-multiple placeholder="请选择投放账号" v-model:value="queryParam.accountId" dictCode = "open_gateway.op_put_account,nick_name,id" allowClear/>
@@ -23,12 +19,11 @@
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择结束时间" v-model:value="queryParam.endTime" allowClear/>
               </a-form-item>
             </a-col>
-            <!-- <a-col :lg="8">
-              <a-form-item label="付费时间">
-                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择开始时间" v-model:value="queryParam.startPayTime" allowClear/>至
-                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择结束时间" v-model:value="queryParam.endPayTime" allowClear/>
+            <a-col :lg="8">
+            <a-form-item label="常用日期">
+                <a href="#" @click="handleClick(1)">今天</a> <a href="#" @click="handleClick(2)">昨天</a> <a href="#" @click="handleClick(3)">最近三天</a> <a href="#" @click="handleClick(4)">最近一周</a> <a href="#" @click="handleClick(5)">最近两周</a>
               </a-form-item>
-            </a-col> -->
+            </a-col>
             <a-col :lg="8">
               <a-form-item label="归类方式">
                 <j-dict-select-tag  placeholder="请输入归类方式" v-model:value="queryParam.type" :options="compareTypeOption"/>
@@ -54,9 +49,9 @@
     <BasicTable @register="registerTable" :rowSelection="rowSelection">
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
+        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="exportXlS"> 导出</a-button>
+        <!-- <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>
@@ -107,9 +102,15 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import GameThirdSingleOptionForm from '/@/views/common/gameThirdSingleOptionForm.vue';
   import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
+  import { useMethods } from '/@/hooks/system/useMethods';
   const queryParam = ref<any>({type:'cost_day',startTime:formatToDate(new Date()),endTime:formatToDate(new Date())});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
+    let date = new Date();
+  let year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
   let getGameVal = (e: any) => {
     queryParam.value.gameId = e.gameId;
     queryParam.value.subGameId = e.subGameId;
@@ -120,6 +121,9 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -128,6 +132,8 @@
       columns,
       canResize:false,
       useSearchForm: false,
+      showActionColumn:false,
+      pagination:false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -138,7 +144,7 @@
     },
     exportConfig: {
       name: "数据投放",
-      url: getExportUrl,
+      url: getExportUrl
     },
 	  importConfig: {
 	    url: getImportUrl,
@@ -162,7 +168,16 @@
     registerModal.value.disableSubmit = false;
     registerModal.value.add();
   }
-  
+    //导入导出方法
+ const { handleExportXls, handleImportXls } = useMethods();
+
+/**
+ * 导出事件
+ */
+function exportXlS() {
+  return handleExportXls( "数据投放表", "/count/summaryLaunch/exportExcel", queryParam.value);
+
+}
   /**
    * 编辑事件
    */
@@ -179,6 +194,76 @@
     registerModal.value.edit(record);
   }
    
+  function handleClick(type) {
+    let date = new Date();
+    //今天
+    if(type === 1) {
+      // 创建Date对象，获取今天的年、月、日等信息
+      date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 2) {
+      //昨天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 3) {
+      //最近三天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 3);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 4) {
+      //最近一周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 7);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 5) {
+      //最近两周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }
+  }
   /**
    * 删除事件
    */

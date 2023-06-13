@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts"  setup>
-  import { ref, nextTick, reactive, watch, defineExpose} from 'vue';
+  import { ref, nextTick, reactive, watch, defineExpose, defineComponent} from 'vue';
   import { Form, TreeSelect } from 'ant-design-vue';
   import { getOptionList } from '/@/views/operationTool/gameManager/opPkg/OpPkg.api';
 import func from '../../../vue-temp/vue-editor-bridge';
@@ -25,14 +25,23 @@ import func from '../../../vue-temp/vue-editor-bridge';
      })
   const treeData = ref([]);
   const SHOW_PARENT = TreeSelect.SHOW_PARENT;
+  
+
+  const props = defineProps({
+    // v-model:value
+    initData: {
+        type: Array,
+        default: () => []
+      }
+  });
   let emitFn = defineEmits(['handler']);
  
   getList();
   function getList() {
-    getOptionList({type:1}).then((res: any)=>{
+      getOptionList({type:1, channelId:props.initData}).then((res: any)=>{
         treeData.value = res
       })
-  }
+    }
 
   // 监听数据变化 传值给父组件
   watch(queryParam, () => {

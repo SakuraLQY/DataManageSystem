@@ -86,7 +86,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="备注" v-bind="validateInfos.note">
-            <a-input v-model:value="formData.note" placeholder="请输入备注" :disabled="disabled"></a-input>
+            <a-input v-model:value="formData.note" placeholder="请输入备注" :disabled="disabled" showCount :maxlength="255"></a-input>
           </a-form-item>
         </a-col>
       </a-row>

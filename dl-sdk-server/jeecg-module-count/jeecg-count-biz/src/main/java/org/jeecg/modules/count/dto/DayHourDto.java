@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -26,74 +28,74 @@ import java.io.Serializable;
 public class DayHourDto implements Serializable {
     /**id*/
     @ApiModelProperty(value = "id")
-    private java.lang.Integer id;
+    private Integer id;
     @ApiModelProperty(value = "对比维度 0=注册数,1=激活数,2=付费总额,3=新用户付费总额,4=DAU")
-    private java.lang.String level;
+    private String level;
     /**游戏id*/
     @ApiModelProperty(value = "游戏id")
-    private java.lang.Integer gameId;
+    private List<Integer> gameId;
     /**子游戏id*/
     @ApiModelProperty(value = "子游戏id")
-    private java.lang.Integer subGameId;
+    private List<Integer>  subGameId;
     /**渠道类型id*/
     @ApiModelProperty(value = "渠道类型id")
-    private java.lang.Integer channelTypeId;
+    private List<Integer>  channelTypeId;
     /**渠道id*/
     @ApiModelProperty(value = "渠道id")
-    private java.lang.Integer channelId;
+    private List<Integer>  channelId;
     /**渠道子账号id*/
     @ApiModelProperty(value = "渠道子账号id")
-    private java.lang.Integer channelSubAccountId;
+    private List<Integer>  channelSubAccountId;
     @ApiModelProperty(value = "渠道游戏包Id")
-    private Integer pkgId;
+    private List<Integer>  pkgId;
     /**广告-id*/
     @ApiModelProperty(value = "广告-id")
-    private java.lang.Integer dealId;
+    private List<Integer>  dealId;
     /**新增-激活数*/
     @ApiModelProperty(value = "新增-激活数")
-    private java.lang.Integer countActive;
+    private Integer countActive;
     /**新增-注册数*/
     @ApiModelProperty(value = "新增-注册数")
-    private java.lang.Integer countUser;
+    private Integer countUser;
     /**新增-活跃用户*/
     @ApiModelProperty(value = "新增-活跃用户")
-    private java.lang.Integer countDau;
+    private Integer countDau;
     /**首日-付费金额*/
     @ApiModelProperty(value = "首日-付费金额")
-    private java.math.BigDecimal firstMoney;
+    private BigDecimal firstMoney;
     /**累积-付费金额*/
     @ApiModelProperty(value = "累积-付费金额")
-    private java.math.BigDecimal totalMoney;
+    private BigDecimal totalMoney;
     /**次日留存*/
     @ApiModelProperty(value = "次日留存")
-    private java.lang.Integer loyal2;
+    private Integer loyal2;
     /**3日留存*/
     @ApiModelProperty(value = "3日留存")
-    private java.lang.Integer loyal3;
+    private Integer loyal3;
     /**4日留存*/
     @ApiModelProperty(value = "4日留存")
-    private java.lang.Integer loyal4;
+    private Integer loyal4;
     /**5日留存*/
     @ApiModelProperty(value = "5日留存")
-    private java.lang.Integer loyal5;
+    private Integer loyal5;
     /**6日留存*/
     @ApiModelProperty(value = "6日留存")
-    private java.lang.Integer loyal6;
+    private Integer loyal6;
     /**7日留存*/
     @ApiModelProperty(value = "7日留存")
-    private java.lang.Integer loyal7;
+    private Integer loyal7;
     /**15日留存*/
     @ApiModelProperty(value = "15日留存")
-    private java.lang.Integer loyal15;
+    private Integer loyal15;
     /**30日留存*/
     @ApiModelProperty(value = "30日留存")
-    private java.lang.Integer loyal30;
+    private Integer loyal30;
     /**45日留存*/
     @ApiModelProperty(value = "45日留存")
-    private java.lang.Integer loyal45;
+    private Integer loyal45;
     /**60日留存*/
     @ApiModelProperty(value = "60日留存")
-    private java.lang.Integer loyal60;
+    private Integer loyal60;
     /**时间-创建*/
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")

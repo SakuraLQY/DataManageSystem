@@ -40,7 +40,10 @@
         <where>
             a.time_hour between CONCAT(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),' ','00:00:00') and  CONCAT(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),' ','23:59:59')
             <if test="ctDailySummary.dealId!=null ">
-                and a.deal_id = #{ctDailySummary.dealId}
+                and a.deal_id in
+                <foreach collection="ctDailySummary.dealId" item="dealId" open="(" separator="," close=")">
+                    #{dealId}
+                </foreach>
             </if>
             <if test="ctDailySummary.channelId != null and ctDailySummary.channelId.length > 0">
                 AND a.channel_id IN
@@ -118,7 +121,10 @@
         <where>
             a.time_hour between CONCAT(DATE_SUB(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),INTERVAL 1 DAY),' ','00:00:00') and  CONCAT(DATE_SUB(DATE(#{ctDailySummary.createTime,jdbcType=DATE}),INTERVAL 1 DAY),' ','23:59:59')
             <if test="ctDailySummary.dealId!=null ">
-                and a.deal_id = #{ctDailySummary.dealId}
+                and a.deal_id in
+                <foreach collection="ctDailySummary.dealId" item="dealId" open="(" separator="," close=")">
+                    #{dealId}
+                </foreach>
             </if>
             <if test="ctDailySummary.channelId != null and ctDailySummary.channelId.length > 0">
                 AND a.channel_id IN

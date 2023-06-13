@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.poi.ss.formula.functions.T;
+import org.jeecg.common.function.bo.GetNameByIdDto;
+import org.jeecg.common.function.vo.GetNameByIdVo;
 import org.jeecg.common.kafka.dto.ParsePayDto;
 import org.jeecg.modules.count.dto.BlockadeDto;
 import org.jeecg.modules.count.dto.CtUserDto;
@@ -78,6 +80,15 @@ public interface ICtUserService extends IService<CtUser> {
      * @Date 16:22 2023/5/8
      **/
     IPage<PayUserVo> getPagePayUserList(Page<T> page, PayUserDto payUserDto);
+
+    /**
+     * @param getNameByIdDto
+     * @return org.jeecg.common.function.vo.GetNameByIdVo
+     * @Author lili
+     * @Description 通过id得到名称（游戏，子游戏，渠道游戏包，广告）
+     * @Date 20:03 2023/5/25
+     **/
+    GetNameByIdVo getNameById(GetNameByIdDto getNameByIdDto);
 
     /**
      * @param payUserDto

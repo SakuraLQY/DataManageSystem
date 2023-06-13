@@ -24,5 +24,5 @@ public interface IStatDealService extends IService<StatDeal> {
      **/
     List<StatDealVo> queryList(StatDealDto statDealDto,String username);
 
-    ModelAndView exportExcel(HttpServletRequest request, StatDealVo statDealVo,StatDealDto statDealDto, Class name, String title);
+    ModelAndView exportExcel(HttpServletRequest request, StatDealDto statDealDto, Class<StatDealVo>clazz, String title);
 }

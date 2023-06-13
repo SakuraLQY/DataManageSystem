@@ -234,7 +234,7 @@ def copyRootResFiles(apkfile, decompileDir):
     decompileDir = file_utils.getFullPath(decompileDir)
 
     igoreFiles = ['AndroidManifest.xml', 'apktool.yml', 'smali', 'res', 'original', 'lib', 'build',
-                  'assets', 'unknown']
+                  'assets', 'unknown', 'kotlin']
 
     for k in range(2, 20):
         igoreFiles.append("smali_classes" + str(k))

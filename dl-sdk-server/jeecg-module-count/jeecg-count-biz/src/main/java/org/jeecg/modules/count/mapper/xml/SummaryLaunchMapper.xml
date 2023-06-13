@@ -5,7 +5,7 @@
 
     <select id="selectByAll" resultType="org.jeecg.modules.count.bo.LaunchTempBo">
         SELECT
-            DATE(a.cost_day) as 'ID', IFNULL(SUM(a.cost_money ),0) AS 'cost' FROM `op_cost`  as a
+            DATE(a.cost_day) as 'ID', IFNULL(SUM(a.cost_money ),0) AS 'cost' FROM `op_cost` as a
             left JOIN `op_deal` as b ON a.deal_id = b.id
             LEFT JOIN `op_pkg` as c on b.pkg_id = c.id
             ${ew.customSqlSegment}

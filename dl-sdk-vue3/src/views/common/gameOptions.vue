@@ -4,10 +4,10 @@
     <a-select-option
         v-for="(gameItem,index) in faList"
         :key="index"
-        :value="index"
-        :label="gameItem.gameName + '(' + index + ')'"
+        :value="gameItem.id"
+        :label="gameItem.gameName + '(' + gameItem.id + ')'"
     >
-    {{gameItem.gameName  + '(' + index + ')'}}
+    {{gameItem.gameName  + '(' + gameItem.id + ')'}}
     </a-select-option>
     </a-select>
     /
@@ -16,7 +16,7 @@
         v-for="(gameItem,index) in faList[queryParam.gameId].list"
         :key="index"
         :value="gameItem.id"
-        :label="gameItem.gameName + '(' + index + ')'"
+        :label="gameItem.gameName + '(' + gameItem.id + ')'"
     >
     {{gameItem.gameName  + '(' + gameItem.id + ')'}}
     </a-select-option>

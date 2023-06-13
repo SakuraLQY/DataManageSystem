@@ -5,7 +5,7 @@
     <div style="margin-left:20px;margin-top:200px;font-size:20px;color:red">
       <div>判定规则(从上往下为判断顺序)</div>
       <div>1、游戏没有配置切支付->ios支付</div>
-      <div>2、在黑马单内->ios支付</div>
+      <div>2、在黑名单内->ios支付</div>
       <div>3、没有配置非默认支付-> 默认支付</div>
       <div>4、在白名单内 -> 非默认支付</div>
       <div>5、游戏版本和构建版本都匹配 -> 默认支付</div>
@@ -47,7 +47,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-item label="地区" v-bind="validateInfos.paySwitch">
+          <a-form-item label="地区" v-bind="validateInfos.regions">
             <div>
             <a-checkbox
                 v-model:checked="state.checkAll"
@@ -148,7 +148,7 @@ import { mode } from 'crypto-js';
   const state = reactive({
     indeterminate: true,
     checkAll: false,
-    checkedList: ['Apple', 'Orange'],
+    checkedList: [],
   });
 
   const onCheckAllChange = (e: any) => {
@@ -188,7 +188,7 @@ import { mode } from 'crypto-js';
    * 新增
    */
   function add() {
-    edit({});
+    edit(formData);
   }
 
   /**
@@ -207,6 +207,11 @@ import { mode } from 'crypto-js';
       resetFields();
       //赋值
       let paySwitchData = record;
+      if (paySwitchData.regions !== '') {
+        state.checkedList = paySwitchData.regions.split(',')
+      }else {
+        state.checkedList = []
+      }
       paySwitchData.gameId = paySwitchData.gameId + "";
       paySwitchData.rangeTime = paySwitchData.rangeTime instanceof Array?paySwitchData.rangeTime:paySwitchData.rangeTime.split(',')
       Object.assign(formData, paySwitchData);

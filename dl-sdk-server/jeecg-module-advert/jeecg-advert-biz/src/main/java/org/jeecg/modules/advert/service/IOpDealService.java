@@ -1,10 +1,12 @@
 package org.jeecg.modules.advert.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 import org.jeecg.modules.advert.dto.OpDealDto;
 import org.jeecg.modules.advert.entity.OpDeal;
+import org.jeecg.modules.advert.modal.DealOptionResult;
 
 /**
  * @Description: ad_deal
@@ -13,6 +15,17 @@ import org.jeecg.modules.advert.entity.OpDeal;
  * @Version: V1.0
  */
 public interface IOpDealService extends IService<OpDeal> {
+
+    /**
+     * @param page
+     * @return org.jeecg.modules.advert.modal.DealOptionResult
+     * @Author lili
+     * @Description 下拉框分页
+     * @Date 20:02 2023/5/18
+     **/
+    DealOptionResult getOptionList(Page<OpDeal> page);
+
+    List<OpDeal> getListByText(String text);
 
     /**
      * @param opDeal:    广告

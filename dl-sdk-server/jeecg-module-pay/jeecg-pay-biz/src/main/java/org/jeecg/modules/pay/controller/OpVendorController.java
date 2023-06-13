@@ -71,7 +71,7 @@ public class OpVendorController extends JeecgController<OpVendor, IOpVendorServi
 	//@RequiresPermissions("vendor:op_vendor:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody OpVendor opVendor) {
-		opVendorService.save(opVendor);
+		opVendorService.insert(opVendor);
 		return Result.OK("添加成功！");
 	}
 
@@ -86,7 +86,7 @@ public class OpVendorController extends JeecgController<OpVendor, IOpVendorServi
 	//@RequiresPermissions("vendor:op_vendor:edit")
 	@RequestMapping(value = "/edit", method = {RequestMethod.PUT,RequestMethod.POST})
 	public Result<String> edit(@RequestBody OpVendor opVendor) {
-		opVendorService.updateById(opVendor);
+		opVendorService.update(opVendor);
 		return Result.OK("编辑成功!");
 	}
 

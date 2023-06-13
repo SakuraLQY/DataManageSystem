@@ -3,7 +3,7 @@ package org.jeecg.modules.game.service;
 import org.jeecg.modules.game.dto.SdkConfDto;
 import org.jeecg.modules.game.dto.SdkIosConfDto;
 import org.jeecg.modules.game.dto.SdkStartDataDto;
-import org.jeecg.modules.game.vo.PrivacyAndUserProtocolVo;
+import org.jeecg.modules.game.vo.PrivacyVo;
 import org.jeecg.modules.game.vo.SdkConfRes;
 import org.jeecg.modules.game.vo.SdkIosConfRes;
 
@@ -45,6 +45,6 @@ public interface SdkGameService {
      * @Description 获取隐私政策
      * @Date 11:12 2023/4/7
      **/
-    PrivacyAndUserProtocolVo getPrivacyAndUserProtocol(Integer pkgId);
+    PrivacyVo getPrivacy(Integer subGameId, Integer pkgId);
 
 }

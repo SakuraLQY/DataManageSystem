@@ -37,6 +37,8 @@ public class OpPayBlackVo implements Serializable {
     private String gameName;
     @ApiModelProperty(value = "子游戏名")
     private String subGameName;
+    @ApiModelProperty(value = "渠道游戏包名")
+    private String pkgName;
     @ApiModelProperty(value = "支付限制用户ID")
     private String payLimitUserId;
     @ApiModelProperty(value = "支付限制IP")

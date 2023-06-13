@@ -16,7 +16,6 @@ public class SdkVerifyDto {
     @ApiModelProperty(value = "子游戏ID")
     private Integer subGameId;
 
-    @NotNull(message = "一级游戏包id不能为空")
     @ApiModelProperty(value = "一级游戏包id")
     private Integer pkgId;
 

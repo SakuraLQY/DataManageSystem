@@ -19,5 +19,7 @@ public class BankStatus {
     public static final Integer MONEY_NE = -2;
     // 未支付成功
     public static final Integer TRADE_FAIL = -3;
+    // ios商品不存在
+    public static final Integer COMMODITY_NO_FOUND = -4;
 
 }

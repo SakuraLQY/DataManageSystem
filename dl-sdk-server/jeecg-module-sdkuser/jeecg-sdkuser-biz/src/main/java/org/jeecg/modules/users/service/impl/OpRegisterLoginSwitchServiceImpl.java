@@ -11,6 +11,7 @@ import org.jeecg.common.exception.IdeaRunTimeException;
 import org.jeecg.common.game.api.IAdvertApi;
 import org.jeecg.common.game.api.IGameApi;
 import org.jeecg.common.game.vo.OpGameModel;
+import org.jeecg.common.game.vo.OpPkgModel;
 import org.jeecg.common.game.vo.OpSubGameModel;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.users.constant.RuleTypeConstant;
@@ -67,9 +68,12 @@ public class OpRegisterLoginSwitchServiceImpl extends
                 }else if (opRegisterLoginSwitchVo.getRuleType() == 2) {
                     OpSubGameModel opSubGameModel = gameApi.getOpSubGame(opRegisterLoginSwitchVo.getRuleId());
                     opRegisterLoginSwitchVo.setRuleName(opSubGameModel.getGameName());
-                }else {
+                }else if (opRegisterLoginSwitchVo.getRuleType() == 3){
                     OpDealModel opDealModel = advertApi.getOpDeal(opRegisterLoginSwitchVo.getRuleId());
                     opRegisterLoginSwitchVo.setRuleName(opDealModel.getDealName());
+                }else {
+                    OpPkgModel opPkgModel = gameApi.getOpPkgById(opRegisterLoginSwitchVo.getRuleId());
+                    opRegisterLoginSwitchVo.setRuleName(opPkgModel.getPkgName());
                 }
                 opRegisterLoginSwitchVoList.add(opRegisterLoginSwitchVo);
             }

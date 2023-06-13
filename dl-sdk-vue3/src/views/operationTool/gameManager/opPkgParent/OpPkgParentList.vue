@@ -80,15 +80,16 @@
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
       </template>
       <!--字段回显插槽-->
-      <template #game="{record}">
+      <!-- <template #game="{record}">
         {{getGameName(record.gameId)}}
       </template>
       <template #subGame="{record}">
         {{gerSubGameName(record.gameId,record.subGameId)}}
-      </template>
+      </template> -->
       <template #state="{record}">
-          <BigFileupload :gameId="record.gameId" :subGameId="record.subGameId" :label="record.state?'更新母包':'上传母包'" accept=".apk" :onSuccess="callback"></BigFileupload>
-      </template>
+        <BigFileupload :gameId="record.gameId" :subGameId="record.subGameId" :label="record.state?'更新母包':'上传母包'" accept=".apk" :onSuccess="callback"></BigFileupload>
+          
+        </template>
       <template #htmlSlot="{text}">
         <div v-html="text"></div>
       </template>
@@ -216,7 +217,7 @@
    */
   function handlePackConf(record) {
     getObjByGameId({subGameId:record.subGameId}).then((res: any)=>{
-      opPackConfigModal.value.edit(res, record.gameName);
+      opPackConfigModal.value.edit(res, record.subGameId_dictText);
     })
   }
    

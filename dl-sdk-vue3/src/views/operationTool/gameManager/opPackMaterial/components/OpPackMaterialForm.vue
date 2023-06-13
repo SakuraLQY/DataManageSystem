@@ -4,7 +4,7 @@
       <a-row>
         <a-col :span="24">
           <a-form-item label="素材名" v-bind="validateInfos.materialName">
-            <a-input v-model:value="formData.materialName" maxLength="64" placeholder="长度限制至64位" style="width:500px"  :disabled="disabled"></a-input>
+            <a-input v-model:value="formData.materialName" showCount maxLength="64" placeholder="长度限制至64位" style="width:500px"  :disabled="disabled"></a-input>
             <span style="color:red"> 选填，如果不填就采用文件名</span>
           </a-form-item>
         </a-col>
@@ -20,13 +20,13 @@
         </a-col>
         <a-col :span="24">
           <div class="file-select" > 
-          <GameOptionModal ref="selectForm" @handlerModal="getGameVal"></GameOptionModal>
+          <GameOptionModal ref="selectForm" @handlerModal="getGameVal" :disabled="disabled"></GameOptionModal>
           </div>
         </a-col>
         <a-col :span="24">
           <a-form-item label="图片" :labelCol="labelCol"  :wrapperCol="wrapperCol" v-bind="validateInfos.file">
             <div :key="ImgKey">
-            <JImageUpload :fileMax="1" :bizPath="bizPath" v-model:value="fileList"></JImageUpload>
+            <JImageUpload :fileMax="1" :disabled="disabled" :bizPath="bizPath" v-model:value="fileList"></JImageUpload>
             </div>
           </a-form-item>
         </a-col>
@@ -176,25 +176,25 @@
                 return false;
               }
               if(formData.type === '2') {
-                if(res.packConfig['screen_type'] === '' || res.packConfig['screen_width'] === '' || res.packConfig['screen_height'] === '' || res.packConfig['screen_path'] === '') {
+                if(res.packConfig['screen_type'] === '' || res.packConfig['screen_width'] === '' || res.packConfig['screen_height'] === '') {
                   msg.value = "该游戏未配置游戏闪屏打包配置";
                 }else {
                   msg.value = '图片格式：' + res.packConfig['screen_type'] +', 宽：' + res.packConfig['screen_width'] + ', 高：' + res.packConfig['screen_height'];
                 }
               }else if (formData.type === '3') {
-                if(res.packConfig['loading_type'] === '' || res.packConfig['loading_width'] === '' || res.packConfig['loading_height'] === '' || res.packConfig['loading_path'] === '') {
+                if(res.packConfig['loading_type'] === '' || res.packConfig['loading_width'] === '' || res.packConfig['loading_height'] === '') {
                   msg.value = "该游戏未配置游戏加载图打包配置";
                 }else {
                   msg.value = '图片格式：' + res.packConfig['loading_type'] +', 宽：' + res.packConfig['loading_width'] + ', 高：' + res.packConfig['loading_height'];
                 }
               }else if (formData.type === '4') {
-                if(res.packConfig['login_type'] === '' || res.packConfig['login_width'] === '' || res.packConfig['login_height'] === '' || res.packConfig['login_path'] === '') {
+                if(res.packConfig['login_type'] === '' || res.packConfig['login_width'] === '' || res.packConfig['login_height'] === '') {
                   msg.value = "该游戏未配置游戏登陆图打包配置";
                 }else {
                   msg.value = '图片格式：' + res.packConfig['login_type'] +', 宽：' + res.packConfig['login_width'] + ', 高：' + res.packConfig['login_height'];
                 }
               }else if (formData.type === '5') {
-                if(res.packConfig['logo_type'] === '' || res.packConfig['logo_width'] === '' || res.packConfig['logo_height'] === '' || res.packConfig['logo_path'] === '') {
+                if(res.packConfig['logo_type'] === '' || res.packConfig['logo_width'] === '' || res.packConfig['logo_height'] === '') {
                   msg.value = "该游戏未配置游戏logo打包配置";
                 }else {
                   msg.value = '图片格式：' + res.packConfig['logo_type'] +', 宽：' + res.packConfig['logo_width'] + ', 高：' + res.packConfig['logo_height'];

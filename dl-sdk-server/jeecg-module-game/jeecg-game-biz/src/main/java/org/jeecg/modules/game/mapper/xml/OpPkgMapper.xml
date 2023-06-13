@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.game.mapper.OpPkgMapper">
+
+  <select id="getList" resultType="org.jeecg.modules.game.vo.OpPkgVo">
+    SELECT a.id id, a.pkg_name pkgName, a.game_id gameId, a.sub_game_id subGameId,  b.game_name gameName, c.game_name subGameName
+    FROM `open_gateway`.`op_pkg` a
+           LEFT JOIN `open_gateway`.`op_game` b ON a.game_id = b.id
+           LEFT JOIN `open_gateway`.`op_sub_game` c ON a.sub_game_id = c.id
+   ${ew.customSqlSegment}
+  </select>
 
 </mapper>

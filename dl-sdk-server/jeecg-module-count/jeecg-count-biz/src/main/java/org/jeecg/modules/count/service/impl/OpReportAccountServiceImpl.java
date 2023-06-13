@@ -4,6 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.auth.In;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -13,6 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.util.JwtUtil;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.count.bo.ReportAccountBillBo;
 import org.jeecg.modules.count.bo.ReportAccountBo;
 import org.jeecg.modules.count.bo.ReportAccountCostBo;
@@ -20,12 +27,20 @@ import org.jeecg.modules.count.bo.ReportBillCostBo;
 import org.jeecg.modules.count.dto.ReportAccountDto;
 import org.jeecg.modules.count.entity.OpReport;
 import org.jeecg.modules.count.mapper.OpReportAccountMapper;
+import org.jeecg.modules.count.modal.ReportAccountModal;
 import org.jeecg.modules.count.service.IOpReportAccountService;
 import org.jeecg.modules.count.vo.ReportAccountBillVo;
 import org.jeecg.modules.count.vo.ReportAccountVo;
+import org.jeecg.modules.count.vo.StatDealVo;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description: 数据报表
@@ -41,6 +56,8 @@ public class OpReportAccountServiceImpl extends ServiceImpl<OpReportAccountMappe
     private static final String ADMIN = "admin";
     @Resource
     private OpReportAccountMapper opReportAccountMapper;
+    @Value("${jeecg.path.upload}")
+    private String upLoadPath;
     @Override
     public List<ReportAccountVo> queryAccountList(ReportAccountDto reportAccountDto,String username) {
         QueryWrapper<ReportAccountDto> where = new QueryWrapper<>();
@@ -212,5 +229,65 @@ public class OpReportAccountServiceImpl extends ServiceImpl<OpReportAccountMappe
             Collections.reverse(list);
         }
         return list;
+    }
+
+    @Override
+    public ModelAndView exportExcel(HttpServletRequest request, ReportAccountDto reportAccountDto,
+        Class<ReportAccountModal> reportAccountVoClass, String title) {
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String  username = JwtUtil.getUserNameByToken(request);
+        // Step.2 获取导出数据
+        List<ReportAccountVo> resultList = this.queryAccountList(reportAccountDto,username);
+        List<ReportAccountModal>exportList = new ArrayList<>();
+        for (ReportAccountVo reportAccountVo : resultList) {
+            //拼接游戏和子游戏
+            String gameSubGameIds = reportAccountVo.getSubGameIds();
+            ObjectMapper objectMapper = new ObjectMapper();
+            if(gameSubGameIds!=null){
+                try {
+                    List<Map<String, Object>> list = objectMapper.readValue(gameSubGameIds,
+                        new TypeReference<List<Map<String, Object>>>() {
+                        });
+                    StringBuilder result = new StringBuilder();
+                    for (Map<String, Object> item : list) {
+                        String gameName = " ";
+                        String subGameName =" ";
+                        if(item.containsKey("gameId") && item.get("gameId")!=null){
+                            int gameId = Integer.parseInt(String.valueOf(item.get("gameId"))) ;
+                            gameName = opReportAccountMapper.getNameByGameId(gameId);
+                        }
+                        if(item.containsKey("subGameId") && item.get("subGameId")!=null){
+                            int subGameId = Integer.parseInt(String.valueOf(item.get("subGameId")));
+                            subGameName = opReportAccountMapper.getNameBySubGameId(subGameId);
+                        }
+                        result.append("游戏：").append(gameName).append("<=>子游戏：").append(subGameName).append(",");
+                        String finalResult = result.substring(0,result.length()-1);
+                        ReportAccountModal reportAccountModal = new ReportAccountModal();
+                        BeanUtils.copyProperties(reportAccountVo,reportAccountModal);
+                        reportAccountModal.setSubGameIds(finalResult);
+                        exportList.add(reportAccountModal);
+                    }
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(gameSubGameIds==null){
+                ReportAccountModal reportAccountModal = new ReportAccountModal();
+                BeanUtils.copyProperties(reportAccountVo,reportAccountModal);
+                exportList.add(reportAccountModal);
+            }
+        }
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.FILE_NAME, title);
+        mv.addObject(NormalExcelConstants.CLASS, reportAccountVoClass);
+        //update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+        ExportParams exportParams=new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(), title);
+        exportParams.setImageBasePath(upLoadPath);
+        //update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+        mv.addObject(NormalExcelConstants.PARAMS,exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
     }
 }

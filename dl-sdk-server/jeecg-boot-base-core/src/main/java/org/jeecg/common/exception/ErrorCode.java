@@ -326,7 +326,7 @@ public enum ErrorCode {
     /**
      * 一级游戏包和子游戏都不存在
      */
-    SUB_GAME_AND_PKG_EMPTY(-85, "一级游戏包和子游戏都不存在"),
+    SUB_GAME_AND_PKG_EMPTY(-85, "子游戏不存在"),
     /**
      * 写入或更新角色信息错误
      */

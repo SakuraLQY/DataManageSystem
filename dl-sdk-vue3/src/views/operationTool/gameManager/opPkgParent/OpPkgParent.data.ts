@@ -8,14 +8,14 @@ export const columns: BasicColumn[] = [
   {
     title: '游戏',
     align: "center",
-    dataIndex: 'gameId',
-    slots: { customRender: 'game' }
+    dataIndex: 'gameId_dictText',
+    // slots: { customRender: 'game' }
   },
   {
     title: '子游戏',
     align: "center",
-    dataIndex: 'subGameId',
-    slots: { customRender: 'subGame' }
+    dataIndex: 'subGameId_dictText',
+    // slots: { customRender: 'subGame' }
   },
   {
     title: 'apk文件名',

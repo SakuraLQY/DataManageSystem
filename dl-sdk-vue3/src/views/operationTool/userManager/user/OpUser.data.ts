@@ -80,12 +80,31 @@ export const columns: BasicColumn[] = [
 //查询数据
 export const searchFormSchema: FormSchema[] = [
 	{
-      label: "用户名",
-      field: 'userName',
+      label: "用户ID",
+      field: 'id',
       component: 'Input',
       colProps: {span: 6},
+      dynamicRules: ({model,schema}) => {
+        return [
+               { required: false},
+               { pattern: /^\d{0,10}$/, message: '只能输入十位以内数字!'},
+        ];
+      },
       
- 	},
+   },
+   {
+    label: "用户名",
+    field: 'userName',
+    component: 'Input',
+    colProps: {span: 6},
+    dynamicRules: ({model,schema}) => {
+      return [
+             { required: false},
+             { pattern: /^(?=.*\w)(?=.*[\\u4e00-\\u9fa5]).{0,10}$/, message: '只能输入十位以内!'},
+      ];
+    },
+    
+  },
 	{
       label: "手机号",
       field: 'userPhone',
@@ -93,7 +112,7 @@ export const searchFormSchema: FormSchema[] = [
       dynamicRules: ({model,schema}) => {
         return [
                { required: false},
-               { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号码!'},
+               { pattern: /^\d{0,11}$/, message: '只能输入十一位以内数字!'},
         ];
    },
       colProps: {span: 6},

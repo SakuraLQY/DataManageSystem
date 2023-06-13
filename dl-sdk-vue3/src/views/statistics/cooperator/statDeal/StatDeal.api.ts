@@ -12,6 +12,7 @@ enum Api {
   deleteBatch = '/count/statDeal/deleteBatch',
   importExcel = '/count/statDeal/importExcel',
   exportXls = '/count/statDeal/exportXls',
+  exportExcel = '/count/statDeal/exportExcel',
 }
 
 /**

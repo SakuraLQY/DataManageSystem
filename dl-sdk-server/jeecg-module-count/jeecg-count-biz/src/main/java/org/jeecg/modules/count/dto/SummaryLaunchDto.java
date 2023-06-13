@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import java.util.List;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,11 +61,11 @@ public class SummaryLaunchDto implements Serializable {
 	/**广告编号*/
 	@Excel(name = "广告编号", width = 15)
     @ApiModelProperty(value = "广告编号")
-    private Integer[] dealId;
+    private List<Integer> dealId;
 	/**投放账号*/
 	@Excel(name = "投放账号", width = 15)
     @ApiModelProperty(value = "投放账号")
-    private Integer[] accountId;
+    private  List<Integer> accountId;
 	/**注册时间*/
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")

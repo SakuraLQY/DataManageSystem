@@ -2,7 +2,7 @@
   <a-spin :spinning="confirmLoading">
     <a-form ref="formRef" class="antd-modal-form" :labelCol="labelCol" :wrapperCol="wrapperCol">
       <a-row>
-        <PkgOptionSingleSelect ref="selectForm" @handlerModal="getGameVal" :disabled="disabled"></PkgOptionSingleSelect>
+        <PkgOptionSingleSelect ref="selectForm" @handlerModal="getGameVal" :initData="[4,5]" :disabled="disabled"></PkgOptionSingleSelect>
         <a-col :span="24">
           <a-form-item label="投放账号" v-bind="validateInfos.accountId" >
             <j-search-select placeholder="请选择投放账号" :disabled="disabled" v-model:value="formData.accountId" dict="open_gateway.op_put_account where channel_Id = '4' and state = '1' and level_id = '2' ,nick_name,id"/>

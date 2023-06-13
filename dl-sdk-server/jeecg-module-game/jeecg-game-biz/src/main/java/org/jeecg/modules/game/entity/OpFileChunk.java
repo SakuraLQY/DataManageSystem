@@ -64,12 +64,12 @@ public class OpFileChunk implements Serializable {
     @ApiModelProperty(value = "总分片数")
     private java.lang.Integer totalChunk;
 	/**文件标识*/
-	@Excel(name = "文件标识", width = 15)
-    @ApiModelProperty(value = "文件标识")
+	@Excel(name = "md5文件标识", width = 15)
+    @ApiModelProperty(value = "md5文件标识")
     private java.lang.String identifier;
-	/**md5校验码*/
-	@Excel(name = "md5校验码", width = 15)
-    @ApiModelProperty(value = "md5校验码")
+	/**真实路径*/
+	@Excel(name = "真实路径", width = 15)
+    @ApiModelProperty(value = "真实路径")
     private java.lang.String relativePath;
 	/**createtime*/
 	@Excel(name = "createtime", width = 15, format = "yyyy-MM-dd HH:mm:ss")

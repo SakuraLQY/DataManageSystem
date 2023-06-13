@@ -22,12 +22,15 @@
   <select id="getPayBlackList" resultMap="OpPayBlackVo">
     SELECT a.*,
            b.game_name as gameName,
-           c.game_name as subGameName
+           c.game_name as subGameName,
+           d.pkg_name as pkgName
     FROM op_pay_black a
            LEFT JOIN op_game b ON a.rule_type = 0
       AND a.rule_id = b.id
            LEFT JOIN op_sub_game c ON a.rule_type = 1
-      AND a.rule_id = c.id ${ew.customSqlSegment}
+      AND a.rule_id = c.id
+           LEFT JOIN op_pkg d ON a.rule_type = 2
+      AND a.rule_id = d.id ${ew.customSqlSegment}
     order by id DESC
   </select>
 

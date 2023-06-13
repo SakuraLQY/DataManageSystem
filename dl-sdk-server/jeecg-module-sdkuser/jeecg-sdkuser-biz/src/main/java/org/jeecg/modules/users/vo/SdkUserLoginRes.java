@@ -39,4 +39,9 @@ public class SdkUserLoginRes {
     @ApiModelProperty(value = "ios审核版本")
     private String iosAuditVersion;
 
+    @ApiModelProperty(value = "防沉迷开关 1打开 0关闭")
+    private Integer antiIndulgeSwitch;
+
+    @ApiModelProperty(value = "绑定手机开关 1打开 0关闭")
+    private Integer isPhonePop;
 }

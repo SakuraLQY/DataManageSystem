@@ -84,6 +84,15 @@ public class OpSubGame implements Serializable {
 	@Excel(name = "隐私政策开关", width = 15)
     @ApiModelProperty(value = "隐私政策开关")
     private java.lang.Integer privacySwitch;
+    /**隐私政策地址*/
+    @ApiModelProperty(value = "隐私政策地址")
+    private java.lang.String privacyPolicyUrl;
+    /**用户协议地址*/
+    @ApiModelProperty(value = "用户协议地址")
+    private java.lang.String userAgreementUrl;
+    /**客服地址*/
+    @ApiModelProperty(value = "客服地址")
+    private java.lang.String customerServiceUrl;
 	/**实名验证窗口*/
 	@Excel(name = "实名验证窗口", width = 15)
     @ApiModelProperty(value = "实名验证窗口")

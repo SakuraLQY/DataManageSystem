@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
@@ -54,8 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class OpOrderServiceImpl extends ServiceImpl<OpOrderMapper, OpOrder> implements
     IOpOrderService {
 
-    @Value("#{'${list-retry-seconds}'.split(',')}")
-    private List<Integer> list;
+    @Value("${order.retryTimes}")
+    private Integer retryTimes;
 
     @Autowired
     private ISdkuserApi sdkuserApi;
@@ -115,43 +117,37 @@ public class OpOrderServiceImpl extends ServiceImpl<OpOrderMapper, OpOrder> impl
      */
     @Scheduled(cron = "0/15 * * * * ?")
     public void handleOrder() {
-        int maxTimes = list.size();
-        //从重试次数大的开始遍历
-        for (int i = maxTimes; i > 0; i--) {
-            //这次重试需要的间隔时间
-            Integer timeSeconds = list.get(i - 1);
-            List<OpOrder> orders = list(new LambdaQueryWrapper<OpOrder>()
-                //银行状态正常
-                .ge(OpOrder::getBankStatus, BankStatus.NORMAL)
-                //距离上次更新银行状态时间不超过10秒
-                .le(OpOrder::getBankStatusTime, LocalDateTime.now().minusSeconds(10))
-                //发货状态没成功的
-                .lt(OpOrder::getGameStatus, GameStatus.GAME_STATUS_SUCCESS)
-                //重试次数
-                .eq(OpOrder::getGameDeliverRetry, i)
-                // 当前时间 - 时间间隔 在上次发货之后
-                .le(OpOrder::getGameStatusTime, LocalDateTime.now().minusSeconds(timeSeconds))
-            );
-            if (orders.size() == 0) {
-                continue;
-            }
-            LinkedList<OpOrder> opOrders = new LinkedList<>();
-            LinkedList<OpOrderCount> opOrderCounts = new LinkedList<>();
-            for (OpOrder order : orders) {
-                //发货
-                Integer gameStatus = doDeliverOnce(order);
-                //更新用户总消费表，有记录加上此次订单消费金额，没有创建新纪录，如果支付失败gameStatus < 1000,则不更新或者不创建新纪录
-                OpOrderCount opOrderCount = updateOrderCount(gameStatus, order);
-                if (opOrderCount != null) {
-                    opOrderCounts.add(opOrderCount);
-                }
-                //更新订单信息
-                updateOrder(order, gameStatus);
-                opOrders.add(order);
-            }
-            //数据库操作
-            ((IOpOrderService) AopContext.currentProxy()).updateDBBatch(opOrders, opOrderCounts);
+        List<OpOrder> orders = list(new LambdaQueryWrapper<OpOrder>()
+            //银行状态正常
+            .ge(OpOrder::getBankStatus, BankStatus.NORMAL)
+            //发货状态没成功的
+            .lt(OpOrder::getGameStatus, GameStatus.GAME_STATUS_SUCCESS)
+            //距离上次更新银行状态时间超过10秒
+            .le(OpOrder::getBankStatusTime, LocalDateTime.now().minusSeconds(10))
+            //重试次数
+            .le(OpOrder::getGameDeliverRetry, retryTimes)
+            //上次发货时间到现在超过时间间隔 时间间隔公式=重试次数的平方（单位秒，最大为3600秒（即一个小时））
+            .last("and now() - game_deliver_time > if(POW(game_deliver_retry,2) > 3600, 3600, POW(game_deliver_retry, 2))")
+        );
+        if (orders.size() == 0) {
+            return;
         }
+        LinkedList<OpOrder> opOrders = new LinkedList<>();
+        LinkedList<OpOrderCount> opOrderCounts = new LinkedList<>();
+        for (OpOrder order : orders) {
+            //发货
+            Integer gameStatus = doDeliverOnce(order);
+            //更新用户总消费表，有记录加上此次订单消费金额，没有创建新纪录，如果支付失败gameStatus < 1000,则不更新或者不创建新纪录
+            OpOrderCount opOrderCount = updateOrderCount(gameStatus, order);
+            if (opOrderCount != null) {
+                opOrderCounts.add(opOrderCount);
+            }
+            //更新订单信息
+            updateOrder(order, gameStatus);
+            opOrders.add(order);
+        }
+        //数据库操作
+        ((IOpOrderService) AopContext.currentProxy()).updateDBBatch(opOrders, opOrderCounts);
     }
 
 
@@ -205,7 +201,7 @@ public class OpOrderServiceImpl extends ServiceImpl<OpOrderMapper, OpOrder> impl
             OpSubGameModel opSubGameModel = gameApi.getOpSubGame(order.getSubGameId());
             //请求参数，字典序排序
             TreeMap<String, Object> dictMap = new TreeMap<>();
-            dictMap.put("app_id", opSubGameModel.getGameId());
+            dictMap.put("app_id", opSubGameModel.getId());
             dictMap.put("user_id", order.getUserId());
             dictMap.put("order_id", order.getOrderId());
             dictMap.put("pay_type", order.getBankType());
@@ -213,8 +209,7 @@ public class OpOrderServiceImpl extends ServiceImpl<OpOrderMapper, OpOrder> impl
             dictMap.put("app_order_id", order.getGameOrderId());
             dictMap.put("app_data", order.getGameData());
             dictMap.put("is_test", order.getIsTest());
-            dictMap.put("time", LocalDateTime.now());
-
+            dictMap.put("time", System.currentTimeMillis() / 1000);
             StringBuilder toSignStr = new StringBuilder();
             for (Entry<String, Object> entry : dictMap.entrySet()) {
                 toSignStr.append(entry.getValue().toString());
@@ -222,12 +217,19 @@ public class OpOrderServiceImpl extends ServiceImpl<OpOrderMapper, OpOrder> impl
             toSignStr.append(opSubGameModel.getGameKey());
             //签名
             String sign = RSAUtil.sign(toSignStr.toString(), opSubGameModel.getPayPrikey());
+            try {
+                sign = URLEncoder.encode(sign, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                log.error("urlEncode失败");
+            }
             dictMap.put("sign", sign);
             JSONObject jsonObject = new JSONObject();
             for (Entry<String, Object> entry : dictMap.entrySet()) {
                 jsonObject.put(entry.getKey(), entry.getValue());
             }
-            JSONObject result = RestUtil.post(opSubGameModel.getDeliverUrl(), null, jsonObject);
+            log.info("发货请求:{}", jsonObject);
+            JSONObject result = RestUtil.post(opSubGameModel.getDeliverUrl(), jsonObject, null);
+            log.info("发货结果:{}", result);
             if (null == result) {
                 gameStatus = GameStatus.GAME_STATUS_RESULT_NULL;
             } else {

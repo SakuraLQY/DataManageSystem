@@ -7,11 +7,7 @@
           <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
-            <a-col :lg="8">
-            <a-form-item label="广告列表">
-              <j-search-select placeholder="请选择广告" v-model:value="queryParam.dealId"  dict="open_gateway.op_deal,deal_name,id" allowClear />
-            </a-form-item>
-          </a-col>
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="留存类型">
                 <j-dict-select-tag  placeholder="请输入留存类型" v-model:value="queryParam.retainType" :options = "retainOption"/>
@@ -119,7 +115,6 @@
   import { retainOption } from './RetainAnalyze.data';
   import { queryList, deleteOne, batchDelete, getImportUrl, getExportUrl } from './RetainAnalyze.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import RetainAnalyzeModal from './components/RetainAnalyzeModal.vue'
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
   import GameThirdMuchOptionForm from '/@/views/common/gameThirdMuchOptionForm.vue';
   import ChannelThirdMuchOptionForm from '/@/views/common/channelThirdMuchOptionForm.vue';
@@ -127,7 +122,7 @@
   import {formatToDate } from '/@/utils/dateUtil';
   import {formatToDates } from '/@/utils/dateUtil';
   import LineMulti from '/@/components/chart/LineMulti.vue';
-  import {BasicColumn} from '/@/components/Table';
+  import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
   const lineMultiData = ref([]);
   const queryParam = ref<any>({retainType:'newLoyal',startTime:formatToDates(new Date()),endTime:formatToDate(new Date()),costTime:formatToDate(new Date())});
   const toggleSearchStatus = ref<boolean>(false);
@@ -146,7 +141,9 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
-  
+  let getDealVal = (e: any) => {
+    queryParam.value.dealId = e.dealId;
+  };
   const barOption = ref({
     title: { text: '', left: 'center'},
      yAxis: {

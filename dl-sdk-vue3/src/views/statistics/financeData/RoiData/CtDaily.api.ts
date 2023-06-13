@@ -6,6 +6,10 @@ const { createConfirm } = useMessage();
 enum Api {
   queryROIList = '/count/ctDaily/queryROIList',
   queryOverViewList = '/count/ctDaily/queryOverViewList',
+  queryDayReportList = '/count/ctDaily/queryDayReportList',
+  queryXingtuDayReportList = '/count/ctDaily/queryXingtuDayReportList',
+  queryRetentionList = '/count/ctDaily/queryRetentionList',
+  queryStatCustomList = '/count/ctDaily/queryStatCustomList',
   queryRecoveryList = '/count/ctDaily/queryRecoveryList',
   queryFinanceUserList = '/count/ctDaily/queryFinanceUserList',
   deleteOne = '/count/ctUser/delete',
@@ -36,7 +40,31 @@ export const queryROIList = (params) => defHttp.get({ url: Api.queryROIList, par
  * 列表接口
  * @param params
  */
+export const queryXingtuDayReportList = (params) => defHttp.get({ url: Api.queryXingtuDayReportList, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const queryStatCustomList = (params) => defHttp.get({ url: Api.queryStatCustomList, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const queryRetentionList = (params) => defHttp.get({ url: Api.queryRetentionList, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
 export const queryOverViewList = (params) => defHttp.get({ url: Api.queryOverViewList, params });
+
+/**
+ * 列表接口
+ * @param params
+ */
+export const queryDayReportList = (params) => defHttp.get({ url: Api.queryDayReportList, params });
 
 /**
  * 列表接口

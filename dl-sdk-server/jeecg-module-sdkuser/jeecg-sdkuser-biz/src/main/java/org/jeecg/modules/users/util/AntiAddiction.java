@@ -34,7 +34,7 @@ public class AntiAddiction {
     // appId
     public static final String APP_ID = "c7219f35f26a4b0ca1a4bf9aac3c853b";
     // 密钥
-    public static final String SECRET_KEY = "de9258ccc7a55be385d043970d1548e8";
+    public static final String SECRET_KEY = "800879e423d1c43b24b95da2231f07a4";
     // 实名认证请求接口
     private static final String CHECK_URL = "https://api.wlc.nppa.gov.cn/idcard/authentication/check";
     // 实名认证结果请求接口

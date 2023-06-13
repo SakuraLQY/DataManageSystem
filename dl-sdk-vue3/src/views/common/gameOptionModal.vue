@@ -2,7 +2,7 @@
     <span style="color:red;margin-right:6px;margin-left:50px;">*</span>
             <span style="white-space: normal">游戏/子游戏 : </span>
             <a-form-item style="margin-left:10px" v-bind="validateInfos.gameId">
-              <a-select v-model:value="formData.gameId" optionFilterProp="label" show-search style="width:190px;"   placeholder="请选择游戏名" @change="changeSubGame" allowClear>
+              <a-select v-model:value="formData.gameId" optionFilterProp="label" show-search style="width:190px;" :disabled="props.disabled"  placeholder="请选择游戏名" @change="changeSubGame" allowClear>
                 <a-select-option
                   v-for="(gameItem,index) in faList"
                   :key="index"
@@ -17,7 +17,7 @@
               <span style="margin-left:10px;margin-right:10px">/</span>
             </a-form-item>
             <a-form-item  style="width:40%">
-	            <a-select v-model:value="formData.subGameId" optionFilterProp="label" show-search style="width:100%"  allowClear placeholder="请选择子游戏名" v-if="formData.gameId !=='' && formData.gameId !==undefined">
+	            <a-select v-model:value="formData.subGameId" optionFilterProp="label" show-search style="width:100%" :disabled="props.disabled"  allowClear placeholder="请选择子游戏名" v-if="formData.gameId !=='' && formData.gameId !==undefined">
                 <a-select-option
                   v-for="(gameItem,index) in faList[formData.gameId]?.list"
                   :key="index"
@@ -27,7 +27,7 @@
                 {{gameItem.gameName + '(' + gameItem.id + ')'}}
                 </a-select-option>
               </a-select>
-              <a-select v-model:value="formData.subGameId" style="width:100%"  placeholder="请选择子游戏名" v-if="formData.gameId ==='' || formData.gameId ===undefined">
+              <a-select v-model:value="formData.subGameId" style="width:100%"  placeholder="请选择子游戏名" :disabled="props.disabled" v-if="formData.gameId ==='' || formData.gameId ===undefined">
                 <a-select-option
                   v-for="(gameItem,index) in []"
                   :key="index"
@@ -82,6 +82,14 @@
         emitFn('handlerModal', formData);
         }
     )
+  
+  const props = defineProps({
+    // v-model:value
+    disabled: {
+        type: Boolean,
+        default: () => false
+      }
+  });
 
 //   const fn = () => {
 //   // 第一个参数是 自定义事件名称  第二个参数是 传过去的值

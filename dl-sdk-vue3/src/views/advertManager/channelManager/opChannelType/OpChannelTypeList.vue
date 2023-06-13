@@ -25,10 +25,10 @@
       </a-form>
     </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable" >
       <!--插槽:table标题-->
       <template #tableTitle>
-        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
+        <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined" v-show="false"> 新增</a-button>
         <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls" v-show="false"> 导出</a-button>
         <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls" v-show="false">导入</j-upload-button>
         <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -47,7 +47,7 @@
       </template>
       <!--操作栏-->
       <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
+        <TableAction :actions="getTableAction(record)" />
       </template>
       <!--字段回显插槽-->
       <template #htmlSlot="{text}">
@@ -164,9 +164,9 @@
    */
   function getTableAction(record) {
     return [
-      {
-        label: '编辑',
-        onClick: handleEdit.bind(null, record),
+       {
+        label: '详情',
+        onClick: handleDetail.bind(null, record),
       },
     ];
   }
@@ -176,16 +176,7 @@
    */
   function getDropDownAction(record) {
     return [
-      {
-        label: '详情',
-        onClick: handleDetail.bind(null, record),
-      }, {
-        label: '删除',
-        popConfirm: {
-          title: '是否确认删除',
-          confirm: handleDelete.bind(null, record),
-        }
-      }
+     
     ]
   }
 

@@ -293,6 +293,7 @@
       columns,
       canResize:false,
       useSearchForm: false,
+      showActionColumn: false,
       actionColumn: {
         width: 120,
         fixed: 'right',

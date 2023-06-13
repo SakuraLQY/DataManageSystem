@@ -52,4 +52,20 @@ public interface IOpVendorService extends IService<OpVendor> {
      * @param ids: ID集合
      */
     void deleteIds(List<String> ids);
+
+    /**
+     * @author xmh
+     * @description 添加
+     * @date 2023/6/12 13:45
+     * @param opVendor: 支付厂商
+     */
+    void insert(OpVendor opVendor);
+
+    /**
+     * @author xmh
+     * @description 更新
+     * @date 2023/6/12 15:01
+     * @param opVendor: 支付厂商
+     */
+    void update(OpVendor opVendor);
 }

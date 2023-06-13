@@ -59,6 +59,22 @@ public class OpJrttPutAccountVo {
     @ApiModelProperty(value = "账号归属用户")
     @Dict(dictTable = "sys_user", dicText = "realname", dicCode = "id")
     private java.lang.String putUser;
+    /**广告主ID*/
+    @Excel(name = "广告主ID", width = 15)
+    @ApiModelProperty(value = "广告主ID")
+    private String advertiserId;
+    /**access_token*/
+    @Excel(name = "access_token", width = 15)
+    @ApiModelProperty(value = "广告主ID")
+    private String accessToken;
+    /**access_token_time*/
+    @Excel(name = "access_token_time", width = 15)
+    @ApiModelProperty(value = "广告主ID")
+    private String accessTokenTime;
+    /**refresh_token*/
+    @Excel(name = "refresh_token", width = 15)
+    @ApiModelProperty(value = "广告主ID")
+    private String refreshToken;
     /**账号备注*/
     @Excel(name = "账号备注", width = 15)
     @ApiModelProperty(value = "账号备注")

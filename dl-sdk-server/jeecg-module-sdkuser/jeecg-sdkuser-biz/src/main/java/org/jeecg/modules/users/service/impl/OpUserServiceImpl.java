@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.common.constant.IsConstant;
+import org.jeecg.common.constant.PkgParentConstant;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.config.SdkConfig;
 import org.jeecg.config.sign.context.SdkContext;
@@ -137,7 +138,7 @@ public class OpUserServiceImpl extends ServiceImpl<OpUserMapper, OpUser> impleme
         if (oConvertUtils.isEmpty(opUser)) {
             throw new IdeaRunTimeException(ErrorCode.NO_FOUND_SDK_USER);
         }
-        if (oConvertUtils.isNotEmpty(sdkInfo.getOpPkgModel())) {
+        if (!PkgParentConstant.DEFAULT_PKG_ID.equals(sdkIdAuthDto.getPkgId())) {
             return singleGameIdAuth(sdkIdAuthDto.getSubGameId(), sdkIdAuthDto.getPkgId(), sdkIdAuthDto.getUserId(),
                 sdkIdAuthDto.getIdNumber(), sdkIdAuthDto.getRealName(),
                 sdkInfo.getOpPkgModel().getIdAuthApi(),
@@ -163,7 +164,7 @@ public class OpUserServiceImpl extends ServiceImpl<OpUserMapper, OpUser> impleme
             q.like("a.user_phone", opUser.getUserPhone());
         }
         if (null != opUser.getId()) {
-            q.eq("a.id", opUser.getId());
+            q.like("a.id", opUser.getId());
         }
         return baseMapper.getUserList(page, q);
     }

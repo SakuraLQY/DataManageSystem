@@ -6,9 +6,9 @@
                 v-for="(gameItem,index) in resList[1]"
                 :key="index"
                 :value="gameItem.id"
-                :label="gameItem.name + '(' + index + ')'"
+                :label="gameItem.name + '(' + gameItem.id + ')'"
             >
-            {{gameItem.name + '(' + index + ')'}}
+            {{gameItem.name + '(' + gameItem.id + ')'}}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -20,9 +20,9 @@
                 v-for="(gameItem,index) in channelList"
                 :key="index"
                 :value="gameItem.id"
-                :label="gameItem.name + '(' + index + ')'"
+                :label="gameItem.name + '(' + gameItem.id + ')'"
             >
-            {{gameItem.name + '(' + index + ')'}}
+            {{gameItem.name + '(' + gameItem.id + ')'}}
             </a-select-option>
             </a-select>
             <a-select v-model:value="queryParam.channelId"  placeholder="请选择渠道" v-if="queryParam.channelTypeId ==='' || queryParam.channelTypeId ===undefined">

@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
@@ -131,13 +132,20 @@ public class OpPaySwitchServiceImpl extends ServiceImpl<OpPaySwitchMapper, OpPay
      * @date 2022/12/15 18:23
      */
     @Override
-    public List<Integer> checkPayMode(Integer subGameId, Integer PkgId, String userId,
+    public List<Integer> checkPayMode(Integer subGameId, Integer pkgId, String userId,
         String version,
         String build, BigDecimal orderMoney) {
+        // 如果是母包的话 不限制支付
+        if(pkgId == 0){
+            return PayTypeConstant.DEFAULT_PAY;
+        }
         // 安卓不切支付，直走默认支付
         OpPaySwitch paySwitchConf = opPaySwitchMapper
-            .selectOne(new LambdaQueryWrapper<OpPaySwitch>().eq(OpPaySwitch::getGameId, subGameId)
-                .eq(OpPaySwitch::getPkgId, PkgId));
+            .selectOne(new LambdaQueryWrapper<OpPaySwitch>().eq(OpPaySwitch::getSubGameId, subGameId)
+                .eq(OpPaySwitch::getPkgId, pkgId));
+        if(null == paySwitchConf){
+            return new ArrayList<>();
+        }
         //默认支付
         String defaultPayStr = paySwitchConf.getDefaultPay();
         List<Integer> defaultPay = new LinkedList<>();
@@ -195,8 +203,7 @@ public class OpPaySwitchServiceImpl extends ServiceImpl<OpPaySwitchMapper, OpPay
 
         //查询当前版本支付配置
         OpPaySwitch paySwitchConf = opPaySwitchMapper
-            .selectOne(new LambdaQueryWrapper<OpPaySwitch>().eq(OpPaySwitch::getGameId, subGameId)
-                .eq(OpPaySwitch::getGameVersion, version).eq(OpPaySwitch::getGameBuild, build));
+            .selectOne(new LambdaQueryWrapper<OpPaySwitch>().eq(OpPaySwitch::getGameBuild, build));
         //没有配置
         if (paySwitchConf == null) {
             return iosPay;
@@ -276,12 +283,12 @@ public class OpPaySwitchServiceImpl extends ServiceImpl<OpPaySwitchMapper, OpPay
             .orElse(new OpOrderCount(0, BigDecimal.ZERO));
         //金额小于【订单金额】 -->默认支付
         if (paySwitchConf.getOrderMoney() != null
-            && orderMoney.compareTo(paySwitchConf.getOrderMoney()) > 0) {
+            && orderMoney.compareTo(paySwitchConf.getOrderMoney()) < 0) {
             return defaultPay;
         }
         //次数小于【充值次数】 --> 默认支付
         if (paySwitchConf.getRechargeTimes() != null
-            && orderCount1.getNumber() > paySwitchConf.getRechargeTimes()) {
+            && orderCount1.getNumber() < paySwitchConf.getRechargeTimes()) {
             return defaultPay;
         }
         // 总充值小于【累充金额】-->默认支付

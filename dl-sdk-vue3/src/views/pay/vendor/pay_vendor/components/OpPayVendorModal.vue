@@ -66,6 +66,7 @@
    */
   function handleCancel() {
     visible.value = false;
+    registerForm.value.cancel();
   }
 
   defineExpose({

@@ -9,6 +9,7 @@
             :beforeUpload="handleBeforeUpload"
             :customRequest="uploadBigFile"
             style="float: inline-start;"
+            :showUploadList="false"
             >
                 <a-button type="primary" size="small" >
                     <CloudUploadOutlined />
@@ -16,7 +17,7 @@
                 </a-button>
             </a-upload>
         </div>
-        
+        <Progress :percent="percent" v-if="isShow"/>
     </div>
 </template>
 
@@ -28,17 +29,18 @@
   import { uploadUrl, checkUploadUrl, updatePkgInfoUrl } from "../OpPkgParent.api";
   import { message, Upload} from 'ant-design-vue';
   import {CloudUploadOutlined,PauseCircleOutlined } from '@ant-design/icons-vue';
+  import Progress from 'ant-design-vue/lib/progress'; // 加载 JS
 
     //分片大小
     const CHUNK_SIZE = 20 * 1024 * 1024;
     let chunkList: any = [];
     let totalSize: any = 0;
     let successChunks: any = [];
-    let percent = 0;
+    let percent = ref(0);
     let stopFlag = ref(false);
     let md5: any;
     let fileName: string;
-    let tempParams: any;
+    let isShow = ref();
     const props = defineProps({
         path: propTypes.string,
         onSuccess : propTypes.func,
@@ -52,10 +54,12 @@
 
     function handleBeforeUpload(file) {
         chunkList = [];
-        percent = 0;
+        percent.value = 0;
         totalSize = 0;
         successChunks = [];
 		md5 = '';
+        isShow.value = true;
+        stopFlag.value = false
         if(!apkType.includes(file.type)){
             message.error("上传文件类型错误");
             return false || Upload.LIST_IGNORE;
@@ -78,6 +82,7 @@
                         doUpload();
                         return;
                     }
+                    console.log(i)
                     let data:any = {
                         data :{
                             file : chunkList[i],
@@ -98,22 +103,23 @@
                         // success : doFileUploadCallBack,
                         isReturnResponse : true
                     };
-                    let res = await defHttp.uploadFile({url : uploadUrl,},  data,chunkUploadCallBack);
+                    let res = await defHttp.uploadFile({url : uploadUrl},  data,chunkUploadCallBack);
                     if(res.code == 200){
-                            successChunks.push(res.result.chunkNumber);
-                            percent = percent + Math.round((res.result.currentChunkSize/totalSize)*100)
-                            tempParams.onProgress({percent : percent})
-                            if(successChunks.length >= len){
-                                tempParams.onSuccess();
-                                if (props.onSuccess != undefined) {
-                                    props.onSuccess();
-                                }
-                                showPause.value = false;
-                                return;
+                        successChunks.push(res.result.chunkNumber);
+                        percent.value = percent.value + Math.round((res.result.currentChunkSize/totalSize)*100)
+                        if(successChunks.length >= len){
+                            percent.value = 100;
+                            isShow.value = false;
+                            if (props.onSuccess != undefined) {
+                                props.onSuccess();
                             }
+                            showPause.value = false;
+                            return;
+                        }
                     } 
-                        i=i+1;
-                        doUpload();
+                    i=i+1;
+                    doUpload();
+
 				}else{
 					message.info("暂停")
 				}
@@ -124,7 +130,6 @@
 
   	async function uploadBigFile(params : any){
         showPause.value = true;
-        tempParams = params;
         const file =  params.file;
         fileName = file.name
         totalSize = file.size;
@@ -133,7 +138,7 @@
         successChunks = res.uploadedChunks;
         if(successChunks.length >= chunkList.length){
             message.success("上传成功");
-            params.onSuccess();
+            isShow.value = false;
             defHttp.get({url : updatePkgInfoUrl, params: {gameId : props.gameId , subGameId : props.subGameId, fileName: fileName}});
             if(props.onSuccess != undefined){
                 props.onSuccess();

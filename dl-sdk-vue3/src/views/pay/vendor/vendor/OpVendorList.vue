@@ -6,7 +6,7 @@
         <a-row :gutter="24">
           <a-col :lg="8">
             <a-form-item label="厂商名">
-              <a-input placeholder="请输入厂商名" v-model:value="queryParam.vendorName"></a-input>
+              <a-input placeholder="请输入厂商名" v-model:value="queryParam.vendorName" allowClear></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -105,8 +105,8 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button> -->
+        <!-- <j-upload-button type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>

@@ -12,7 +12,7 @@ import org.jeecg.modules.game.dto.SdkConfDto;
 import org.jeecg.modules.game.dto.SdkIosConfDto;
 import org.jeecg.modules.game.dto.SdkStartDataDto;
 import org.jeecg.modules.game.service.SdkGameService;
-import org.jeecg.modules.game.vo.PrivacyAndUserProtocolVo;
+import org.jeecg.modules.game.vo.PrivacyVo;
 import org.jeecg.modules.game.vo.SdkConfRes;
 import org.jeecg.modules.game.vo.SdkIosConfRes;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,7 +53,7 @@ public class SdkGameController {
 
     @ApiOperation(value = "start", notes = "激活")
     @GetMapping(value = "/start")
-    public SdkResult<SdkConfRes> start(SdkStartDataDto sdkEventDto, HttpServletRequest request) {
+    public SdkResult start(SdkStartDataDto sdkEventDto, HttpServletRequest request) {
         if (StringUtils.isEmpty(sdkEventDto.getClientIp())) {
             sdkEventDto.setClientIp(IpUtils.getIpAddr(request));
         }
@@ -62,9 +62,10 @@ public class SdkGameController {
     }
 
     @ApiOperation(value = "privacy", notes = "获取隐私政策,用户协议")
-    @GetMapping(value = "/privacyAndUserProtocol")
-    public SdkResult<PrivacyAndUserProtocolVo> getPrivacy(@RequestParam("pkgId") Integer pkgId) {
-        return SdkResult.success(sdkGameService.getPrivacyAndUserProtocol(pkgId));
+    @GetMapping(value = "/privacy")
+    public SdkResult<PrivacyVo> getPrivacy(@RequestParam("subGameId") Integer subGameId,
+        @RequestParam("pkgId") Integer pkgId) {
+        return SdkResult.success(sdkGameService.getPrivacy(subGameId, pkgId));
     }
 
 }

@@ -64,40 +64,40 @@ public class PrivacyTest {
     @Autowired
     private IOpPkgService opPkgService;
 
-    @Test
-    public void test() {
-        List<OpPkgVo> list = opPkgMapper.getList();
-        Map<Integer, Map<Integer, List<OpPkgVo>>> map = list.stream()
-            .collect(Collectors.groupingBy(OpPkgVo::getGameId, Collectors.groupingBy(OpPkgVo::getSubGameId)));
-        List<SubAndOpPackGameVo> optionList = new ArrayList<>();
-        for (Integer key : map.keySet()) {
-            Map<Integer, List<OpPkgVo>> listOne = map.get(key);
-            SubAndOpPackGameVo subAndOpPackGameVo = new SubAndOpPackGameVo();
-            List<SubAndOpPackGameVo> subList = new ArrayList<>();
-            for (Integer key2 : listOne.keySet()) {
-                List<OpPkgVo> listTwo = listOne.get(key2);
-                subAndOpPackGameVo.setTitle(listTwo.get(0).getGameName());
-                subAndOpPackGameVo.setValue("game" + key);
-                SubAndOpPackGameVo subAndOpPackGameVo2 = new SubAndOpPackGameVo();
-                List<SubAndOpPackGameVo> pkgList = new ArrayList<>();
-                for (OpPkgVo opPkgVo : listTwo) {
-                    subAndOpPackGameVo2.setTitle(opPkgVo.getSubGameName());
-                    subAndOpPackGameVo2.setValue("subGame" + key2);
-                    SubAndOpPackGameVo subAndOpPackGameVo3 = new SubAndOpPackGameVo();
-                    subAndOpPackGameVo3.setTitle(opPkgVo.getNickName());
-                    subAndOpPackGameVo3.setValue(String.valueOf(opPkgVo.getId()));
-                    subAndOpPackGameVo3.setChildren(new ArrayList<>());
-                    pkgList.add(subAndOpPackGameVo3);
-                }
-                subAndOpPackGameVo2.setChildren(pkgList);
-                subList.add(subAndOpPackGameVo2);
-            }
-            subAndOpPackGameVo.setChildren(subList);
-            optionList.add(subAndOpPackGameVo);
-        }
-        System.out.println("optionList-->"+optionList);
-
-    }
+//    @Test
+//    public void test() {
+//        List<OpPkgVo> list = opPkgMapper.getList();
+//        Map<Integer, Map<Integer, List<OpPkgVo>>> map = list.stream()
+//            .collect(Collectors.groupingBy(OpPkgVo::getGameId, Collectors.groupingBy(OpPkgVo::getSubGameId)));
+//        List<SubAndOpPackGameVo> optionList = new ArrayList<>();
+//        for (Integer key : map.keySet()) {
+//            Map<Integer, List<OpPkgVo>> listOne = map.get(key);
+//            SubAndOpPackGameVo subAndOpPackGameVo = new SubAndOpPackGameVo();
+//            List<SubAndOpPackGameVo> subList = new ArrayList<>();
+//            for (Integer key2 : listOne.keySet()) {
+//                List<OpPkgVo> listTwo = listOne.get(key2);
+//                subAndOpPackGameVo.setTitle(listTwo.get(0).getGameName());
+//                subAndOpPackGameVo.setValue("game" + key);
+//                SubAndOpPackGameVo subAndOpPackGameVo2 = new SubAndOpPackGameVo();
+//                List<SubAndOpPackGameVo> pkgList = new ArrayList<>();
+//                for (OpPkgVo opPkgVo : listTwo) {
+//                    subAndOpPackGameVo2.setTitle(opPkgVo.getSubGameName());
+//                    subAndOpPackGameVo2.setValue("subGame" + key2);
+//                    SubAndOpPackGameVo subAndOpPackGameVo3 = new SubAndOpPackGameVo();
+//                    subAndOpPackGameVo3.setTitle(opPkgVo.getNickName());
+//                    subAndOpPackGameVo3.setValue(String.valueOf(opPkgVo.getId()));
+//                    subAndOpPackGameVo3.setChildren(new ArrayList<>());
+//                    pkgList.add(subAndOpPackGameVo3);
+//                }
+//                subAndOpPackGameVo2.setChildren(pkgList);
+//                subList.add(subAndOpPackGameVo2);
+//            }
+//            subAndOpPackGameVo.setChildren(subList);
+//            optionList.add(subAndOpPackGameVo);
+//        }
+//        System.out.println("optionList-->"+optionList);
+//
+//    }
 
     /**
      * @Author lili

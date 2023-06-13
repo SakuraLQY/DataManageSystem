@@ -37,13 +37,8 @@
       </a-form>
     </div>
     <div>
-      <Bar :chartData="barDataSource" height="50vh" :option="barOption"></Bar>
-      <!-- <div class="button-container">
-        <a-button  type="primary"  @click="showSeries(1)"> 真实ROI</a-button>
-        <a-button  type="primary"  @click="showSeries(2)"> 推广费用</a-button>
-        <a-button  type="primary"  @click="showSeries(3)"> SDK分成所得</a-button>
-        <a-button  type="primary"  @click="showSeries(4)"> 回收金额</a-button>
-      </div> -->
+      <!-- <Bar :chartData="barDataSource" height="50vh" :option="barOption"></Bar> -->
+      <div ref="chartRef" style="width: 100%; height: 400px;"></div>
     </div>
     <!--引用表格-->
     <BasicTable @register="registerTable" >
@@ -108,6 +103,7 @@
   import func from '../../../../../vue-temp/vue-editor-bridge';
   import Bar from '/@/components/chart/Bar.vue';
   import DealOptionSelect from '/@/views/common/dealOptionSelect.vue';
+  import { useECharts } from '/@/hooks/web/useECharts';
 
   let date = new Date();
   let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 90);
@@ -246,6 +242,8 @@
   let promotionCost = ref(0)
   let sdkShare = ref(0)
   let profit = ref(0)
+  const chartRef = ref<HTMLDivElement | null>(null);
+  const { setOptions, echarts } = useECharts(chartRef as Ref<HTMLDivElement>);
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -265,7 +263,8 @@
         fixed: 'right',
       },
       beforeFetch: (params) => {
-        for (let i = 2; i <= 150; i++) {
+        if (!columns.value.some(obj => obj.title === '2日ROI(0)')) {
+          for (let i = 2; i <= 150; i++) {
           columns.value.push({
             title: i + '日ROI(0)',
             align: 'center',
@@ -273,6 +272,7 @@
               return record.remainROI['day' + i] + '%';
             }
           },)
+        }
         }
         return Object.assign(params, queryParam.value);
       },
@@ -298,6 +298,7 @@
           data4.value = []
         }
         xData.value = []
+        barOption.value = {}
         for (let i = 0; i < queryList.value.length; i++) {
           let roiObj = queryList.value[i];
           xData.value.push(roiObj.roiDate)
@@ -370,11 +371,21 @@
               type: 'value',
               max: 120,
               min: 0,
+              position: 'left',
               axisLabel: {
                 show: true,
                 formatter: '{value} %'
               },
               name: 'ROI (%)' // 设置 y 轴名称
+            },
+            {
+              type: 'value',
+              position: 'right',
+              axisLabel: {
+                show: true,
+                formatter: '{value} 元'
+              },
+              name: '价格 (元)' // 设置 y 轴名称
             }
           ],
           dataZoom: [{
@@ -384,6 +395,9 @@
           }],
            grid: {
             bottom: 80  // 调整底部留白区域的大小
+          },
+          tooltip: {
+            trigger: 'axis',
           },
           series: [{
               name: '真实ROI',
@@ -399,7 +413,7 @@
               type: 'bar',
               barWidth: '30%', // 设置柱形图宽度为 80%
               barGap: '10%',    // 设置柱形图间距为 30%
-              yAxisIndex: 0
+              yAxisIndex: 1
           },
           {
               name: 'SDK分成所得',
@@ -407,7 +421,7 @@
               type: 'bar',
               barWidth: '30%', // 设置柱形图宽度为 80%
               barGap: '10%',    // 设置柱形图间距为 30%
-              yAxisIndex: 0
+              yAxisIndex: 1
           },
           {
               name: '回收金额',
@@ -415,9 +429,10 @@
               type: 'bar',
               barWidth: '30%', // 设置柱形图宽度为 80%
               barGap: '10%',    // 设置柱形图间距为 30%
-              yAxisIndex: 0
+              yAxisIndex: 1
           }]
       }
+      setOptions(barOption.value);
       return queryList.value
       },
     },

@@ -104,6 +104,10 @@ public class OpCostVo {
     @DateTimeFormat(pattern="yyyy-MM-dd")
     @ApiModelProperty(value = "更新-时间")
     private java.util.Date updateTime;
+    /**游戏*/
+    @Excel(name = "游戏", width = 15)
+    @ApiModelProperty(value = "游戏")
+    private java.lang.String gameName;
     /**子游戏*/
     @Excel(name = "子游戏", width = 15)
     @ApiModelProperty(value = "子游戏")

@@ -615,9 +615,9 @@ public class SdkPayServiceImpl implements ISdkPayService {
             Long timestamp = time.toInstant(ZoneOffset.of("+8")).toEpochMilli();
             parsePayDto.setGameId(gameId)
                 .setSubGameId(openDto.getSubGameId())
-                .setChannelId(opDealModel.getChannelId())
-                .setChannelTypeId(opDealModel.getChannelTypeId())
-                .setChannelSubAccountId(opDealModel.getChannelSubAccountId())
+                .setChannelId(opDealModel.getChannelId() == null ? 0 : opDealModel.getChannelId())
+                .setChannelTypeId(opDealModel.getChannelTypeId() == null ? 0 : opDealModel.getChannelTypeId())
+                .setChannelSubAccountId(opDealModel.getChannelSubAccountId() == null ? 0 : opDealModel.getChannelTypeId())
                 .setDealId(dealId)
                 .setPkgId(openDto.getPkgId())
                 .setUniqueId(openDto.getDevice())

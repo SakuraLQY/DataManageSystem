@@ -70,7 +70,7 @@ public class OpPayVendorController extends JeecgController<OpPayVendor, IOpPayVe
 	//@RequiresPermissions("vendor:op_pay_vendor:add")
 	@PostMapping(value = "/add")
 	public Result<String> add(@RequestBody OpPayVendor opPayVendor) {
-		opPayVendorService.save(opPayVendor);
+		opPayVendorService.insert(opPayVendor);
 		return Result.OK("添加成功！");
 	}
 

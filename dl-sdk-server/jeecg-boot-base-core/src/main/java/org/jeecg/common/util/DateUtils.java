@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.jeecg.common.constant.SymbolConstant;
+import org.jeecg.common.exception.JeecgBootException;
 import org.springframework.util.StringUtils;
 
 /**
@@ -597,9 +598,13 @@ public class DateUtils extends PropertyEditorSupport {
         return cal;
     }
 
-    public static String formatAddDate(String src, String pattern, int amount) throws ParseException {
-        Calendar cal;
-        cal = parseCalendar(src, pattern);
+    public static String formatAddDate(String src, String pattern, int amount){
+        Calendar cal = null;
+        try {
+            cal = parseCalendar(src, pattern);
+        } catch (ParseException e) {
+            throw new JeecgBootException("解析日期失败");
+        }
         cal.add(Calendar.DATE, amount);
         return formatDate(cal);
     }
@@ -662,6 +667,15 @@ public class DateUtils extends PropertyEditorSupport {
         return 0;
     }
 
+    /**
+     * @param flag
+     * @param startTime
+     * @param endTime
+     * @return int
+     * @author chenyw
+     * @description 返回startTime - endTime
+     * @date 11:06 2023/5/18/018
+     **/
     public static int dateToDiff(char flag, Date startTime, Date endTime){
         char year = 'y';
         char day = 'd';
@@ -778,6 +792,37 @@ public class DateUtils extends PropertyEditorSupport {
             return date_sdf_hour.get().format(date1).equals(yyyyMMdd.get().format(date2));
         }
 
+    }
+
+    /**
+     * @param dateString 需要判断的时间 yyyy-MM-dd HH:mm:ss
+     * @param startString 开始时间 yyyy-MM-dd HH:mm:ss
+     * @param endString 结束时间 yyyy-MM-dd HH:mm:ss
+     * @return boolean
+     * @author chenyw
+     * @description 判断一个时间是否在一个时间区间里面
+     * @date 20:46 2023/5/22/022
+     **/
+    public static boolean isDateInRange(String dateString, String startString, String endString) {
+        DateFormat dateFormat = datetimeFormat.get();
+        try {
+            Date dateToCheck = dateFormat.parse(dateString);
+            Date start = dateFormat.parse(startString);
+            Date end = dateFormat.parse(endString);
+
+            Calendar calendarToCheck = Calendar.getInstance();
+            calendarToCheck.setTime(dateToCheck);
+
+            Calendar calendarStart = Calendar.getInstance();
+            calendarStart.setTime(start);
+
+            Calendar calendarEnd = Calendar.getInstance();
+            calendarEnd.setTime(end);
+
+            return calendarToCheck.after(calendarStart) && calendarToCheck.before(calendarEnd);
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
 }

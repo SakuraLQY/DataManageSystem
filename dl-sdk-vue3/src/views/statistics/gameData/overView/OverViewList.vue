@@ -251,8 +251,6 @@
       queryParam.value.startTime = dateString2;
       queryParam.value.endTime = dateString;
     }
-
-
   }
 
   getList()

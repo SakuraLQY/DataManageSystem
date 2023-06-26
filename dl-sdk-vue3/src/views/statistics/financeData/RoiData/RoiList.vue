@@ -41,7 +41,7 @@
       <div ref="chartRef" style="width: 100%; height: 400px;"></div>
     </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" >
+    <BasicTable :fixedHeader="true" @register="registerTable" >
       <!--插槽:table标题-->
       <template #tableTitle>
         <!-- <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button> -->
@@ -144,91 +144,110 @@
   const columns = ref([{
     title: '日期',
     align: "center",
-    dataIndex: 'roiDate'
+    dataIndex: 'roiDate',
+    fixed: 'left', // 固定列
+    sorter: true,
   },{
     title: '游戏名',
     align: "center",
-    dataIndex: 'gameName'
+    dataIndex: 'gameName',
+    sorter: true,
   },
   {
     title: '渠道名',
     align: "center",
-    dataIndex: 'channelName'
+    dataIndex: 'channelName',
+    sorter: true,
   },
   {
     title: '广告名',
     align: "center",
-    dataIndex: 'dealName'
+    dataIndex: 'dealName',
+    sorter: true,
   },
   {
     title: '推广费用',
     align: "center",
-    dataIndex: 'promotionCost'
+    dataIndex: 'promotionCost',
+    sorter: true,
   },
   {
     title: '新增注册数',
     align: "center",
-    dataIndex: 'regCount'
+    dataIndex: 'regCount',
+    sorter: true,
   },
   {
     title: '剩余DAU',
     align: "center",
-    dataIndex: 'remainDAU'
+    dataIndex: 'remainDAU',
+    sorter: true,
   },
   {
     title: '付费DAU',
     align: "center",
-    dataIndex: 'costDAU'
+    dataIndex: 'costDAU',
+    sorter: true,
   },
   {
     title: '注册单价',
     align: "center",
-    dataIndex: 'regUnitPrice'
+    dataIndex: 'regUnitPrice',
+    sorter: true,
   },
   {
     title: '新增付费人数',
     align: "center",
-    dataIndex: 'costCount'
+    dataIndex: 'costCount',
+    sorter: true,
   },
   {
     title: '付费率',
     align: "center",
-    dataIndex: 'costProbability'
+    dataIndex: 'costProbability',
+    sorter: true,
   },
   {
     title: '付费单价',
     align: "center",
-    dataIndex: 'costUnitPrice'
+    dataIndex: 'costUnitPrice',
+    sorter: true,
   },
   {
     title: '新增付费金额',
     align: "center",
-    dataIndex: 'addCostPrice'
+    dataIndex: 'addCostPrice',
+    sorter: true,
   },
   {
     title: '累计付费金额',
     align: "center",
-    dataIndex: 'allCostPrice'
+    dataIndex: 'allCostPrice',
+    sorter: true,
   },
   {
     title: 'sdk分成所得',
     align: "center",
-    dataIndex: 'sdkShare'
+    dataIndex: 'sdkShare',
+    sorter: true,
   },
   {
     title: '利润',
     align: "center",
-    dataIndex: 'profit'
+    dataIndex: 'profit',
+    sorter: true,
   },
   {
     title: '累计ROI',
     align: "center",
-    dataIndex: 'allROI'
+    dataIndex: 'allROI',
+    sorter: true,
   },
   {
     title: '首日ROI',
     align: "center",
-    dataIndex: 'firstROI'
+    dataIndex: 'firstROI',
+    sorter: true,
   },])
   let barOption = ref()
 
@@ -253,6 +272,7 @@
       canResize:false,
       useSearchForm: false,
       showActionColumn: false,
+      clickToRowSelect:true,
       summaryFunc: (res) => {
         return summaryData.value
       },
@@ -270,7 +290,8 @@
             align: 'center',
             customRender: ({ record }) => {
               return record.remainROI['day' + i] + '%';
-            }
+            },
+            sorter: true,
           },)
         }
         }
@@ -278,7 +299,7 @@
       },
       afterFetch: (result) => {
         // allData.value = result
-        queryList.value = result.slice(0, result.length - 1)
+        queryList.value = result.slice(0, result.length - 1).reverse()
         summaryData.value = []
         if(result.length !== 0) {
           result[result.length - 1].costProbability = result[result.length - 1].costProbability + '%'
@@ -594,5 +615,4 @@
       gap: 20px;
       margin-bottom: 20px;
     }
-
 </style>

@@ -121,6 +121,10 @@ public class LtvAnalyzeServiceImpl extends ServiceImpl<LtvAnalyzeMapper, LtvAnal
         //存储查询合計出来的ltv
         Map<String,BigDecimal>countLtvSummary = new HashMap<>();
         Map<String,BigDecimal>countUserLtv = new HashMap<>();
+        for (int i = 1; i <= 150; i++) {
+            countLtvSummary.put("ltv"+i,BigDecimal.ZERO);
+            countUserLtv.put("count_user"+i,BigDecimal.ZERO);
+        }
         if(null!=list && !list.isEmpty()){
             for (LtvPaybackVo ltvPaybackVo : list) {
                 LtvVo ltvVo = new LtvVo();
@@ -179,8 +183,7 @@ public class LtvAnalyzeServiceImpl extends ServiceImpl<LtvAnalyzeMapper, LtvAnal
                         BigDecimal temp1 = tempLtv.get("ltv"+i);
                         BigDecimal temp2 = BigDecimal.valueOf(ltvPaybackVo.getRegCount());
                         remainLtv.put("ltv"+i,temp1
-                            .divide(temp2)
-                            .setScale(2, RoundingMode.HALF_UP));
+                            .divide(temp2,2,RoundingMode.HALF_UP));
                     }else{
                         remainLtv.put("ltv"+i,BigDecimal.ZERO);
                     }
@@ -195,16 +198,8 @@ public class LtvAnalyzeServiceImpl extends ServiceImpl<LtvAnalyzeMapper, LtvAnal
                 DateUtils.str2Date(ltvPaybackVo.getLtvDate(), DateUtils.date_sdf.get()));
                 for (int i = 1; i <=149 ; i++) {
                     if(day>=i){
-                        if(!countLtvSummary.containsKey("ltv"+(i+1))){
-                            countLtvSummary.put("ltv"+(i+1),BigDecimal.ZERO);
-                        }
-                        countLtvSummary.put("ltv"+(i+1),countLtvSummary.get("ltv"+(i+1)))
-                                .add(remainLtv.get("ltv"+(i+1)));
-                        if(!countUserLtv.containsKey("count_user"+(i+1))){
-                            countUserLtv.put("count_user"+(i+1),BigDecimal.ZERO);
-                        }
-                        countUserLtv.put("count_user"+(i+1),countUserLtv.get("count_user"+(i+1)))
-                            .add(BigDecimal.valueOf(ltvPaybackVo.getRegCount()));
+                        countLtvSummary.put("ltv"+(i+1),countLtvSummary.get("ltv"+(i+1)).add(remainLtv.get("ltv"+(i+1))));
+                        countUserLtv.put("count_user"+(i+1),countUserLtv.get("count_user"+(i+1)).add(BigDecimal.valueOf(ltvPaybackVo.getRegCount())));
                         }
                     }
                 resList.add(ltvVo);
@@ -218,7 +213,7 @@ public class LtvAnalyzeServiceImpl extends ServiceImpl<LtvAnalyzeMapper, LtvAnal
             allLtvVo.setRegCount(allRegCount);
             //计算合计的LTV1
         if(count_ltv!=null && allRegCount>0 ){
-            BigDecimal LTV1 = count_ltv.divide(BigDecimal.valueOf(allRegCount)).setScale(2,RoundingMode.HALF_UP);
+            BigDecimal LTV1 = count_ltv.divide(BigDecimal.valueOf(allRegCount),2,RoundingMode.HALF_UP);
             allRemainLtv.put("ltv1",LTV1);
         }else{
             allRemainLtv.put("ltv1",BigDecimal.ZERO);
@@ -228,7 +223,7 @@ public class LtvAnalyzeServiceImpl extends ServiceImpl<LtvAnalyzeMapper, LtvAnal
             if(null!=countLtvSummary.get("ltv"+i) && null!=countUserLtv.get("count_user"+i)&&countUserLtv.get("count_user"+i).compareTo(BigDecimal.ZERO)>0){
                 BigDecimal tempCountLtv = countLtvSummary.get("ltv"+i);
                 BigDecimal tempCountUser = countUserLtv.get("count_user"+i);
-                allRemainLtv.put("ltv"+i,tempCountLtv.divide(tempCountUser).setScale(2,RoundingMode.HALF_UP));
+                allRemainLtv.put("ltv"+i,tempCountLtv.divide(tempCountUser,2,RoundingMode.HALF_UP));
             }else{
                 allRemainLtv.put("ltv"+i,BigDecimal.ZERO);
             }

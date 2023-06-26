@@ -43,6 +43,11 @@
                 <j-search-select v-model:value="queryParam.createUser"  dict="sys_user,realname,username" placeholder="请选择账号人员" />
               </a-form-item>
             </a-col>
+            <a-col :lg="8">
+            <a-form-item label="常用日期">
+                <a href="#" @click="handleClick(1)">今天</a> <a href="#" @click="handleClick(2)">昨天</a> <a href="#" @click="handleClick(3)">最近三天</a> <a href="#" @click="handleClick(4)">最近一周</a> <a href="#" @click="handleClick(5)">最近两周</a>
+              </a-form-item>
+            </a-col>
           </template>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
@@ -91,9 +96,9 @@
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
       </template>
       <!--字段回显插槽-->
-      <!-- <template #htmlSlot="{text}">
+      <template #htmlSlot="{text}">
         <div v-html="text"></div>
-      </template> -->
+      </template>
       <!--省市区字段回显插槽-->
       <template #pcaSlot="{text}">
         {{ getAreaTextByCode(text) }}
@@ -316,7 +321,7 @@ let tempcolumn = columns.value;
         //拿到合计那一行的数据
         return summaryData.value
       },
-      showSummary: true,
+      showSummary: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -334,7 +339,7 @@ let tempcolumn = columns.value;
         if(!res || res.length==1){
             barOption.value.title.text = "无数据";
         }else{
-          barOption.value.title.text = res[1]?.gameName+"数据";
+          barOption.value.title.text = res[0]?.gameName+"数据";
         }
         if(queryParam.value.retainType==='newLoyal'){
           res.forEach((item) => {
@@ -435,6 +440,77 @@ let tempcolumn = columns.value;
     (selectedRowKeys.value = []) && reload();
   }
    
+  function handleClick(type) {
+    let date = new Date();
+    //今天
+    if(type === 1) {
+      // 创建Date对象，获取今天的年、月、日等信息
+      date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 2) {
+      //昨天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      queryParam.value.startTime = dateString;
+      queryParam.value.endTime = dateString;
+    }else if(type === 3) {
+      //最近三天
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 3);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 4) {
+      //最近一周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 7);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }else if(type === 5) {
+      //最近两周
+      date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      let date2 = new Date(Date.now() - 24 * 60 * 60 * 1000 * 14);
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year2 = date2.getFullYear();
+      let month2 = date2.getMonth() + 1;
+      let day2 = date2.getDate();
+      // 格式化年月日信息，回填到时间控件上
+      let dateString = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+      let dateString2 = year2 + '-' + (month2 < 10 ? '0' + month2 : month2) + '-' + (day2 < 10 ? '0' + day2 : day2);
+      queryParam.value.startTime = dateString2;
+      queryParam.value.endTime = dateString;
+    }
+  }
+
   /**
    * 操作栏
    */
@@ -536,7 +612,7 @@ let tempcolumn = columns.value;
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {retainType:'newLoyal',startTime:formatToDates(new Date()),endTime:formatToDate(new Date()),costTime:formatToDate(new Date())};
     selectedRowKeys.value = [];
     //刷新数据
     selectGameForm.value.reload();

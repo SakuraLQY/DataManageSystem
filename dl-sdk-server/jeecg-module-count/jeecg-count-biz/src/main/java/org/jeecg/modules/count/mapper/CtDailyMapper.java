@@ -142,10 +142,19 @@ public interface CtDailyMapper extends BaseMapper<CtDaily> {
      * @param queryWrapper
      * @return java.util.List<org.jeecg.modules.count.entity.CtDaily>
      * @Author lili
-     * @Description 查询整体概况、财务数据-回收数据
+     * @Description 查询整体概况
      * @Date 14:03 2023/5/15
      **/
     List<OverViewBo> getOverViewData(@Param(Constants.WRAPPER) Wrapper<OverViewDto> queryWrapper);
+
+    /**
+     * @param queryWrapper
+     * @return java.util.List<org.jeecg.modules.count.bo.OverViewBo>
+     * @Author lili
+     * @Description 财务数据-回收数据
+     * @Date 15:40 2023/6/19
+     **/
+    List<OverViewBo> getRecoveryData(@Param(Constants.WRAPPER) Wrapper<OverViewDto> queryWrapper);
 
     /**
      * @param queryWrapper

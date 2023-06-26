@@ -78,8 +78,8 @@ public class CtDailyLoyalDevServiceImpl extends ServiceImpl<CtDailyLoyalDevMappe
             }
 
             insertCtDailyLoyalDev.setDailyId(ctDaily.getId());
-            insertCtDailyLoyalDev.setCreateTime(time);
-            insertCtDailyLoyalDev.setUpdateTime(time);
+            insertCtDailyLoyalDev.setCreateTime(day);
+            insertCtDailyLoyalDev.setUpdateTime(day);
             ctDailyLoyalDevMapper.insert(insertCtDailyLoyalDev);
         } else{
 

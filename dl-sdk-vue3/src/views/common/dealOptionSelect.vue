@@ -1,7 +1,7 @@
 <template>
     <a-col :lg="8">
         <a-form-item label="广告">
-          <a-select v-model:value="queryParam.dealId"  placeholder="请选择广告" mode="multiple" optionFilterProp="label"  style="width:120%" allowClear>
+          <a-select v-model:value="queryParam.dealId"  placeholder="请选择广告" mode="multiple" optionFilterProp="label"  allowClear>
             <a-select-option v-for="(dealItem,index) in paginatedData" :key="index" :value="dealItem.id" :label="dealItem.dealName">{{ dealItem.dealName }}</a-select-option>
             <a-select-option value="" disabled>
               <div style="bottom: -10px">

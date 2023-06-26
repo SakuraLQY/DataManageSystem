@@ -80,6 +80,9 @@ public class CtDeviceServiceImpl extends ServiceImpl<CtDeviceMapper, CtDevice> i
 
         }else {
 
+            if (ObjectUtils.isEmpty(ctDevice.getStartupTime())){
+                ctDevice.setStartupTime(day);
+            }
             BeanUtils.copyProperties(ctDevice,resultCtDevice);
 
             ctDevice.setClientIp(parseStartDto.getClientIp());
@@ -191,8 +194,6 @@ public class CtDeviceServiceImpl extends ServiceImpl<CtDeviceMapper, CtDevice> i
         String date=simpleDateFormat.format(parseAliveDto.getTime());
         Date day=DateUtils.str2Date(date,simpleDateFormat);
 
-        int second = DateUtils.dateToDiff('s', day, ctDevice.getCreateTime());
-
         CtDevice resultCtDevice = new CtDevice();
         if (ObjectUtils.isEmpty(ctDevice)){
             CtDevice insertCtDevice = new CtDevice();
@@ -213,6 +214,7 @@ public class CtDeviceServiceImpl extends ServiceImpl<CtDeviceMapper, CtDevice> i
 
 
         }else {
+            int second = DateUtils.dateToDiff('s', day, ctDevice.getCreateTime());
 
             BeanUtils.copyProperties(ctDevice,resultCtDevice);
             ctDevice.setAliveTime(day);

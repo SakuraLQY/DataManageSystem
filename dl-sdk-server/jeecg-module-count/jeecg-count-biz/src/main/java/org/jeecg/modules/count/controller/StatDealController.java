@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.util.oConvertUtils;
@@ -83,6 +84,7 @@ public class StatDealController extends JeecgController<StatDeal, IStatDealServi
 	 **/
 	 @ApiOperation(value="stat_deal-分页列表查询", notes="stat_deal-分页列表查询")
 	 @GetMapping(value = "/queryList")
+	 @UserPermissionData(alias = "ct_daily")
 	public Result<List<StatDealVo>>queryList(StatDealDto statDealDto,HttpServletRequest request){
 		 String  username = JwtUtil.getUserNameByToken(request);
 		return Result.OK(statDealService.queryList(statDealDto,username));

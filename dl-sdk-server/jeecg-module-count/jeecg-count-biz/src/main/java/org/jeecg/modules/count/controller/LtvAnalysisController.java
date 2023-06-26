@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.LtvAnalysisDto;
@@ -81,6 +82,7 @@ public class LtvAnalysisController extends JeecgController<LtvAnalysis, ILtvAnal
 	 **/
 	@ApiOperation(value="ltv_analysis查询", notes="ltv_analysis查询")
 	@GetMapping(value = "/queryList")
+	@UserPermissionData(alias = "a")
 	public Result<List<LtvAnalysisVo>>queryList(LtvAnalysisDto ltvAnalysisDto){
 		return Result.OK(ltvAnalysisService.queryList(ltvAnalysisDto));
 	}

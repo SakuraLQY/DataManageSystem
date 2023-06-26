@@ -102,6 +102,18 @@ export const columns: BasicColumn[] = [
     sorter: true,
   },
   {
+    title: '累计付费金额',
+    align: "center",
+    dataIndex: 'totalMoney',
+    sorter: true,
+  },
+  {
+    title: 'DAU',
+    align: "center",
+    dataIndex: 'countDau',
+    sorter: true,
+  },
+  {
     title: '活跃付费人数',
     align: "center",
     dataIndex: 'alivePayuser',
@@ -138,6 +150,12 @@ export const columns: BasicColumn[] = [
     title: '推广费用',
     align: "center",
     dataIndex: 'costMoney',
+    sorter: true,
+  },
+  {
+    title: 'SDK分成所得',
+    align: "center",
+    dataIndex: 'sdkShare',
     sorter: true,
   },
 ];

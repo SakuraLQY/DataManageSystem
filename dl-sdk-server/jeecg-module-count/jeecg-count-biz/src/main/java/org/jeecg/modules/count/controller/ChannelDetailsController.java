@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.ChannelDetailDto;
@@ -89,6 +90,7 @@ public class ChannelDetailsController extends
      **/
     @ApiOperation(value = "渠道明细表数据-列表查询", notes = "渠道明细表数据-列表查询")
     @GetMapping(value = "queryList")
+    @UserPermissionData(alias = "a")
     public Result<List<ChannelDetailVo>> queryList(ChannelDetailDto channelDetailDto,
         HttpServletRequest req) {
         List<ChannelDetailVo> list = channelDetailsService.queryList(channelDetailDto);

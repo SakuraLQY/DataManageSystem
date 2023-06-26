@@ -2,26 +2,16 @@ package org.jeecg.modules.count.bo;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-
 import java.math.BigDecimal;
-import java.util.Date;
 import lombok.Data;
 
 /**
- * @description: 作为渠道信息查询出来的临时对象
+ * @description: 补充渠道明细合计
  * @author: chenglin
- * @date: 2023年05月12日 10:23
+ * @date: 2023年06月15日 11:45
  */
 @Data
-public class ChannelDetailBo<T> implements Serializable {
-    @ApiModelProperty(value = "日期")
-    private Date timeDaily;
-    @ApiModelProperty(value = "游戏id")
-    private T gameName;
-    @ApiModelProperty(value = "子游戏Id")
-    private T subGameName;
-    @ApiModelProperty(value = "渠道Id")
-    private T channel;
+public class ChannelDetailAllBo implements Serializable {
     @ApiModelProperty(value = "激活")
     private Integer countActive;
     /**

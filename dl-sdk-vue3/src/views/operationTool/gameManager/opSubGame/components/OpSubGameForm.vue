@@ -60,8 +60,8 @@
             <j-search-select v-model:value="formData.phoneSwitch" dict="game_is_open" placeholder="请选择绑定手机开关" :disabled="disabled"/>
           </a-form-item>
         </a-col>
-        <a-col :span="24" v-show="false">
-          <a-form-item label="隐私政策开关" v-bind="validateInfos.privacySwitch">
+        <a-col :span="24">
+          <a-form-item label="隐私协议开关" v-bind="validateInfos.privacySwitch">
             <j-search-select v-model:value="formData.privacySwitch" dict="game_is_open" placeholder="请选择隐私政策开关" :disabled="disabled"/>
           </a-form-item>
         </a-col>

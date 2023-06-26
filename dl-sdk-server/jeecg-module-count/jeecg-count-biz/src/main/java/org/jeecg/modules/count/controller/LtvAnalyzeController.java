@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.modules.count.dto.LtvDto;
 import org.jeecg.modules.count.entity.LtvAnalyze;
@@ -69,6 +70,7 @@ public class LtvAnalyzeController extends JeecgController<LtvAnalyze, ILtvAnalyz
 	 **/
 	 @ApiOperation(value="ct_daily-ltv查询", notes="ct_daily-ltv查询")
 	 @GetMapping(value = "/queryLtvList")
+	 @UserPermissionData(alias = "a")
 	public Result<List<LtvVo>>queryLtvList(LtvDto ltvDto){
 		return Result.OK(ltvAnalyzeService.qeuryLtvList(ltvDto));
 	}

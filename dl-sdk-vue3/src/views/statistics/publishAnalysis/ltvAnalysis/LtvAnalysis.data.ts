@@ -1,88 +1,88 @@
-import {BasicColumn} from '/@/components/Table';
-import {FormSchema} from '/@/components/Table';
-import { rules} from '/@/utils/helper/validator';
+import { BasicColumn } from '/@/components/Table';
+import { FormSchema } from '/@/components/Table';
+import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
     title: 'ID',
-    align: "center",
-    dataIndex: 'typeId'
+    align: 'center',
+    dataIndex: 'typeId',
   },
   {
     title: '名称',
-    align: "center",
-    dataIndex: 'name'
+    align: 'center',
+    dataIndex: 'name',
   },
   {
     title: 'LTV1',
-    align: "center",
-    dataIndex: 'ltv1'
+    align: 'center',
+    dataIndex: 'ltv1',
   },
   {
     title: 'LTV2',
-    align: "center",
-    dataIndex: 'ltv2'
+    align: 'center',
+    dataIndex: 'ltv2',
   },
   {
     title: 'LTV3',
-    align: "center",
-    dataIndex: 'ltv3'
+    align: 'center',
+    dataIndex: 'ltv3',
   },
   {
     title: 'LTV4',
-    align: "center",
-    dataIndex: 'ltv4'
+    align: 'center',
+    dataIndex: 'ltv4',
   },
   {
     title: 'LTV5',
-    align: "center",
-    dataIndex: 'ltv5'
+    align: 'center',
+    dataIndex: 'ltv5',
   },
   {
     title: 'LTV6',
-    align: "center",
-    dataIndex: 'ltv6'
+    align: 'center',
+    dataIndex: 'ltv6',
   },
   {
     title: 'LTV7',
-    align: "center",
-    dataIndex: 'ltv7'
+    align: 'center',
+    dataIndex: 'ltv7',
   },
   {
     title: 'LTV15',
-    align: "center",
-    dataIndex: 'ltv15'
+    align: 'center',
+    dataIndex: 'ltv15',
   },
   {
     title: 'LTV30',
-    align: "center",
-    dataIndex: 'ltv30'
+    align: 'center',
+    dataIndex: 'ltv30',
   },
   {
     title: 'LTV45',
-    align: "center",
-    dataIndex: 'ltv45'
+    align: 'center',
+    dataIndex: 'ltv45',
   },
   {
     title: 'LTV60',
-    align: "center",
-    dataIndex: 'ltv60'
+    align: 'center',
+    dataIndex: 'ltv60',
   },
   {
     title: 'LTV90',
-    align: "center",
-    dataIndex: 'ltv90'
+    align: 'center',
+    dataIndex: 'ltv90',
   },
   {
     title: 'LTV120',
-    align: "center",
-    dataIndex: 'ltv120'
+    align: 'center',
+    dataIndex: 'ltv120',
   },
   {
     title: 'LTV150',
-    align: "center",
-    dataIndex: 'ltv150'
+    align: 'center',
+    dataIndex: 'ltv150',
   },
 ];
 
@@ -90,59 +90,66 @@ export const columns: BasicColumn[] = [
 export const typeOption = [
   {
     label: '全部',
-    value: ' '
+    value: ' ',
   },
   {
     label: '按广告',
-    value: 'deal_id'
-  },{
+    value: 'deal_id',
+  },
+  {
     label: '按渠道',
-    value:  'channel_id'
-  },{
+    value: 'channel_id',
+  },
+  {
     label: '按游戏',
-    value:  'game_id'
-  },{
+    value: 'game_id',
+  },
+  {
     label: '按游戏包',
-    value:  'sub_game_id'
-  }
-]
+    value: 'sub_game_id',
+  },
+  {
+    label: '按渠道游戏包',
+    value: 'pkg_id',
+  },
+];
 //查询数据
 export const searchFormSchema: FormSchema[] = [
   {
-    label: "游戏项目",
+    label: '游戏项目',
     field: 'gameId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "游戏名称",
+    label: '游戏名称',
     field: 'subGameId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "子游戏包",
+    label: '子游戏包',
     field: 'pkgId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "开始时间",
+    label: '开始时间',
     field: 'startTime',
     component: 'DatePicker',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "结束时间",
+    label: '结束时间',
     field: 'endTime',
     component: 'DatePicker',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "归类方式",
+    label: '归类方式',
     field: 'type',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
 ];
 
@@ -248,7 +255,7 @@ export const formSchema: FormSchema[] = [
     field: 'ltv150',
     component: 'Input',
   },
-	// TODO 主键隐藏字段，目前写死为ID
+  // TODO 主键隐藏字段，目前写死为ID
   {
     label: '',
     field: 'id',

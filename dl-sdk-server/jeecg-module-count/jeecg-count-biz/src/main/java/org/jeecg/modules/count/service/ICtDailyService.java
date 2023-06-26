@@ -2,23 +2,23 @@ package org.jeecg.modules.count.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.jeecg.common.kafka.dto.ParseAliveDto;
+import org.jeecg.common.kafka.dto.ParseLoginDto;
+import org.jeecg.common.kafka.dto.ParsePayDto;
+import org.jeecg.common.kafka.dto.ParseStartDto;
 import org.jeecg.modules.count.bo.DetailDailyBo;
 import org.jeecg.modules.count.bo.GetWeekReportDailyBo;
 import org.jeecg.modules.count.bo.SummaryAdvertDailyBo;
+import org.jeecg.modules.count.bo.SummaryDailyBo;
 import org.jeecg.modules.count.bo.UserPayRateDailyBo;
 import org.jeecg.modules.count.bo.WeekReportDailyBo;
 import org.jeecg.modules.count.dto.DetailDto;
-import org.jeecg.modules.count.dto.RecoveryDto;
-import org.jeecg.modules.count.dto.RetentionDto;
-import org.jeecg.modules.count.dto.SummaryAdvertDto;
 import org.jeecg.modules.count.dto.OverViewDto;
-import org.jeecg.modules.count.dto.SummaryDto;
-import org.jeecg.common.kafka.dto.ParseAliveDto;
-import org.jeecg.common.kafka.dto.ParseLoginDto;
-import org.jeecg.common.kafka.dto.ParseStartDto;
-import org.jeecg.common.kafka.dto.ParsePayDto;
-import org.jeecg.modules.count.bo.SummaryDailyBo;
+import org.jeecg.modules.count.dto.RetentionDto;
 import org.jeecg.modules.count.dto.RoiDto;
+import org.jeecg.modules.count.dto.SummaryAdvertDto;
+import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.modules.count.dto.UserPayRateDto;
 import org.jeecg.modules.count.dto.XingtuDayReportDto;
 import org.jeecg.modules.count.entity.CtDaily;
@@ -27,7 +27,6 @@ import org.jeecg.modules.count.entity.CtUser;
 import org.jeecg.modules.count.modal.DayReportResultModal;
 import org.jeecg.modules.count.modal.RoiModal;
 import org.jeecg.modules.count.modal.XingtuDayReportModal;
-import org.jeecg.modules.count.vo.DayReportVo;
 import org.jeecg.modules.count.vo.FinanceUserVo;
 import org.jeecg.modules.count.vo.OverViewVo;
 import org.jeecg.modules.count.vo.RecoveryVo;
@@ -73,6 +72,9 @@ public interface ICtDailyService extends IService<CtDaily> {
      * @Date 17:13 2023/5/26
      **/
     List<StatCustomVo> queryStatCustomList(RetentionDto retentionDto);
+
+
+    ModelAndView statCustomListexportXls(HttpServletRequest request, RetentionDto retentionDto, String title);
 
     /**
      * @param retentionDto

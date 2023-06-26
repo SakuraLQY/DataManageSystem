@@ -3,6 +3,7 @@ package org.jeecg.modules.count.vo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import lombok.Data;
+import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
  * @Description: OrderMoneyGroupBo
@@ -18,14 +19,17 @@ public class OrderMoneyGroupRateVo implements Serializable {
     /**
      * 金额
      */
+    @Excel(name = "面额", width = 15)
     private BigDecimal money = BigDecimal.ZERO;
     /**
      * 数量
      */
+    @Excel(name = "数量", width = 15)
     private Integer count = 0;
     /**
      * 比率
      */
+    @Excel(name = "比率", width = 15)
     private BigDecimal rate = BigDecimal.ZERO;
 
 }

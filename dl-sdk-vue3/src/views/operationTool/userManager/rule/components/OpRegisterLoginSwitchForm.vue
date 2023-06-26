@@ -18,13 +18,13 @@
             <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_game,game_name,id"  placeholder="请选择游戏" :disabled="isEdit" />
           </a-form-item>
           <a-form-item label="子游戏" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '2'">
-            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_sub_game,game_name,id"  placeholder="请选择子游戏" :disabled="isEdit" />
+            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_sub_game where status = 0,game_name,id"  placeholder="请选择子游戏" :disabled="isEdit" />
           </a-form-item>
           <a-form-item label="广告" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '3'">
             <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_deal,deal_name,id"  placeholder="请选择广告" :disabled="isEdit" />
           </a-form-item>
           <a-form-item label="渠道游戏包" v-bind="validateInfos.ruleId" v-if="formData.ruleType === '4'">
-            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_pkg,pkg_name,id"  placeholder="请选择渠道游戏包" :disabled="isEdit" />
+            <j-search-select v-model:value="formData.ruleId" dict="open_gateway.op_pkg where status = 0,pkg_name,id"  placeholder="请选择渠道游戏包" :disabled="isEdit" />
           </a-form-item>
         </a-col>
         <a-col :span="30">

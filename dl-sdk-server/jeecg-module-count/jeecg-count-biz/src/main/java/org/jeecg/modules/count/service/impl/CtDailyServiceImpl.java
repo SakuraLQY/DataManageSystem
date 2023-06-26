@@ -1,7 +1,5 @@
 package org.jeecg.modules.count.service.impl;
 
-import static java.lang.System.getProperty;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollectionUtil;
@@ -10,8 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,12 +16,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -33,24 +31,6 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.constant.PayTypeConstant;
 import org.jeecg.common.constant.RuleTypeConstant;
 import org.jeecg.common.function.bo.GetNameByIdDto;
-import org.jeecg.modules.count.bo.DayReportBo;
-import org.jeecg.modules.count.bo.RetentionBo;
-import org.jeecg.modules.count.bo.StatCustomBo;
-import org.jeecg.modules.count.bo.GetWeekReportDailyBo;
-import org.jeecg.modules.count.bo.SummaryAdvertDailyBo;
-import org.jeecg.modules.count.bo.UserPayRateDailyBo;
-import org.jeecg.modules.count.bo.WeekReportDailyBo;
-import org.jeecg.modules.count.constant.PlatformType;
-import org.jeecg.modules.count.constant.SummaryAdvertType;
-import org.jeecg.modules.count.constant.enums.SummaryEnum;
-import org.jeecg.modules.count.bo.DetailDailyBo;
-import org.jeecg.modules.count.bo.OverViewBo;
-import org.jeecg.modules.count.dto.DetailDto;
-import org.jeecg.modules.count.dto.RecoveryDto;
-import org.jeecg.modules.count.dto.RetentionDto;
-import org.jeecg.modules.count.dto.SummaryAdvertDto;
-import org.jeecg.modules.count.dto.OverViewDto;
-import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.common.kafka.dto.ParseAliveDto;
 import org.jeecg.common.kafka.dto.ParseLoginDto;
 import org.jeecg.common.kafka.dto.ParsePayDto;
@@ -59,14 +39,31 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.CountUtil;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.count.bo.DayReportBo;
+import org.jeecg.modules.count.bo.DetailDailyBo;
+import org.jeecg.modules.count.bo.GetWeekReportDailyBo;
+import org.jeecg.modules.count.bo.OverViewBo;
+import org.jeecg.modules.count.bo.RetentionBo;
+import org.jeecg.modules.count.bo.StatCustomBo;
+import org.jeecg.modules.count.bo.SummaryAdvertDailyBo;
 import org.jeecg.modules.count.bo.SummaryDailyBo;
+import org.jeecg.modules.count.bo.UserPayRateDailyBo;
+import org.jeecg.modules.count.bo.WeekReportDailyBo;
+import org.jeecg.modules.count.constant.DivideConstant;
+import org.jeecg.modules.count.constant.PlatformType;
+import org.jeecg.modules.count.constant.SummaryAdvertType;
+import org.jeecg.modules.count.constant.enums.SummaryEnum;
+import org.jeecg.modules.count.dto.DetailDto;
+import org.jeecg.modules.count.dto.OverViewDto;
+import org.jeecg.modules.count.dto.RetentionDto;
 import org.jeecg.modules.count.dto.RoiDto;
+import org.jeecg.modules.count.dto.SummaryAdvertDto;
+import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.modules.count.dto.UserPayRateDto;
 import org.jeecg.modules.count.dto.XingtuDayReportDto;
 import org.jeecg.modules.count.entity.CtDaily;
 import org.jeecg.modules.count.entity.CtDevice;
 import org.jeecg.modules.count.entity.CtHour;
-import org.jeecg.modules.count.entity.CtReportConfig;
 import org.jeecg.modules.count.entity.CtUser;
 import org.jeecg.modules.count.mapper.CtDailyMapper;
 import org.jeecg.modules.count.mapper.CtReportConfigMapper;
@@ -79,6 +76,7 @@ import org.jeecg.modules.count.service.ICtDailyPaybackService;
 import org.jeecg.modules.count.service.ICtDailyService;
 import org.jeecg.modules.count.service.ICtHourService;
 import org.jeecg.modules.count.service.ICtUserService;
+import org.jeecg.modules.count.vo.CostDataVo;
 import org.jeecg.modules.count.vo.CostDayDataVo;
 import org.jeecg.modules.count.vo.DailyPaybackVo;
 import org.jeecg.modules.count.vo.DauDataVo;
@@ -88,7 +86,6 @@ import org.jeecg.modules.count.vo.OverViewVo;
 import org.jeecg.modules.count.vo.RecoveryVo;
 import org.jeecg.modules.count.vo.RetentionVo;
 import org.jeecg.modules.count.vo.RoiVo;
-import org.jeecg.modules.count.vo.CostDataVo;
 import org.jeecg.modules.count.vo.StatCustomVo;
 import org.jeecg.modules.count.vo.XingtuDayReportVo;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -322,8 +319,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 xingtuDayReportVo.setClickRate(new BigDecimal(0.00));
                 if (xingtuDayReportVo.getExhibition() > 0) {
                     xingtuDayReportVo.setClickRate(new BigDecimal(
-                        xingtuDayReportVo.getClick() / xingtuDayReportVo.getExhibition()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        xingtuDayReportVo.getClick() * 100 / xingtuDayReportVo.getExhibition()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //点击均价
                 xingtuDayReportVo.setClickPrice(new BigDecimal(0.00));
@@ -337,8 +334,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 xingtuDayReportVo.setDownloadRate(new BigDecimal(0.00));
                 if (xingtuDayReportVo.getClick() > 0) {
                     xingtuDayReportVo.setDownloadRate(new BigDecimal(
-                        xingtuDayReportVo.getDownload() / xingtuDayReportVo.getClick()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        xingtuDayReportVo.getDownload() * 100 / xingtuDayReportVo.getClick()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //下载均价
                 xingtuDayReportVo.setDownloadPrice(new BigDecimal(0.00));
@@ -352,15 +349,15 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 xingtuDayReportVo.setDownloadRegRate(new BigDecimal(0.00));
                 if (xingtuDayReportVo.getDownload() > 0) {
                     xingtuDayReportVo.setDownloadRegRate(new BigDecimal(
-                        xingtuDayReportVo.getCountUser() / xingtuDayReportVo.getDownload()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        xingtuDayReportVo.getCountUser() * 100 / xingtuDayReportVo.getDownload()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //激活注册率
                 xingtuDayReportVo.setActiveRegRate(new BigDecimal(0.00));
                 if (xingtuDayReportVo.getCountActive() > 0) {
                     xingtuDayReportVo.setActiveRegRate(new BigDecimal(
-                        xingtuDayReportVo.getCountUser() / xingtuDayReportVo.getCountActive()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        xingtuDayReportVo.getCountUser() * 100 / xingtuDayReportVo.getCountActive()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //注册单价
                 xingtuDayReportVo.setRegUnitPrice(new BigDecimal(0.00));
@@ -374,8 +371,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 xingtuDayReportVo.setCostProbability(new BigDecimal(0.00));
                 if (xingtuDayReportVo.getCountUser() > 0) {
                     xingtuDayReportVo.setCostProbability(new BigDecimal(
-                        xingtuDayReportVo.getCostCount() / xingtuDayReportVo.getCountUser()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        xingtuDayReportVo.getCostCount() * 100 / xingtuDayReportVo.getCountUser()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //付费单价
                 xingtuDayReportVo.setCostUnitPrice(new BigDecimal(0.00));
@@ -395,20 +392,18 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 }
                 //首日ROI
                 xingtuDayReportVo.setFirstROI(new BigDecimal(0.00));
-                if (xingtuDayReportVo.getCostMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (xingtuDayReportVo.getCostMoney().compareTo(new BigDecimal(0)) != 0) {
                     xingtuDayReportVo.setFirstROI(
-                        xingtuDayReportVo.getAddCostPrice().divide(
+                        xingtuDayReportVo.getAddCostPrice().multiply(new BigDecimal(100)).divide(
                                 xingtuDayReportVo.getCostMoney(), BigDecimal.ROUND_CEILING)
-                            .multiply(new BigDecimal(100))
                             .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //回收率
                 xingtuDayReportVo.setRecoveryRate(new BigDecimal(0.00));
-                if (xingtuDayReportVo.getCostMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (xingtuDayReportVo.getCostMoney().compareTo(new BigDecimal(0)) != 0) {
                     xingtuDayReportVo.setRecoveryRate(
-                        xingtuDayReportVo.getAliveMoney().divide(
+                        xingtuDayReportVo.getAliveMoney().multiply(new BigDecimal(100)).divide(
                                 xingtuDayReportVo.getCostMoney(), BigDecimal.ROUND_CEILING)
-                            .multiply(new BigDecimal(100))
                             .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 resList.add(xingtuDayReportVo);
@@ -486,8 +481,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         summaryXingtuDayReport.setClickRate(new BigDecimal(0.00));
         if (summaryXingtuDayReport.getExhibition() > 0) {
             summaryXingtuDayReport.setClickRate(new BigDecimal(
-                summaryXingtuDayReport.getClick() / summaryXingtuDayReport.getExhibition()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                summaryXingtuDayReport.getClick() * 100 / summaryXingtuDayReport.getExhibition()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //点击均价
         summaryXingtuDayReport.setClickPrice(new BigDecimal(0.00));
@@ -501,8 +496,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         summaryXingtuDayReport.setDownloadRate(new BigDecimal(0.00));
         if (summaryXingtuDayReport.getClick() > 0) {
             summaryXingtuDayReport.setDownloadRate(new BigDecimal(
-                summaryXingtuDayReport.getDownload() / summaryXingtuDayReport.getClick()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                summaryXingtuDayReport.getDownload() * 100 / summaryXingtuDayReport.getClick()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //下载均价
         summaryXingtuDayReport.setDownloadPrice(new BigDecimal(0.00));
@@ -516,15 +511,16 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         summaryXingtuDayReport.setDownloadRegRate(new BigDecimal(0.00));
         if (summaryXingtuDayReport.getDownload() > 0) {
             summaryXingtuDayReport.setDownloadRegRate(new BigDecimal(
-                summaryXingtuDayReport.getCountUser() / summaryXingtuDayReport.getDownload()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                summaryXingtuDayReport.getCountUser() * 100 / summaryXingtuDayReport.getDownload()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //激活注册率
         summaryXingtuDayReport.setActiveRegRate(new BigDecimal(0.00));
         if (summaryXingtuDayReport.getCountActive() > 0) {
             summaryXingtuDayReport.setActiveRegRate(new BigDecimal(
-                summaryXingtuDayReport.getCountUser() / summaryXingtuDayReport.getCountActive()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                summaryXingtuDayReport.getCountUser() * 100
+                    / summaryXingtuDayReport.getCountActive()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //注册单价
         summaryXingtuDayReport.setRegUnitPrice(new BigDecimal(0.00));
@@ -538,8 +534,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         summaryXingtuDayReport.setCostProbability(new BigDecimal(0.00));
         if (summaryXingtuDayReport.getCountUser() > 0) {
             summaryXingtuDayReport.setCostProbability(new BigDecimal(
-                summaryXingtuDayReport.getCostCount() / summaryXingtuDayReport.getCountUser()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                summaryXingtuDayReport.getCostCount() * 100 / summaryXingtuDayReport.getCountUser()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //付费单价
         summaryXingtuDayReport.setCostUnitPrice(new BigDecimal(0.00));
@@ -559,20 +555,18 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         }
         //首日ROI
         summaryXingtuDayReport.setFirstROI(new BigDecimal(0.00));
-        if (summaryXingtuDayReport.getCostMoney().compareTo(new BigDecimal(0)) > 0) {
+        if (summaryXingtuDayReport.getCostMoney().compareTo(new BigDecimal(0)) != 0) {
             summaryXingtuDayReport.setFirstROI(
-                summaryXingtuDayReport.getAddCostPrice().divide(
+                summaryXingtuDayReport.getAddCostPrice().multiply(new BigDecimal(100)).divide(
                         summaryXingtuDayReport.getCostMoney(), BigDecimal.ROUND_CEILING)
-                    .multiply(new BigDecimal(100))
                     .setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //回收率
         summaryXingtuDayReport.setRecoveryRate(new BigDecimal(0.00));
-        if (summaryXingtuDayReport.getCostMoney().compareTo(new BigDecimal(0)) > 0) {
+        if (summaryXingtuDayReport.getCostMoney().compareTo(new BigDecimal(0)) != 0) {
             summaryXingtuDayReport.setRecoveryRate(
-                summaryXingtuDayReport.getAliveMoney().divide(
+                summaryXingtuDayReport.getAliveMoney().multiply(new BigDecimal(100)).divide(
                         summaryXingtuDayReport.getCostMoney(), BigDecimal.ROUND_CEILING)
-                    .multiply(new BigDecimal(100))
                     .setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         resList.add(summaryXingtuDayReport);
@@ -737,14 +731,14 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //新增付费率
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setAddCostRate(new BigDecimal(
-                        statCustomVo.getFirstPayuser() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomVo.getFirstPayuser() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //活跃付费率
                 if (statCustomVo.getCountDau() > 0) {
                     statCustomVo.setAliveMoneyRate(new BigDecimal(
-                        statCustomVo.getAlivePayuser() / statCustomVo.getCountDau()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomVo.getAlivePayuser() * 100 / statCustomVo.getCountDau()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //首日ARPU
                 if (statCustomVo.getCountUserDev() > 0) {
@@ -761,32 +755,32 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //次留
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setDay2(new BigDecimal(
-                        statCustomBo.getLoyal2() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomBo.getLoyal2() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //3日留存
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setDay3(new BigDecimal(
-                        statCustomBo.getLoyal3() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomBo.getLoyal3() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //7日留存
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setDay7(new BigDecimal(
-                        statCustomBo.getLoyal7() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomBo.getLoyal7() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //15日留存
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setDay15(new BigDecimal(
-                        statCustomBo.getLoyal15() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomBo.getLoyal15() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //30日留存
                 if (statCustomVo.getCountUserDev() > 0) {
                     statCustomVo.setDay30(new BigDecimal(
-                        statCustomBo.getLoyal30() / statCustomVo.getCountUserDev()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        statCustomBo.getLoyal30() * 100 / statCustomVo.getCountUserDev()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //LTV1
                 if (statCustomVo.getCountUserDev() > 0) {
@@ -837,6 +831,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //有效注册数
                 summaryStatCustomBo.setCountValidUser(
                     summaryStatCustomBo.getCountValidUser() + statCustomVo.getCountValidUser());
+                //新增付费人数
+                summaryStatCustomBo.setFirstPayuser(
+                    summaryStatCustomBo.getFirstPayuser() + statCustomVo.getFirstPayuser());
                 //新增付费金额
                 summaryStatCustomBo.setFirstMoney(
                     summaryStatCustomBo.getFirstMoney().add(statCustomVo.getFirstMoney()));
@@ -892,14 +889,14 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             //新增付费率
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setAddCostRate(new BigDecimal(
-                    summaryStatCustom.getFirstPayuser() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustom.getFirstPayuser() * 100 / summaryStatCustom.getCountUserDev()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //活跃付费率
             if (summaryStatCustom.getCountDau() > 0) {
                 summaryStatCustom.setAliveMoneyRate(new BigDecimal(
-                    summaryStatCustom.getAlivePayuser() / summaryStatCustom.getCountDau()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustom.getAlivePayuser() * 100 / summaryStatCustom.getCountDau()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //首日ARPU
             if (summaryStatCustom.getCountUserDev() > 0) {
@@ -916,32 +913,33 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             //次留
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setDay2(new BigDecimal(
-                    summaryStatCustomBo.getLoyal2() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustomBo.getLoyal2() * 100
+                        / summaryStatCustom.getCountUserDev()).setScale(2,
+                    BigDecimal.ROUND_HALF_EVEN));
             }
             //3日留存
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setDay3(new BigDecimal(
-                    summaryStatCustomBo.getLoyal3() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustomBo.getLoyal3() * 100 / summaryStatCustom.getCountUserDev()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //7日留存
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setDay7(new BigDecimal(
-                    summaryStatCustomBo.getLoyal7() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustomBo.getLoyal7() * 100 / summaryStatCustom.getCountUserDev()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //15日留存
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setDay15(new BigDecimal(
-                    summaryStatCustomBo.getLoyal15() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustomBo.getLoyal15() * 100 / summaryStatCustom.getCountUserDev()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //30日留存
             if (summaryStatCustom.getCountUserDev() > 0) {
                 summaryStatCustom.setDay30(new BigDecimal(
-                    summaryStatCustomBo.getLoyal30() / summaryStatCustom.getCountUserDev()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    summaryStatCustomBo.getLoyal30() * 100 / summaryStatCustom.getCountUserDev()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //LTV1
             if (summaryStatCustom.getCountUserDev() > 0) {
@@ -982,6 +980,39 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             resList.add(summaryStatCustom);
         }
         return resList;
+    }
+
+
+    /**
+     * @param request:
+     * @param retentionDto:
+     * @param title:
+     * @return ModelAndView
+     * @author Fkh
+     * @description 合作商数据【数据】导出功能
+     * @date 2023/6/21 14:57
+     */
+    @Override
+    public ModelAndView statCustomListexportXls(HttpServletRequest request,
+        RetentionDto retentionDto, String title) {
+
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+        List<StatCustomVo> statCustomVos = this.queryStatCustomList(retentionDto);
+
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.FILE_NAME, title);
+        mv.addObject(NormalExcelConstants.CLASS, StatCustomVo.class);
+        //update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+        ExportParams exportParams = new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(),
+            title);
+        exportParams.setImageBasePath(upLoadPath);
+        //update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+        mv.addObject(NormalExcelConstants.PARAMS, exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, statCustomVos);
+        return mv;
     }
 
     @Override
@@ -1051,45 +1082,25 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 countUser = retentionBo.getCountUser();
             }
             BeanUtils.copyProperties(retentionBo, retentionVo);
-            if (null == retentionBo.getDay2()) {
-                retentionBo.setDay2(0);
-            }
+
             retentionVo.setDay2(
                 new BigDecimal(retentionBo.getDay2() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay3()) {
-                retentionBo.setDay3(0);
-            }
             retentionVo.setDay3(
                 new BigDecimal(retentionBo.getDay3() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay7()) {
-                retentionBo.setDay7(0);
-            }
             retentionVo.setDay7(
                 new BigDecimal(retentionBo.getDay7() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay15()) {
-                retentionBo.setDay15(0);
-            }
             retentionVo.setDay15(
                 new BigDecimal(retentionBo.getDay15() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay30()) {
-                retentionBo.setDay30(0);
-            }
             retentionVo.setDay30(
                 new BigDecimal(retentionBo.getDay30() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay45()) {
-                retentionBo.setDay45(0);
-            }
             retentionVo.setDay45(
                 new BigDecimal(retentionBo.getDay45() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
-            if (null == retentionBo.getDay60()) {
-                retentionBo.setDay60(0);
-            }
             retentionVo.setDay60(
                 new BigDecimal(retentionBo.getDay60() * 100 / countUser).setScale(2,
                     BigDecimal.ROUND_HALF_EVEN));
@@ -1219,11 +1230,11 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //新增分成所得
                 BigDecimal profit = newMap.get(key).getFirstMoney().subtract(
                     newMap.get(key).getFirstMoneyIos()
-                        .multiply(new BigDecimal(String.valueOf(0.29))));
+                        .multiply(DivideConstant.IOS));
                 //活跃付费分成所得
                 BigDecimal aliveProfit = newMap.get(key).getAliveMoney().subtract(
                     newMap.get(key).getAliveMoneyIos()
-                        .multiply(new BigDecimal(String.valueOf(0.29))));
+                        .multiply(DivideConstant.IOS));
                 //付费求整
                 Integer firstMoney = newMap.get(key).getFirstMoney().intValue();
                 Integer aliveMoney = newMap.get(key).getAliveMoney().intValue();
@@ -1305,8 +1316,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 dayReportVo.setDownloadRate(new BigDecimal(0));
                 if (dataListZj.get(key).getExhibition() > 0) {
                     dayReportVo.setDownloadRate(new BigDecimal(
-                        dataListZj.get(key).getDownload() / dataListZj.get(key).getExhibition()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        dataListZj.get(key).getDownload() * 100 / dataListZj.get(key)
+                            .getExhibition()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //下载单价
                 dayReportVo.setDownloadUnitPrice(new BigDecimal(0));
@@ -1319,8 +1331,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 dayReportVo.setRegProbability(new BigDecimal(0));
                 if (dataListZj.get(key).getDownload() > 0) {
                     dayReportVo.setRegProbability(new BigDecimal(
-                        dataListZj.get(key).getCountUser() / dataListZj.get(key).getDownload()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        dataListZj.get(key).getCountUser() * 100 / dataListZj.get(key).getDownload()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //注册单价
                 dayReportVo.setRegUnitPrice(new BigDecimal(0));
@@ -1340,8 +1352,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 dayReportVo.setAddCostProbability(new BigDecimal(0));
                 if (dataListZj.get(key).getCountUser() > 0) {
                     dayReportVo.setAddCostProbability(new BigDecimal(
-                        dataListZj.get(key).getFirstUser() / dataListZj.get(key).getCountUser()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        dataListZj.get(key).getFirstUser() * 100 / dataListZj.get(key)
+                            .getCountUser()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //新增ARPU
                 dayReportVo.setFirstArpu(new BigDecimal(0));
@@ -1352,19 +1365,21 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 }
                 //首日ROI
                 dayReportVo.setFirstROI(new BigDecimal(0));
-                if (dataListZj.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
-                    dayReportVo.setFirstROI(dataListZj.get(key).getProfit()
-                        .divide(dataListZj.get(key).getRealCostMoney(),
-                            BigDecimal.ROUND_CEILING).multiply(new BigDecimal(100))
-                        .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                if (dataListZj.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
+                    dayReportVo.setFirstROI(
+                        dataListZj.get(key).getProfit().multiply(new BigDecimal(100))
+                            .divide(dataListZj.get(key).getRealCostMoney(),
+                                BigDecimal.ROUND_CEILING)
+                            .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //投产比
                 dayReportVo.setProductionRatio(new BigDecimal(0));
-                if (dataListZj.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
-                    dayReportVo.setProductionRatio(dataListZj.get(key).getAliveProfit()
-                        .divide(dataListZj.get(key).getRealCostMoney(),
-                            BigDecimal.ROUND_CEILING).multiply(new BigDecimal(100))
-                        .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                if (dataListZj.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
+                    dayReportVo.setProductionRatio(
+                        dataListZj.get(key).getAliveProfit().multiply(new BigDecimal(100))
+                            .divide(dataListZj.get(key).getRealCostMoney(),
+                                BigDecimal.ROUND_CEILING)
+                            .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 dataList.add(dayReportVo);
             }
@@ -1509,9 +1524,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 countDataList.get(key).setDownloadRate(new BigDecimal(0));
                 if (countDataList.get(key).getExhibition() > 0) {
                     countDataList.get(key).setDownloadRate(new BigDecimal(
-                        countDataList.get(key).getDownload() / countDataList.get(key)
+                        countDataList.get(key).getDownload() * 100 / countDataList.get(key)
                             .getExhibition()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //下载单价
                 countDataList.get(key).setDownloadUnitPrice(new BigDecimal(0));
@@ -1525,8 +1540,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 countDataList.get(key).setRegProbability(new BigDecimal(0));
                 if (countDataList.get(key).getDownload() > 0) {
                     countDataList.get(key).setRegProbability(new BigDecimal(
-                        countDataList.get(key).getCountUser() / countDataList.get(key).getDownload()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        countDataList.get(key).getCountUser() * 100 / countDataList.get(key)
+                            .getDownload()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //注册单价
                 countDataList.get(key).setRegUnitPrice(new BigDecimal(0));
@@ -1547,9 +1563,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 countDataList.get(key).setAddCostProbability(new BigDecimal(0));
                 if (countDataList.get(key).getCountUser() > 0) {
                     countDataList.get(key).setAddCostProbability(new BigDecimal(
-                        countDataList.get(key).getFirstUser() / countDataList.get(key)
+                        countDataList.get(key).getFirstUser() * 100 / countDataList.get(key)
                             .getCountUser()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //新增ARPU
                 countDataList.get(key).setFirstArpu(new BigDecimal(0));
@@ -1560,20 +1576,22 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 }
                 //首日ROI
                 countDataList.get(key).setFirstROI(new BigDecimal(0));
-                if (countDataList.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
-                    countDataList.get(key).setFirstROI(countDataList.get(key).getProfit()
-                        .divide(countDataList.get(key).getRealCostMoney(),
-                            BigDecimal.ROUND_CEILING)
-                        .multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                if (countDataList.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
+                    countDataList.get(key).setFirstROI(
+                        countDataList.get(key).getProfit().multiply(new BigDecimal(100))
+                            .divide(countDataList.get(key).getRealCostMoney(),
+                                BigDecimal.ROUND_CEILING)
+                            .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //投产比
                 countDataList.get(key).setProductionRatio(new BigDecimal(0));
-                if (countDataList.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (countDataList.get(key).getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
                     countDataList.get(key)
-                        .setProductionRatio(countDataList.get(key).getAliveProfit()
-                            .divide(countDataList.get(key).getRealCostMoney(),
-                                BigDecimal.ROUND_CEILING).multiply(new BigDecimal(100))
-                            .setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        .setProductionRatio(
+                            countDataList.get(key).getAliveProfit().multiply(new BigDecimal(100))
+                                .divide(countDataList.get(key).getRealCostMoney(),
+                                    BigDecimal.ROUND_CEILING)
+                                .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
             }
         }
@@ -1582,9 +1600,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         countAllVo.setDownloadRate(new BigDecimal(0));
         if (countAllVo.getExhibition() > 0) {
             countAllVo.setDownloadRate(new BigDecimal(
-                countAllVo.getDownload() / countAllVo
+                countAllVo.getDownload() * 100 / countAllVo
                     .getExhibition()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //下载单价
         countAllVo.setDownloadUnitPrice(new BigDecimal(0));
@@ -1597,8 +1615,8 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         countAllVo.setRegProbability(new BigDecimal(0));
         if (countAllVo.getDownload() > 0) {
             countAllVo.setRegProbability(new BigDecimal(
-                countAllVo.getCountUser() / countAllVo.getDownload()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                countAllVo.getCountUser() * 100 / countAllVo.getDownload()
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //注册单价
         countAllVo.setRegUnitPrice(new BigDecimal(0));
@@ -1618,9 +1636,9 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         countAllVo.setAddCostProbability(new BigDecimal(0));
         if (countAllVo.getCountUser() > 0) {
             countAllVo.setAddCostProbability(new BigDecimal(
-                countAllVo.getFirstUser() / countAllVo
+                countAllVo.getFirstUser() * 100 / countAllVo
                     .getCountUser()
-                    * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+            ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //新增ARPU
         countAllVo.setFirstArpu(new BigDecimal(0));
@@ -1631,18 +1649,18 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         }
         //首日ROI
         countAllVo.setFirstROI(new BigDecimal(0));
-        if (countAllVo.getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
-            countAllVo.setFirstROI(countAllVo.getProfit()
+        if (countAllVo.getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
+            countAllVo.setFirstROI(countAllVo.getProfit().multiply(new BigDecimal(100))
                 .divide(countAllVo.getRealCostMoney(),
                     BigDecimal.ROUND_CEILING)
-                .multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                .setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
         //投产比
         countAllVo.setProductionRatio(new BigDecimal(0));
-        if (countAllVo.getRealCostMoney().compareTo(new BigDecimal(0)) > 0) {
-            countAllVo.setProductionRatio(countAllVo.getAliveProfit()
+        if (countAllVo.getRealCostMoney().compareTo(new BigDecimal(0)) != 0) {
+            countAllVo.setProductionRatio(countAllVo.getAliveProfit().multiply(new BigDecimal(100))
                 .divide(countAllVo.getRealCostMoney(),
-                    BigDecimal.ROUND_CEILING).multiply(new BigDecimal(100))
+                    BigDecimal.ROUND_CEILING)
                 .setScale(2, BigDecimal.ROUND_HALF_EVEN));
         }
 
@@ -1858,8 +1876,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 financeUserVo.setDealName(dealName);
                 //推广费用
                 financeUserVo.setPromotionCost(new BigDecimal(0));
-                if (null != costMap.get(overViewBo.getTimeDaily())
-                    && costMap.get(overViewBo.getTimeDaily()).compareTo(new BigDecimal(0)) > 0) {
+                if (null != costMap.get(overViewBo.getTimeDaily())) {
                     financeUserVo.setPromotionCost(costMap.get(overViewBo.getTimeDaily()));
                 }
                 //利润
@@ -1867,20 +1884,17 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                     overViewBo.getTotalMoney().subtract(financeUserVo.getPromotionCost()));
                 //总留存
                 financeUserVo.setTotalRetention(0);
-                if (null != userMap.get(financeUserVo.getRoiDate())
-                    && userMap.get(financeUserVo.getRoiDate()) > 0) {
+                if (null != userMap.get(financeUserVo.getRoiDate())) {
                     financeUserVo.setTotalRetention(userMap.get(financeUserVo.getRoiDate()));
                 }
                 //付费留存
                 financeUserVo.setPayRetention(0);
-                if (null != userMap2.get(financeUserVo.getRoiDate())
-                    && userMap2.get(financeUserVo.getRoiDate()) > 0) {
+                if (null != userMap2.get(financeUserVo.getRoiDate())) {
                     financeUserVo.setPayRetention(userMap2.get(financeUserVo.getRoiDate()));
                 }
                 //注册单价
                 financeUserVo.setRegUnitPrice(new BigDecimal(0));
                 if (null != financeUserVo.getPromotionCost()
-                    && financeUserVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
                     && null != overViewBo.getCountUser()
                     && overViewBo.getCountUser() > 0) {
                     financeUserVo.setRegUnitPrice(financeUserVo.getPromotionCost()
@@ -1891,7 +1905,6 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //付费单价
                 financeUserVo.setCostUnitPrice(new BigDecimal(0));
                 if (null != financeUserVo.getPromotionCost()
-                    && financeUserVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
                     && null != overViewBo.getTotalPayuser()
                     && overViewBo.getTotalPayuser() > 0) {
                     financeUserVo.setCostUnitPrice(financeUserVo.getPromotionCost()
@@ -1900,10 +1913,12 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                         .setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //注册数
+                financeUserVo.setRegCount(0);
                 if (null != overViewBo.getCountUser()) {
                     financeUserVo.setRegCount(overViewBo.getCountUser());
                 }
                 //付费用户数
+                financeUserVo.setUserPayCount(0);
                 if (null != overViewBo.getTotalPayuser()) {
                     financeUserVo.setUserPayCount(overViewBo.getTotalPayuser());
                 }
@@ -1929,7 +1944,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             financeUserSummary.setPromotionCost(allPromotionCost);
             financeUserSummary.setRegCount(allRegCount);
             financeUserSummary.setRegUnitPrice(allRegUnitPrice);
-            if (financeUserSummary.getPromotionCost().compareTo(new BigDecimal(0)) > 0
+            if (null != financeUserSummary.getPromotionCost()
                 && financeUserSummary.getRegCount() > 0) {
                 financeUserSummary.setRegUnitPrice(financeUserSummary.getPromotionCost()
                     .divide(new BigDecimal(financeUserSummary.getRegCount()),
@@ -1938,7 +1953,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             }
             financeUserSummary.setUserPayCount(allUserPayCount);
             financeUserSummary.setCostUnitPrice(allCostUnitPrice);
-            if (financeUserSummary.getPromotionCost().compareTo(new BigDecimal(0)) > 0
+            if (null != financeUserSummary.getPromotionCost()
                 && financeUserSummary.getUserPayCount() > 0) {
                 financeUserSummary.setCostUnitPrice(financeUserSummary.getPromotionCost()
                     .divide(new BigDecimal(financeUserSummary.getUserPayCount()),
@@ -2109,7 +2124,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 costMap.put(costDataVo.getCostDay(), costDataVo.getCostMoney());
             }
         }
-        List<OverViewBo> list = ctDailyMapper.getOverViewData(where);
+        List<OverViewBo> list = ctDailyMapper.getRecoveryData(where);
         List<RecoveryVo> resList = new ArrayList<>();
         if (null != list && !list.isEmpty()) {
             BigDecimal aliveMoney = new BigDecimal(0);
@@ -2131,25 +2146,21 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 aliveMoney = aliveMoney.add(overViewBo.getAliveMoney());
                 recoveryVo.setAliveMoney(aliveMoney);
                 //推广费用
-                if (null != costMap.get(overViewBo.getTimeDaily())
-                    && costMap.get(overViewBo.getTimeDaily()).compareTo(new BigDecimal(0)) > 0) {
+                if (null != costMap.get(overViewBo.getTimeDaily())) {
                     promotionCost = promotionCost.add(costMap.get(overViewBo.getTimeDaily()));
                 }
                 recoveryVo.setPromotionCost(promotionCost);
                 //分成金额
-                if (null != overViewBo.getAliveMoney()
-                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) > 0
-                    && null != overViewBo.getAliveMoneyIos()
-                    && overViewBo.getAliveMoneyIos().compareTo(new BigDecimal(0))
-                    > 0) {
+                if (null != overViewBo.getAliveMoney() && null != overViewBo.getAliveMoneyIos()) {
                     shareMoney = shareMoney.add(overViewBo.getAliveMoney().subtract(
                         overViewBo.getAliveMoneyIos()
-                            .multiply(new BigDecimal(String.valueOf(0.29)))));
+                            .multiply(DivideConstant.IOS)));
                 }
                 recoveryVo.setShareMoney(shareMoney);
                 //回收金额
                 recoveryVo.setRecoveryMoney(
-                    recoveryVo.getShareMoney().subtract(recoveryVo.getPromotionCost()));
+                    recoveryVo.getShareMoney().subtract(recoveryVo.getPromotionCost())
+                        .setScale(5, BigDecimal.ROUND_HALF_EVEN));
                 resList.add(recoveryVo);
             }
         }
@@ -2225,44 +2236,37 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 financeVo.setRoiDate(overViewBo.getTimeDaily());
                 //新增付费金额
                 financeVo.setAddCostPrice(new BigDecimal(0));
-                if (null != overViewBo.getFirstMoney()
-                    && overViewBo.getFirstMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (null != overViewBo.getFirstMoney()) {
                     financeVo.setAddCostPrice(overViewBo.getFirstMoney());
                 }
                 //活跃付费金额
                 financeVo.setActiveCostPrice(new BigDecimal(0));
-                if (null != overViewBo.getAliveMoney()
-                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (null != overViewBo.getAliveMoney()) {
                     financeVo.setActiveCostPrice(overViewBo.getAliveMoney());
                 }
                 //老用户付费金额
-                if (null != overViewBo.getAliveMoney()
-                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) > 0 &&
-                    overViewBo.getFirstMoney().compareTo(new BigDecimal(0)) > 0) {
+                financeVo.setOldUserPay(new BigDecimal(0));
+                if (null != overViewBo.getAliveMoney() && null != overViewBo.getFirstMoney()) {
                     financeVo.setOldUserPay(
                         overViewBo.getAliveMoney().subtract(overViewBo.getFirstMoney()));
-                } else {
-                    financeVo.setOldUserPay(new BigDecimal(0));
                 }
                 //活跃费率
+                financeVo.setActiveProbability(new BigDecimal(0));
                 if (null != overViewBo.getAlivePayuser() && overViewBo.getAlivePayuser() > 0
-                    && null != overViewBo.getCountUser()
+                    && null != overViewBo.getCountDau()
                     && overViewBo.getCountDau() > 0) {
                     financeVo.setActiveProbability(new BigDecimal(
-                        overViewBo.getAlivePayuser() / overViewBo.getCountDau() * 100).setScale(1,
+                        overViewBo.getAlivePayuser() * 100 / overViewBo.getCountDau()).setScale(1,
                         BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setActiveProbability(new BigDecimal(0));
                 }
                 //新增付费率
+                financeVo.setAddCostProbability(new BigDecimal(0));
                 if (null != overViewBo.getFirstPayuser() && overViewBo.getFirstPayuser() > 0
                     && null != overViewBo.getCountUser()
                     && overViewBo.getCountUser() > 0) {
                     financeVo.setAddCostProbability(new BigDecimal(
-                        overViewBo.getFirstPayuser() / overViewBo.getCountUser() * 100).setScale(1,
+                        overViewBo.getFirstPayuser() * 100 / overViewBo.getCountUser()).setScale(1,
                         BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setAddCostProbability(new BigDecimal(0));
                 }
                 Integer oldPayUser = 0;
                 if (null != overViewBo.getAlivePayuser() && null != overViewBo.getFirstPayuser()) {
@@ -2273,52 +2277,45 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                     oldDau = overViewBo.getCountDau() - overViewBo.getCountUser();
                 }
                 BigDecimal oldPay = new BigDecimal(0);
-                if (null != overViewBo.getAliveMoney()
-                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) > 0
-                    && null != overViewBo.getFirstMoney()
-                    && overViewBo.getFirstMoney().compareTo(new BigDecimal(0)) > 0) {
+                if (null != overViewBo.getAliveMoney() && null != overViewBo.getFirstMoney()) {
                     oldPay = overViewBo.getAliveMoney().subtract(overViewBo.getFirstMoney());
                 }
                 //老用户付费率
+                financeVo.setOldUserPayProbability(new BigDecimal(0));
                 if (oldPayUser > 0 && oldDau > 0) {
                     financeVo.setOldUserPayProbability(new BigDecimal(
-                        oldPayUser / oldDau * 100).setScale(1,
+                        oldPayUser * 100 / oldDau).setScale(1,
                         BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setOldUserPayProbability(new BigDecimal(0));
                 }
                 //ARPPU
+                financeVo.setArppu(new BigDecimal(0));
                 if (null != overViewBo.getAliveMoney()
-                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) > 0
+                    && overViewBo.getAliveMoney().compareTo(new BigDecimal(0)) != 0
                     && null != overViewBo.getAlivePayuser()
                     && overViewBo.getAlivePayuser() > 0) {
                     financeVo.setArppu(overViewBo.getAliveMoney()
                         .divide(new BigDecimal(overViewBo.getAlivePayuser()),
                             BigDecimal.ROUND_CEILING)
                         .setScale(2, BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setArppu(new BigDecimal(0));
                 }
                 //新增ARPPU
+                financeVo.setAddArppu(new BigDecimal(0));
                 if (null != overViewBo.getFirstMoney()
-                    && overViewBo.getFirstMoney().compareTo(new BigDecimal(0)) > 0
+                    && overViewBo.getFirstMoney().compareTo(new BigDecimal(0)) != 0
                     && null != overViewBo.getFirstPayuser()
                     && overViewBo.getFirstPayuser() > 0) {
                     financeVo.setAddArppu(overViewBo.getFirstMoney()
                         .divide(new BigDecimal(overViewBo.getFirstPayuser()),
                             BigDecimal.ROUND_CEILING)
                         .setScale(2, BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setAddArppu(new BigDecimal(0));
                 }
                 //老用户ARPPU
-                if (oldPay.compareTo(new BigDecimal(0)) > 0 && oldPayUser > 0) {
+                financeVo.setOldUserPayArppu(new BigDecimal(0));
+                if (oldPay.compareTo(new BigDecimal(0)) != 0 && oldPayUser > 0) {
                     financeVo.setOldUserPayArppu(oldPay
                         .divide(new BigDecimal(oldPayUser),
                             BigDecimal.ROUND_CEILING)
                         .setScale(2, BigDecimal.ROUND_HALF_EVEN));
-                } else {
-                    financeVo.setOldUserPayArppu(new BigDecimal(0));
                 }
                 //DAU
                 financeVo.setDau(0);
@@ -2506,14 +2503,14 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 roiVo.setSdkShare(
                     dailyPaybackVo.getRemainTotalMoney().setScale(2, BigDecimal.ROUND_HALF_EVEN)
                         .subtract(
-                            dailyPaybackVo.getTotalMoneyIos().multiply(new BigDecimal("0.29"))));
+                            dailyPaybackVo.getTotalMoneyIos().multiply(DivideConstant.IOS)));
                 //真实ROI
-                if (roiVo.getSdkShare().compareTo(new BigDecimal(0)) > 0 &&
-                    roiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
-                    roiVo.setRealROI(roiVo.getSdkShare()
+                if (null != roiVo.getSdkShare() && null != roiVo.getPromotionCost() &&
+                    roiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
+                    roiVo.setRealROI(roiVo.getSdkShare().multiply(new BigDecimal(100))
                         .divide(roiVo.getPromotionCost(),
                             BigDecimal.ROUND_CEILING)
-                        .multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_HALF_EVEN));
+                        .setScale(1, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //累计ROI
                 roiVo.setAllROI(roiVo.getRealROI());
@@ -2521,8 +2518,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 roiVo.setProfit(roiVo.getSdkShare().subtract(roiVo.getPromotionCost())
                     .setScale(5, BigDecimal.ROUND_HALF_EVEN));
                 //注册单价
-                if (roiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
-                    && roiVo.getRegCount() > 0) {
+                if (null != roiVo.getPromotionCost() && roiVo.getRegCount() > 0) {
                     roiVo.setRegUnitPrice(roiVo.getPromotionCost()
                         .divide(new BigDecimal(roiVo.getRegCount()),
                             BigDecimal.ROUND_CEILING)
@@ -2531,12 +2527,11 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 //付费率
                 if (roiVo.getCostCount() > 0 && roiVo.getRegCount() > 0) {
                     roiVo.setCostProbability(new BigDecimal(
-                        roiVo.getCostCount() / roiVo.getRegCount()
-                            * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                        roiVo.getCostCount() * 100 / roiVo.getRegCount()
+                    ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
                 }
                 //付费单价
-                if (roiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
-                    && roiVo.getCostCount() > 0) {
+                if (null != roiVo.getPromotionCost() && roiVo.getCostCount() > 0) {
                     roiVo.setCostUnitPrice(roiVo.getPromotionCost().divide(
                             new BigDecimal(roiVo.getCostCount()),
                             BigDecimal.ROUND_CEILING)
@@ -2551,12 +2546,11 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 }
                 //首日ROI
                 if (null != dailyPaybackVo.getDay1()
-                    && dailyPaybackVo.getDay1().compareTo(new BigDecimal(0)) > 0
-                    && roiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
-                    roiVo.setFirstROI(dailyPaybackVo.getDay1().divide(
-                            new BigDecimal(String.valueOf(roiVo.getPromotionCost())),
+                    && null != roiVo.getPromotionCost()
+                    && roiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
+                    roiVo.setFirstROI(dailyPaybackVo.getDay1().multiply(new BigDecimal(100))
+                        .divide(roiVo.getPromotionCost(),
                             BigDecimal.ROUND_CEILING)
-                        .multiply(new BigDecimal(100))
                         .setScale(1, RoundingMode.HALF_EVEN));
                 }
                 Map<String, BigDecimal> roiMap = new HashMap<>();
@@ -2594,11 +2588,11 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                         roi = new BigDecimal(0);
                     }
                     roiMap.put("day" + i, roi);
-                    if (null != roi && roi.compareTo(new BigDecimal(0)) > 0
-                        && roiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
+                    if (null != roiVo.getPromotionCost()
+                        && roiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
                         remainROI.put("day" + i,
-                            roi.divide(roiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
-                                .multiply(new BigDecimal(100))
+                            roi.multiply(new BigDecimal(100))
+                                .divide(roiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
                                 .setScale(1, BigDecimal.ROUND_HALF_EVEN));
                     } else {
                         remainROI.put("day" + i, new BigDecimal(0));
@@ -2647,14 +2641,14 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             allRoiVo.setGameName("--");
             allRoiVo.setChannelName("--");
             allRoiVo.setDealName("--");
-            if (allRoiVo.getSdkShare().compareTo(new BigDecimal(0)) > 0
-                && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
-                allRoiVo.setAllROI(allRoiVo.getSdkShare()
+            if (null != allRoiVo.getSdkShare() && null != allRoiVo.getPromotionCost()
+                && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
+                allRoiVo.setAllROI(allRoiVo.getSdkShare().multiply(new BigDecimal(100))
                     .divide(allRoiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
-                    .multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_HALF_EVEN));
+                    .setScale(1, BigDecimal.ROUND_HALF_EVEN));
             }
             //注册单价
-            if (allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
+            if (null != allRoiVo.getPromotionCost() && null != allRoiVo.getRegCount()
                 && allRoiVo.getRegCount() > 0) {
                 allRoiVo.setRegUnitPrice(allRoiVo.getPromotionCost()
                     .divide(new BigDecimal(allRoiVo.getRegCount()),
@@ -2664,12 +2658,11 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             //付费率
             if (allRoiVo.getCostCount() > 0 && allRoiVo.getRegCount() > 0) {
                 allRoiVo.setCostProbability(new BigDecimal(
-                    allRoiVo.getCostCount() / allRoiVo.getRegCount()
-                        * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+                    allRoiVo.getCostCount() * 100 / allRoiVo.getRegCount()
+                ).setScale(2, BigDecimal.ROUND_HALF_EVEN));
             }
             //付费单价
-            if (allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0
-                && allRoiVo.getCostCount() > 0) {
+            if (null != allRoiVo.getPromotionCost() && allRoiVo.getCostCount() > 0) {
                 allRoiVo.setCostUnitPrice(allRoiVo.getPromotionCost().divide(
                         new BigDecimal(String.valueOf(allRoiVo.getCostCount())),
                         BigDecimal.ROUND_CEILING)
@@ -2677,22 +2670,21 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             }
             //合计ROI处理
             //首日ROI
-            if (countRoiMap.get("day1").compareTo(new BigDecimal(0)) > 0
-                && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
-                allRoiVo.setFirstROI(countRoiMap.get("day1")
+            if (null != countRoiMap.get("day1") && null != allRoiVo.getPromotionCost()
+                && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
+                allRoiVo.setFirstROI(countRoiMap.get("day1").multiply(new BigDecimal(100))
                     .divide(allRoiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
-                    .multiply(new BigDecimal(100))
                     .setScale(1, BigDecimal.ROUND_HALF_EVEN));
             } else {
                 allRoiVo.setFirstROI(new BigDecimal(0));
             }
             for (int i = 2; i <= 150; i++) {
-                if (countRoiMap.get("day" + i).compareTo(new BigDecimal(0)) > 0
-                    && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) > 0) {
-                    allRemainROI.put("day" + i, countRoiMap.get("day" + i)
-                        .divide(allRoiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
-                        .multiply(new BigDecimal(100))
-                        .setScale(1, BigDecimal.ROUND_HALF_EVEN));
+                if (null != countRoiMap.get("day" + i) && null != allRoiVo.getPromotionCost()
+                    && allRoiVo.getPromotionCost().compareTo(new BigDecimal(0)) != 0) {
+                    allRemainROI.put("day" + i,
+                        countRoiMap.get("day" + i).multiply(new BigDecimal(100))
+                            .divide(allRoiVo.getPromotionCost(), BigDecimal.ROUND_CEILING)
+                            .setScale(1, BigDecimal.ROUND_HALF_EVEN));
                 } else {
                     allRemainROI.put("day" + i, new BigDecimal(0));
                 }
@@ -2807,7 +2799,7 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                     ctDaily.setCountActive(ctDaily.getCountActive() + 1);
                 }
             }
-            ctDaily.setUpdateTime(day);
+            ctDaily.setUpdateTime(allDay);
             ctDailyMapper.updateById(ctDaily);
         }
     }
@@ -2988,14 +2980,38 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
         Date logDate = DateUtils.getDate(parsePayDto.getTime());
         // 初始化对象
         CtDaily ctDailyLog = initPayDaily(parsePayDto, logDate, logDate);
-        CtDaily ctDailyUser = initPayDaily(parsePayDto, ctUser.getCreateTime(), logDate);
-        CtDaily ctDailyDevice = initPayDaily(parsePayDto, ctDevice.getCreateTime(),
-            logDate);
+        CtDaily ctDailyDevice;
+        CtDaily ctDailyUser;
+        // 同个对象指向一致
+        if (DateUtils.isSameDay(ctDailyLog.getTimeDaily(), ctDevice.getCreateTime())) {
+            ctDailyDevice = ctDailyLog;
+        } else {
+            ctDailyDevice = initPayDaily(parsePayDto, ctDevice.getCreateTime(), logDate);
+        }
+        if (DateUtils.isSameDay(ctDailyLog.getTimeDaily(), ctUser.getCreateTime())) {
+            ctDailyUser = ctDailyLog;
+        } else if (DateUtils.isSameDay(ctDevice.getCreateTime(), ctUser.getCreateTime())) {
+            ctDailyUser = ctDailyDevice;
+        } else {
+            ctDailyUser = initPayDaily(parsePayDto, ctUser.getCreateTime(), logDate);
+        }
         CtHour ctHourLog = ctHourService.initPayHour(parsePayDto, logDate, logDate);
-        CtHour ctHourUser = ctHourService.initPayHour(parsePayDto, ctUser.getCreateTime(),
-            logDate);
-        CtHour ctHourDevice = ctHourService.initPayHour(parsePayDto,
-            ctDevice.getCreateTime(), logDate);
+        CtHour ctHourDevice;
+        CtHour ctHourUser;
+        // 同个对象指向一致
+        if (DateUtils.isSameHour(ctHourLog.getTimeHour(), ctDevice.getCreateTime())) {
+            ctHourDevice = ctHourLog;
+        } else {
+            ctHourDevice = ctHourService.initPayHour(parsePayDto, ctDevice.getCreateTime(),
+                logDate);
+        }
+        if (DateUtils.isSameHour(ctHourLog.getTimeHour(), ctUser.getCreateTime())) {
+            ctHourUser = ctHourLog;
+        } else if (DateUtils.isSameHour(ctDevice.getCreateTime(), ctUser.getCreateTime())) {
+            ctHourUser = ctHourDevice;
+        } else {
+            ctHourUser = ctHourService.initPayHour(parsePayDto, ctUser.getCreateTime(), logDate);
+        }
         // 支付过就算有效注册数
         if (ctUser.getPlayTime() == null) {
             ctDailyUser.setCountValidUser(CountUtil.increaseInt(ctDailyUser.getCountValidUser()));
@@ -3147,8 +3163,22 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
                 ctHourDevice.setFirstPayuser(CountUtil.increaseInt(ctHourDevice.getFirstPayuser()));
             }
         }
-        savePayDaily(ctDailyLog, ctDailyDevice, ctDailyUser);
-        savePayHour(ctHourLog, ctHourDevice, ctHourUser);
+        // 更新每日汇总
+        saveOrUpdate(ctDailyLog);
+        if (ctDailyDevice != ctDailyLog) {
+            saveOrUpdate(ctDailyDevice);
+        }
+        if (ctDailyUser != ctDailyLog && ctDailyUser != ctDailyDevice) {
+            saveOrUpdate(ctDailyUser);
+        }
+        // 更新小时汇总
+        ctHourService.saveOrUpdate(ctHourLog);
+        if (ctHourDevice != ctHourLog) {
+            ctHourService.saveOrUpdate(ctHourDevice);
+        }
+        if (ctHourUser != ctHourLog && ctHourUser != ctHourDevice) {
+            ctHourService.saveOrUpdate(ctHourUser);
+        }
         // 更新用户回本表
         ctDailyPaybackService.parsePayback(ctDailyUser.getId(), ctUser.getCreateTime(),
             parsePayDto.getMoney(), logDate);
@@ -3341,75 +3371,6 @@ public class CtDailyServiceImpl extends ServiceImpl<CtDailyMapper, CtDaily> impl
             "a.game_id,a.sub_game_id,a.pkg_id,a.channel_type_id,a.channel_id,a.channel_sub_account_id,a.time_daily");
         return baseMapper.getWeekReportDaily(wrapper);
     }
-
-    /**
-     * @param ctDailyLog
-     * @param ctDailyDevice
-     * @param ctDailyUser
-     * @author chenyw
-     * @description 支付-更新日汇总表
-     * @date 11:00 2023/4/23/023
-     **/
-    private void savePayDaily(CtDaily ctDailyLog, CtDaily ctDailyDevice, CtDaily ctDailyUser) {
-        if (ctDailyLog.getTimeDaily().equals(ctDailyDevice.getTimeDaily())) {
-            BeanUtils.copyProperties(ctDailyDevice, ctDailyLog);
-            if (ctDailyLog.getTimeDaily().equals(ctDailyUser.getTimeDaily())) {
-                BeanUtils.copyProperties(ctDailyUser, ctDailyLog);
-                saveOrUpdate(ctDailyLog);
-                // 和ctDailyLog为同一个对象，返回id
-                ctDailyUser.setId(ctDailyLog.getId());
-            } else {
-                saveOrUpdate(ctDailyLog);
-                saveOrUpdate(ctDailyUser);
-            }
-            // 和ctDailyLog为同一个对象，返回id
-            ctDailyDevice.setId(ctDailyLog.getId());
-        } else {
-            if (ctDailyLog.getTimeDaily().equals(ctDailyUser.getTimeDaily())) {
-                BeanUtils.copyProperties(ctDailyLog, ctDailyUser);
-                saveOrUpdate(ctDailyLog);
-                // 和ctDailyUser为同一个对象，返回id
-                ctDailyUser.setId(ctDailyLog.getId());
-                saveOrUpdate(ctDailyDevice);
-            } else {
-                saveOrUpdate(ctDailyLog);
-                saveOrUpdate(ctDailyDevice);
-                saveOrUpdate(ctDailyUser);
-            }
-        }
-    }
-
-    /**
-     * @param ctHourLog
-     * @param ctHourDevice
-     * @param ctHourUser
-     * @author chenyw
-     * @description 支付-更新小时汇总表
-     * @date 11:10 2023/4/23/023
-     **/
-    private void savePayHour(CtHour ctHourLog, CtHour ctHourDevice, CtHour ctHourUser) {
-        if (ctHourLog.getTimeHour().equals(ctHourLog.getTimeHour())) {
-            BeanUtils.copyProperties(ctHourDevice, ctHourLog);
-            if (ctHourLog.getTimeHour().equals(ctHourUser.getTimeHour())) {
-                BeanUtils.copyProperties(ctHourUser, ctHourLog);
-                ctHourService.saveOrUpdate(ctHourLog);
-            } else {
-                ctHourService.saveOrUpdate(ctHourLog);
-                ctHourService.saveOrUpdate(ctHourUser);
-            }
-        } else {
-            if (ctHourLog.getTimeHour().equals(ctHourUser.getTimeHour())) {
-                BeanUtils.copyProperties(ctHourLog, ctHourUser);
-                ctHourService.saveOrUpdate(ctHourLog);
-                ctHourService.saveOrUpdate(ctHourDevice);
-            } else {
-                ctHourService.saveOrUpdate(ctHourLog);
-                ctHourService.saveOrUpdate(ctHourDevice);
-                ctHourService.saveOrUpdate(ctHourUser);
-            }
-        }
-    }
-
 
     /**
      * @param parsePayDto 解析支付内容

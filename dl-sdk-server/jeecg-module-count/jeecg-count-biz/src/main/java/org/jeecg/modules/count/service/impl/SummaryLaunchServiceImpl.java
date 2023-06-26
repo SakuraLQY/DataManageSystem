@@ -227,8 +227,7 @@ public class SummaryLaunchServiceImpl extends
                 //计算注册单价
                 if (othersData.getCountUser() != 0) {
                     BigDecimal singlePrice = (data.getCost())
-                        .divide(BigDecimal.valueOf(othersData.getCountUser()),2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100));
+                        .divide(BigDecimal.valueOf(othersData.getCountUser()),2, RoundingMode.HALF_UP);
                     data.setRegistryPrice(singlePrice);
                 } else {
                     data.setRegistryPrice(BigDecimal.ZERO);
@@ -245,8 +244,7 @@ public class SummaryLaunchServiceImpl extends
                 //计算首日付费单价
                 if (othersData.getFirstPayUser() != 0) {
                     BigDecimal fistPrice = othersData.getFirstMoney().
-                        divide(BigDecimal.valueOf(othersData.getFirstPayUser()),2,RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100));
+                        divide(BigDecimal.valueOf(othersData.getFirstPayUser()),2,RoundingMode.HALF_UP);
                     data.setFirstPayprice(fistPrice);
                 } else {
                     data.setFirstPayprice(BigDecimal.ZERO);
@@ -254,8 +252,7 @@ public class SummaryLaunchServiceImpl extends
                 //计算首日arpu
                 if (othersData.getCountUser() != 0) {
                     BigDecimal arpu = BigDecimal.valueOf(othersData.getTotalMoney())
-                        .divide(BigDecimal.valueOf(othersData.getCountDau()),2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100));
+                        .divide(BigDecimal.valueOf(othersData.getCountDau()),2, RoundingMode.HALF_UP);
                     data.setFirstArpu(arpu);
                 } else {
                     data.setFirstArpu(BigDecimal.ZERO);
@@ -263,8 +260,7 @@ public class SummaryLaunchServiceImpl extends
                 //计算首日arrpu
                 if (othersData.getFirstPayUser() != 0) {
                     BigDecimal arrpu = othersData.getFirstMoney()
-                        .divide(BigDecimal.valueOf(othersData.getFirstPayUser()),2,RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100));
+                        .divide(BigDecimal.valueOf(othersData.getFirstPayUser()),2,RoundingMode.HALF_UP);
                     data.setFirstArppu(arrpu);
                 } else {
                     data.setFirstArppu(BigDecimal.ZERO);

@@ -1,5 +1,6 @@
 package org.jeecg.modules.count.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,8 +19,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.system.vo.UserDataPermissionRule;
 import org.jeecg.modules.count.bo.ReportAccountBillBo;
 import org.jeecg.modules.count.bo.ReportAccountBo;
 import org.jeecg.modules.count.bo.ReportAccountCostBo;
@@ -58,27 +61,14 @@ public class OpReportAccountServiceImpl extends ServiceImpl<OpReportAccountMappe
     private OpReportAccountMapper opReportAccountMapper;
     @Value("${jeecg.path.upload}")
     private String upLoadPath;
+    @Resource
+    private ISysBaseAPI sysBaseAPI;
     @Override
     public List<ReportAccountVo> queryAccountList(ReportAccountDto reportAccountDto,String username) {
         QueryWrapper<ReportAccountDto> where = new QueryWrapper<>();
         QueryWrapper where2 = new QueryWrapper<>();
         List<ReportAccountVo>resList = new ArrayList<>();
         where.eq("a.state",1);
-        if(ObjectUtils.isNotEmpty(reportAccountDto.getGameId())){
-            where.in("d.game_id",reportAccountDto.getGameId());
-        }
-        if(ObjectUtils.isNotEmpty(reportAccountDto.getSubGameId())){
-            where.in("d.sub_game_id",reportAccountDto.getSubGameId());
-        }
-        if(ObjectUtils.isNotEmpty(reportAccountDto.getPkgId())){
-            where.in("d.pkg_id",reportAccountDto.getPkgId());
-        }
-        if(ObjectUtils.isNotEmpty(reportAccountDto.getChannelId())){
-            where.in("a.channel_id",reportAccountDto.getChannelId());
-        }
-        if(ObjectUtils.isNotEmpty(reportAccountDto.getChannelSubAccountId())){
-            where.in("d.channel_sub_account_id",reportAccountDto.getChannelSubAccountId());
-        }
         if(ObjectUtils.isNotEmpty(reportAccountDto.getChannelTypeId())){
             where.in("d.channel_type_id",reportAccountDto.getChannelTypeId());
         }
@@ -86,16 +76,76 @@ public class OpReportAccountServiceImpl extends ServiceImpl<OpReportAccountMappe
             where.in("a.id",reportAccountDto.getAccountId());
         }
         //进行权限校验或者别的
-        if(username.equals(ADMIN)){
+        // TODO 账号权限待完善
+//        if(username.equals(ADMIN)){
             if(ObjectUtils.isNotEmpty(reportAccountDto.getCreateUser())){
                 //可能是put_user,但是此时这个表中没有user字段
                 where.eq("d.create_by",reportAccountDto.getCreateUser());
             }
-        }else{
-            where.or().eq("a.put_user",username);
+//        }else{
+//            where.eq("a.put_user",username);
+//        }
+
+        // 手动载入权限
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String userId = loginUser.getId();
+        UserDataPermissionRule userDataPermissionRule = sysBaseAPI.getUserDataPermissionRule(userId);
+        //1.获取账号充值资金与转出金额待定
+
+        List<Integer> gameIdList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(reportAccountDto.getGameId())){
+            gameIdList.addAll(reportAccountDto.getGameId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getGameId())){
+            gameIdList.addAll(userDataPermissionRule.getGameId());
+        }
+        if(CollectionUtil.isNotEmpty(gameIdList)){
+            where.in("d.game_id",gameIdList);
         }
 
-        //1.获取账号充值资金与转出金额待定
+        List<Integer> subGameIdList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(reportAccountDto.getSubGameId())){
+            subGameIdList.addAll(reportAccountDto.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getSubGameId())){
+            subGameIdList.addAll(userDataPermissionRule.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(subGameIdList)){
+            where.in("d.sub_game_id",subGameIdList);
+        }
+
+        List<Integer> pkgIdList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(reportAccountDto.getPkgId())){
+            pkgIdList.addAll(reportAccountDto.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getPkgId())){
+            pkgIdList.addAll(userDataPermissionRule.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(pkgIdList)){
+            where.in("d.pkg_id",pkgIdList);
+        }
+
+        List<Integer> channelIdList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(reportAccountDto.getChannelId())){
+            channelIdList.addAll(reportAccountDto.getChannelId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelId())){
+            channelIdList.addAll(userDataPermissionRule.getChannelId());
+        }
+        if(CollectionUtil.isNotEmpty(channelIdList)){
+            where.in("a.channel_id",channelIdList);
+        }
+
+        List<Integer> channelSubAccountIdList = new ArrayList<>();
+        if(CollectionUtil.isNotEmpty(reportAccountDto.getChannelSubAccountId())){
+            channelSubAccountIdList.addAll(reportAccountDto.getChannelSubAccountId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelSubAccountId())){
+            channelSubAccountIdList.addAll(userDataPermissionRule.getChannelSubAccountId());
+        }
+        if(CollectionUtil.isNotEmpty(channelSubAccountIdList)){
+            where.in("d.channel_sub_account_id",channelSubAccountIdList);
+        }
 
         //展示账号列表
         List<ReportAccountBo>accountList = opReportAccountMapper.queryAccountList(where);

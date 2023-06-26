@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.modules.count.dto.GameChargeDto;
 import org.jeecg.modules.count.vo.CtGameChargeTotal;
@@ -80,6 +81,7 @@ public class CtGameChargeTotalController extends
 
     @GetMapping(value = "queryList")
     @ApiOperation(value = "gameCharge分页列表查询", notes = "自定义列表查询")
+    @UserPermissionData(alias = "ct_daily")
     public Result<List<GameChargeDto>> queryList() {
         List<GameChargeDto> data = ctGameChargeTotalService.queryList();
         return Result.OK(data);

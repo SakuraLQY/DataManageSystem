@@ -100,7 +100,7 @@ export const searchFormSchema: FormSchema[] = [
     dynamicRules: ({model,schema}) => {
       return [
              { required: false},
-             { pattern: /^(?=.*\w)(?=.*[\\u4e00-\\u9fa5]).{0,10}$/, message: '只能输入十位以内!'},
+             { pattern: /^(?=.*\w)(?=.*[\\u4e00-\\u9fa5]).{0,20}$/, message: '只能输入二十位以内!'},
       ];
     },
     

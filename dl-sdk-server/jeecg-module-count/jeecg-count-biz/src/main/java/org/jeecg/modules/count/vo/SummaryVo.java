@@ -195,7 +195,7 @@ public class SummaryVo implements Serializable {
     private Integer totalPayuserDev = 0;
     /** ARPU(累积) 累计付费额/日活 tatalMoney/countDau*/
     @ApiModelProperty(value = "ARPU(累积)")
-    private BigDecimal totalArpu;
+    private BigDecimal totalArpu = BigDecimal.ZERO;
     /** ARPU(累积)-按设备 累计付费额-按设备/日活-按设备 tatalMoneyDev/countDauDev*/
     @ApiModelProperty(value = "ARPU(累积)-按设备")
     private BigDecimal totalArpuDev = BigDecimal.ZERO;

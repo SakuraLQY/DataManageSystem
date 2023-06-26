@@ -1,137 +1,144 @@
-import {BasicColumn} from '/@/components/Table';
-import {FormSchema} from '/@/components/Table';
-import { rules} from '/@/utils/helper/validator';
+import { BasicColumn } from '/@/components/Table';
+import { FormSchema } from '/@/components/Table';
+import { rules } from '/@/utils/helper/validator';
 import { render } from '/@/utils/common/renderUtils';
 //列表数据
 export const columns: BasicColumn[] = [
   {
     title: 'ID',
-    align: "center",
-    dataIndex: 'typeId'
+    align: 'center',
+    dataIndex: 'typeId',
   },
   {
     title: '名称',
-    align: "center",
-    dataIndex: 'name'
+    align: 'center',
+    dataIndex: 'name',
   },
   {
     title: '新增付费人数',
-    align: "center",
-    dataIndex: 'firstPayUser'
+    align: 'center',
+    dataIndex: 'firstPayUser',
   },
   {
     title: '老用户付费人数',
-    align: "center",
-    dataIndex: 'oldPayUser'
+    align: 'center',
+    dataIndex: 'oldPayUser',
   },
   {
     title: '总付费人数',
-    align: "center",
-    dataIndex: 'totalPayUser'
+    align: 'center',
+    dataIndex: 'totalPayUser',
   },
   {
     title: '新增付费金额',
-    align: "center",
-    dataIndex: 'firstPayMoney'
+    align: 'center',
+    dataIndex: 'firstPayMoney',
   },
   {
     title: '老用户付费金额',
-    align: "center",
-    dataIndex: 'oldPayMoney'
+    align: 'center',
+    dataIndex: 'oldPayMoney',
   },
   {
     title: '总付费金额',
-    align: "center",
-    dataIndex: 'totalPayMoney'
+    align: 'center',
+    dataIndex: 'totalPayMoney',
   },
   {
     title: '老用户ARPU',
-    align: "center",
-    dataIndex: 'oldArpu'
+    align: 'center',
+    dataIndex: 'oldArpu',
   },
   {
     title: '老用户ARPPU',
-    align: "center",
-    dataIndex: 'oldArppu'
+    align: 'center',
+    dataIndex: 'oldArppu',
   },
   {
     title: 'ARPU',
-    align: "center",
-    dataIndex: 'arpu'
+    align: 'center',
+    dataIndex: 'arpu',
   },
   {
     title: 'ARPPU',
-    align: "center",
-    dataIndex: 'arppu'
+    align: 'center',
+    dataIndex: 'arppu',
   },
   {
     title: '新增付费率',
-    align: "center",
-    dataIndex: 'firstPayRate'
+    align: 'center',
+    dataIndex: 'firstPayRate',
   },
   {
     title: '总付费率',
-    align: "center",
-    dataIndex: 'totalRate'
+    align: 'center',
+    dataIndex: 'totalRate',
   },
 ];
 //自定义选项
 export const typeOption = [
   {
     label: '全部',
-    value: ' '
+    value: ' ',
   },
   {
     label: '按广告',
-    value: 'deal_id'
-  },{
+    value: 'deal_id',
+  },
+  {
     label: '按渠道',
-    value:  'channel_id'
-  },{
+    value: 'channel_id',
+  },
+  {
     label: '按游戏',
-    value:  'game_id'
-  },{
+    value: 'game_id',
+  },
+  {
     label: '按游戏包',
-    value:  'sub_game_id'
-  }
-]
+    value: 'sub_game_id',
+  },
+  {
+    label: '按渠道游戏包',
+    value: 'pkg_id',
+  },
+];
 //查询数据
 export const searchFormSchema: FormSchema[] = [
   {
-    label: "游戏项目",
+    label: '游戏项目',
     field: 'gameId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "游戏名称",
+    label: '游戏名称',
     field: 'subGameId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "子游戏包",
+    label: '子游戏包',
     field: 'pkgId',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "开始时间",
+    label: '开始时间',
     field: 'startTime',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "结束时间",
+    label: '结束时间',
     field: 'endTime',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
   {
-    label: "归类方式",
+    label: '归类方式',
     field: 'type',
     component: 'Input',
-    colProps: {span: 6},
+    colProps: { span: 6 },
   },
 ];
 
@@ -227,7 +234,7 @@ export const formSchema: FormSchema[] = [
     field: 'totalRate',
     component: 'Input',
   },
-	// TODO 主键隐藏字段，目前写死为ID
+  // TODO 主键隐藏字段，目前写死为ID
   {
     label: '',
     field: 'id',

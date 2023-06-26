@@ -7,8 +7,8 @@
           <GameOptionForm ref="selectForm" @handler="getGameVal"></GameOptionForm>
           <template v-if="toggleSearchStatus">
             <a-col :lg="8">
-              <a-form-item label="渠道id">
-                <j-dict-select-tag placeholder="请选择渠道id" v-model:value="queryParam.channelId" dictCode="open_gateway.op_channel,channel_name,id"/>
+              <a-form-item label="渠道">
+                <j-dict-select-tag placeholder="请选择渠道" v-model:value="queryParam.channelId" dictCode="open_gateway.op_channel,channel_name,id"/>
               </a-form-item>
             </a-col>
           </template>

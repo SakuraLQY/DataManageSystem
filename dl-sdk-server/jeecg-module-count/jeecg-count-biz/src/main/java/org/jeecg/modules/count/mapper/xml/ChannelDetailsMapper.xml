@@ -1,50 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.count.mapper.ChannelDetailsMapper">
 
 
   <select id="queryListByDetail" resultType="org.jeecg.modules.count.bo.ChannelDetailBo">
-    SELECT * FROM(SELECT
-                    DATE (a.time_daily) as 'timeDaily',
-                    ${gameId} as 'gameName',
-                    ${subGameId} as 'subGameName',
-                    ${channelId} as 'channel',
-                    IFNULL(SUM(a.count_active),0) as 'countActive',
-                    IFNULL(SUM(a.count_active_dev),0) as 'countActiveDev',
-                    IFNULL(SUM(a.count_user),0) AS 'countUser',
-                    IFNULL(SUM(a.count_user_dev),0) AS 'countUserDev',
-                    IFNULL(SUM(a.first_payuser),0) AS 'firstPayUser',
-                    IFNULL(SUM(a.count_dau),0) AS 'dau',
-                    IFNULL(SUM(a.count_valid_user),0) AS 'countValidUser',
-                    IFNULL(SUM(a.first_money),0) AS 'firstMoney',
-                    IFNULL(SUM(a.total_money),0) AS 'totalMoney',
-                    IFNULL(SUM(a.alive_payuser),0) AS 'alivePayUser',
-                    IFNULL(SUM(alive_money),0) AS 'aliveMoney',
-                    IFNULL(SUM(b.day2),0) as 'loyal',
-                    IFNULL(SUM(b.day3),0) as 'loyal3',
-                    IFNULL(SUM(b.day4),0) as 'loyal4',
-                    IFNULL(SUM(b.day5),0) as 'loyal5',
-                    IFNULL(SUM(b.day6),0) as 'loyal6',
-                    IFNULL(SUM(b.day7),0) as 'loyal7',
-                    IFNULL(SUM(c.day1),0) as 'ltv1',
-                    IFNULL(SUM(c.day1+c.day2),0) as 'ltv2',
-                    IFNULL(SUM(c.day1+c.day2+c.day3),0) as 'ltv3',
-                    IFNULL(SUM(c.day1+c.day2+c.day3+c.day4),0) as 'ltv4',
-                    IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5),0) as 'ltv5',
-                    IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5+c.day6),0) as 'ltv6',
-                    IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5+c.day6+c.day7),0) as 'ltv7'
-                  FROM ct_daily as a
-                         LEFT JOIN ct_daily_loyal as b
-                                   ON a.id = b.daily_id
-                         LEFT JOIN ct_daily_payback AS c
-                                   ON a.id = c.id
-                    ${ew.customSqlSegment}
-                  GROUP BY timeDaily,gameName,subGameName,channel
-                 )as t ORDER BY t.timeDaily desc;
+    SELECT *
+    FROM (SELECT
+            DATE (a.time_daily)
+      as 'timeDaily', ${gameId} as 'gameName'
+       , ${subGameId} as 'subGameName'
+       , ${channelId} as 'channel'
+       , IFNULL(SUM (a.count_active)
+       , 0) as 'countActive'
+       , IFNULL(SUM (a.count_active_dev)
+       , 0) as 'countActiveDev'
+       , IFNULL(SUM (a.count_user)
+       , 0) AS 'countUser'
+       , IFNULL(SUM (a.count_user_dev)
+       , 0) AS 'countUserDev'
+       , IFNULL(SUM (a.first_payuser)
+       , 0) AS 'firstPayUser'
+       , IFNULL(SUM (a.count_dau)
+       , 0) AS 'dau'
+       , IFNULL(SUM (a.count_valid_user)
+       , 0) AS 'countValidUser'
+       , IFNULL(SUM (a.first_money)
+       , 0) AS 'firstMoney'
+       , IFNULL(SUM (a.total_money)
+       , 0) AS 'totalMoney'
+       , IFNULL(SUM (a.alive_payuser)
+       , 0) AS 'alivePayUser'
+       , IFNULL(SUM (alive_money)
+       , 0) AS 'aliveMoney'
+       , IFNULL(SUM (b.day2)
+       , 0) as 'loyal'
+       , IFNULL(SUM (b.day3)
+       , 0) as 'loyal3'
+       , IFNULL(SUM (b.day4)
+       , 0) as 'loyal4'
+       , IFNULL(SUM (b.day5)
+       , 0) as 'loyal5'
+       , IFNULL(SUM (b.day6)
+       , 0) as 'loyal6'
+       , IFNULL(SUM (b.day7)
+       , 0) as 'loyal7'
+       , IFNULL(SUM (c.day1)
+       , 0) as 'ltv1'
+       , IFNULL(SUM (c.day1+ c.day2)
+       , 0) as 'ltv2'
+       , IFNULL(SUM (c.day1+ c.day2+ c.day3)
+       , 0) as 'ltv3'
+       , IFNULL(SUM (c.day1+ c.day2+ c.day3+ c.day4)
+       , 0) as 'ltv4'
+       , IFNULL(SUM (c.day1+ c.day2+ c.day3+ c.day4+ c.day5)
+       , 0) as 'ltv5'
+       , IFNULL(SUM (c.day1+ c.day2+ c.day3+ c.day4+ c.day5+ c.day6)
+       , 0) as 'ltv6'
+       , IFNULL(SUM (c.day1+ c.day2+ c.day3+ c.day4+ c.day5+ c.day6+ c.day7)
+       , 0) as 'ltv7'
+    FROM ct_daily as a
+      LEFT JOIN ct_daily_loyal as b
+    ON a.id = b.daily_id
+      LEFT JOIN ct_daily_payback AS c
+      ON a.id = c.daily_id
+      ${ew.customSqlSegment}
+    GROUP BY timeDaily, gameName, subGameName, channel
+      ) as t
+    ORDER BY t.timeDaily desc;
   </select>
   <select id="queryListByTotal" resultType="org.jeecg.modules.count.bo.ChannelDetailBo">
-    SELECT * FROM(SELECT
-                    DATE (a.time_daily) as 'timeDaily',
+    SELECT *
+    FROM (SELECT
+            DATE (a.time_daily) as 'timeDaily',
                     '全部游戏' as 'gameName',
                     '全部子游戏' as 'subGameName',
                     '全部渠道' as 'channel',
@@ -72,22 +100,39 @@
                     IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5),0) as 'ltv5',
                     IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5+c.day6),0) as 'ltv6',
                     IFNULL(SUM(c.day1+c.day2+c.day3+c.day4+c.day5+c.day6+c.day7),0) as 'ltv7'
-                  FROM ct_daily as a
-                         LEFT JOIN ct_daily_loyal as b
-                                   ON a.id = b.daily_id
-                         LEFT JOIN ct_daily_payback AS c
-                                   ON a.id = c.id
-                ${ew.customSqlSegment}
-                  GROUP BY timeDaily
-                 )as t ORDER BY t.timeDaily desc;
+    FROM ct_daily as a
+      LEFT JOIN ct_daily_loyal as b
+    ON a.id = b.daily_id
+      LEFT JOIN ct_daily_payback AS c
+      ON a.id = c.daily_id
+      ${ew.customSqlSegment}
+    GROUP BY timeDaily
+      ) as t
+    ORDER BY t.timeDaily desc;
   </select>
   <select id="getGameNameById" resultType="java.lang.String">
-    select game_name as 'gameName' from open_gateway.op_game where id = #{gameId};
+    select game_name as 'gameName'
+    from open_gateway.op_game
+    where id = #{gameId};
   </select>
   <select id="getSubGameNameByid" resultType="java.lang.String">
-    select game_name as 'subGameName' from open_gateway.op_sub_game where id = #{subGameId};
+    select game_name as 'subGameName'
+    from open_gateway.op_sub_game
+    where id = #{subGameId};
   </select>
   <select id="getChannelNameById" resultType="java.lang.String">
-    select channel_name as 'channel' from open_gateway.op_channel where id = #{channelId};
+    select channel_name as 'channel'
+    from open_gateway.op_channel
+    where id = #{channelId};
+  </select>
+  <select id="getSumChannel" resultType="org.jeecg.modules.count.bo.ChannelDetailAllBo">
+    SELECT IFNULL(SUM(a.count_active), 0) as 'countActive', IFNULL(SUM(a.count_active_dev),0) as 'countActiveDev', IFNULL(SUM(a.count_user),0) AS 'countUser', IFNULL(SUM(a.count_user_dev),0) AS 'countUserDev', IFNULL(SUM(a.first_payuser),0) AS 'firstPayUser', IFNULL(SUM(a.count_dau),0) AS 'dau', IFNULL(SUM(a.count_valid_user),0) AS 'countValidUser', IFNULL(SUM(a.first_money),0) AS 'firstMoney', IFNULL(SUM(a.total_money),0) AS 'totalMoney', IFNULL(SUM(a.alive_payuser),0) AS 'alivePayUser', IFNULL(SUM(alive_money),0) AS 'aliveMoney', IFNULL(SUM(b.day2),0) as 'loyal', IFNULL(SUM(b.day3),0) as 'loyal3', IFNULL(SUM(b.day4),0) as 'loyal4', IFNULL(SUM(b.day5),0) as 'loyal5', IFNULL(SUM(b.day6),0) as 'loyal6', IFNULL(SUM(b.day7),0) as 'loyal7', IFNULL(SUM(c.day1),0) as 'ltv1', IFNULL(SUM(c.day1 + c.day2),0) as 'ltv2', IFNULL(SUM(c.day1 + c.day2 + c.day3),0) as 'ltv3', IFNULL(SUM(c.day1 + c.day2 + c.day3 + c.day4),0) as 'ltv4', IFNULL(SUM(c.day1 + c.day2 + c.day3 + c.day4 + c.day5),0) as 'ltv5', IFNULL(SUM(c.day1 + c.day2 + c.day3 + c.day4 + c.day5 + c.day6),0) as 'ltv6', IFNULL(SUM(
+        c.day1 + c.day2 + c.day3 + c.day4 + c.day5 + c.day6 + c.day7),0) as 'ltv7'
+    FROM ct_daily as a
+           LEFT JOIN ct_daily_loyal as b
+                     ON a.id = b.daily_id
+           LEFT JOIN ct_daily_payback AS c
+                     ON a.id = c.id
+      ${ew.customSqlSegment}
   </select>
 </mapper>

@@ -3,7 +3,7 @@
     <!--引用表格-->
    <BasicTable @register="registerTable" :rowSelection="rowSelection">
      <template #realNameInfo="{ record }">
-        <Tag color="green">
+        <Tag color="green" v-if="record.realName !== null">
           {{ record.realName + record.realNumber }}
         </Tag>
       </template>

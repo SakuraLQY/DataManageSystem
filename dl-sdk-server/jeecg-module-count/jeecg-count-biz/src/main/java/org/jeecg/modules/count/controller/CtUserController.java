@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.BlockadeDto;
@@ -77,6 +78,7 @@ public class CtUserController extends JeecgController<CtUser, ICtUserService> {
 	//@AutoLog(value = "ct_user-分页列表查询")
 	@ApiOperation(value="ct_user-分页列表查询", notes="ct_user-分页列表查询")
 	@GetMapping(value = "/list")
+	@UserPermissionData(alias = "a")
 	public Result<IPage<CtUserVo>> queryPageList(CtUserDto ctUser,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -88,6 +90,7 @@ public class CtUserController extends JeecgController<CtUser, ICtUserService> {
 
 	 @ApiOperation(value="ct_user-付费用户数据分页列表查询", notes="ct_user-付费用户数据分页列表查询")
 	 @GetMapping(value = "/payUserPageList")
+	 @UserPermissionData(alias = "a")
 	 public Result<IPage<PayUserVo>> payUserPageList(PayUserDto payUserDto,
 		 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 		 @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -99,6 +102,7 @@ public class CtUserController extends JeecgController<CtUser, ICtUserService> {
 
 	 @ApiOperation(value="ct_user-在线统计", notes="ct_user-在线统计")
 	 @GetMapping(value = "/onlineUserList")
+	 @UserPermissionData(alias = "`ct_user`")
 	 public Result<List<OnlineUserVo>> onlineUserList(OnlineUserDto onlineUserDto) {
 		 return Result.OK(ctUserService.getOnlineUserList(onlineUserDto));
 	 }
@@ -216,6 +220,7 @@ public class CtUserController extends JeecgController<CtUser, ICtUserService> {
     */
     //@RequiresPermissions("count:ct_user:exportXls")
     @RequestMapping(value = "/exportXls")
+	@UserPermissionData(alias = "a")
     public ModelAndView exportXls(CtUserDto ctUser) {
         return ctUserService.exportXls(ctUser, CtUserModal.class, "用户数据");
     }
@@ -226,6 +231,7 @@ public class CtUserController extends JeecgController<CtUser, ICtUserService> {
 	  * @param payUserDto
 	  */
 	 //@RequiresPermissions("count:ct_user:exportXls")
+	 @UserPermissionData(alias = "a")
 	 @RequestMapping(value = "/payUseExportXls")
 	 public ModelAndView exportXls(PayUserDto payUserDto) {
 		 return ctUserService.payUseExportXls(payUserDto, PayUserModal.class, "付费用户数据");

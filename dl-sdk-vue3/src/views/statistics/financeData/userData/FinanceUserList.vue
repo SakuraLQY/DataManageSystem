@@ -165,7 +165,7 @@
         summaryData.value = []
         queryList.value = []
         if (result.length !== 0) {
-          queryList.value = result.slice(0, result.length - 1)
+          queryList.value = result.slice(0, result.length - 1).reverse()
           summaryData.value.push(result[result.length - 1])
         }
         dateData.value = []

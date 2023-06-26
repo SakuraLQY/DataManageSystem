@@ -22,7 +22,7 @@ public class ChannelDetailVo implements Serializable {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd ")
     @ApiModelProperty(value = "日期")
-    private Date timeDaily;
+    private String timeDaily;
     @ApiModelProperty(value = "子游戏")
     private String gameName;
     /**
@@ -154,69 +154,69 @@ public class ChannelDetailVo implements Serializable {
      * 次留
      */
     @ApiModelProperty(value = "次留")
-    private Integer loyal;
+    private String loyal;
     /**
      * 3日留存
      */
     @ApiModelProperty(value = "3日留存")
-    private Integer loyal3;
+    private String loyal3;
     /**
      * 4日留存
      */
     @ApiModelProperty(value = "4日留存")
-    private Integer loyal4;
+    private String loyal4;
     /**
      * 5日留存
      */
     @ApiModelProperty(value = "5日留存")
-    private Integer loyal5;
+    private String loyal5;
     /**
      * 6日留存
      */
     @ApiModelProperty(value = "6日留存")
-    private Integer loyal6;
+    private String loyal6;
     /**
      * 7日留存
      */
     @ApiModelProperty(value = "7日留存")
-    private Integer loyal7;
+    private String loyal7;
     /**
      * LTV1
      */
 
     @ApiModelProperty(value = "LTV1")
-    private Integer ltv1;
+    private BigDecimal ltv1;
     /**
      * LTV2
      */
 
     @ApiModelProperty(value = "LTV2")
-    private Integer ltv2;
+    private BigDecimal ltv2;
     /**
      * LTV3
      */
 
     @ApiModelProperty(value = "LTV3")
-    private Integer ltv3;
+    private BigDecimal ltv3;
     /**
      * LTV4
      */
 
     @ApiModelProperty(value = "LTV4")
-    private Integer ltv4;
+    private BigDecimal ltv4;
     /**
      * LTV5
      */
     @ApiModelProperty(value = "LTV5")
-    private Integer ltv5;
+    private BigDecimal ltv5;
     /**
      * LTV6
      */
     @ApiModelProperty(value = "LTV6")
-    private Integer ltv6;
+    private BigDecimal ltv6;
     /**
      * LTV7
      */
     @ApiModelProperty(value = "LTV7")
-    private Integer ltv7;
+    private BigDecimal ltv7;
 }

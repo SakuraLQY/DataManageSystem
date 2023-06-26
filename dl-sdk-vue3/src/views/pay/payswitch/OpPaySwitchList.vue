@@ -4,33 +4,28 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <!-- <a-col :lg="8">
-            <a-form-item label="游戏id">
-              <j-dict-select-tag placeholder="请选择游戏" v-model:value="queryParam.gameId" dictCode="op_sub_game,game_name,id"/>
-            </a-form-item>
-          </a-col> -->
           <PkgOptionMoreSelect ref="selectForm" @handler="getGameVal" :disabled="disabled"></PkgOptionMoreSelect>
           <a-col :lg="8">
             <a-form-item label="游戏版本">
               <a-input placeholder="请输入游戏版本" v-model:value="queryParam.gameVersion" allowClear></a-input>
             </a-form-item>
           </a-col>
-          <template v-if="toggleSearchStatus">
-            <a-col :lg="8">
+          <a-col :lg="8">
               <a-form-item label="游戏构建">
                 <a-input placeholder="请输入游戏构建" v-model:value="queryParam.gameBuild" allowClear></a-input>
               </a-form-item>
             </a-col>
+          <template v-if="toggleSearchStatus">
           </template>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
             <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
                 <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
+                <!-- <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
                   {{ toggleSearchStatus ? '收起' : '展开' }}
                   <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
+                </a> -->
               </a-col>
             </span>
           </a-col>
@@ -42,8 +37,8 @@
       <!--插槽:table标题-->
       <template #tableTitle>
         <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-        <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
+        <!-- <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
+        <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button> -->
         <a-dropdown v-if="selectedRowKeys.length > 0">
           <template #overlay>
             <a-menu>

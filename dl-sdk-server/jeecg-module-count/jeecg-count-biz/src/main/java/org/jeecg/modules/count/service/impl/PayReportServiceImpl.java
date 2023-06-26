@@ -1,5 +1,6 @@
 package org.jeecg.modules.count.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -10,10 +11,13 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.system.vo.UserDataPermissionRule;
 import org.jeecg.modules.count.dto.DayPayReportDto;
 import org.jeecg.modules.count.dto.MonthPayReportDto;
 import org.jeecg.modules.count.dto.OrderPurchaseVolumeDto;
@@ -56,6 +60,9 @@ public class PayReportServiceImpl  implements IPayReportService {
 
     @Autowired
     private IPayBaseAPI iPayBaseAPI;
+
+    @Autowired
+    private ISysBaseAPI sysBaseAPI;
 
     @Value("${jeecg.path.upload}")
     private String upLoadPath;
@@ -108,7 +115,6 @@ public class PayReportServiceImpl  implements IPayReportService {
                 }else {
                     dayPayReportVo.setArpuNum(0d);
                 }
-
             }
         }
         return  page.setRecords(dayPayReportVos);
@@ -292,27 +298,11 @@ public class PayReportServiceImpl  implements IPayReportService {
         if (ObjectUtils.isNotEmpty(payOrderDto.getOrderType())){
             queryWrapper.eq("oo.order_type",payOrderDto.getOrderType());
         }
-
-        if (ObjectUtils.isNotEmpty(payOrderDto.getGameId())){
-            queryWrapper.eq("oo.game_id",payOrderDto.getGameId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getSubGameId())){
-            queryWrapper.eq("oo.sub_game_id",payOrderDto.getGameId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getPkgId())){
-            queryWrapper.eq("oo.pkg_id",payOrderDto.getPkgId());
-        }
         if (ObjectUtils.isNotEmpty(payOrderDto.getDealId())){
             queryWrapper.in("co.deal_id",payOrderDto.getDealId());
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getChannelTypeId())){
             queryWrapper.eq("co.channel_type_id",payOrderDto.getChannelTypeId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getChannelId())){
-            queryWrapper.eq("co.channel_id",payOrderDto.getChannelId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getChannelSubAccountId())){
-            queryWrapper.eq("co.channel_sub_account_id",payOrderDto.getChannelSubAccountId());
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getBankType())){
             queryWrapper.eq("oo.bank_type",payOrderDto.getBankType());
@@ -328,6 +318,67 @@ public class PayReportServiceImpl  implements IPayReportService {
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getOrderEndTime())){
             queryWrapper.le("oo.open_time",payOrderDto.getOrderEndTime());
+        }
+
+        // 由于op_order表没有渠道字段无法使用统一权限 手动载入权限
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String userId = loginUser.getId();
+        UserDataPermissionRule userDataPermissionRule = sysBaseAPI.getUserDataPermissionRule(userId);
+        List<Integer> gameIdList = new ArrayList<>();
+        if (payOrderDto.getGameId() != null) {
+            gameIdList.add(payOrderDto.getGameId());
+        }
+        if (CollectionUtil.isNotEmpty(userDataPermissionRule.getGameId())) {
+            gameIdList.addAll(userDataPermissionRule.getGameId());
+        }
+        if(CollectionUtil.isNotEmpty(gameIdList)){
+            queryWrapper.in("oo.game_id", gameIdList);
+        }
+
+        List<Integer> subGameIdList = new ArrayList<>();
+        if(payOrderDto.getSubGameId() != null){
+            subGameIdList.add(payOrderDto.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getSubGameId())){
+            subGameIdList.addAll(userDataPermissionRule.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(subGameIdList)){
+            queryWrapper.in("oo.sub_game_id", subGameIdList);
+        }
+
+        List<Integer> pkgIdList = new ArrayList<>();
+        if(payOrderDto.getPkgId()!= null){
+            pkgIdList.add(payOrderDto.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getPkgId())){
+            pkgIdList.addAll(userDataPermissionRule.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(pkgIdList)){
+            queryWrapper.in("oo.pkg_id", pkgIdList);
+        }
+
+        // 只有充值成功的订单有带渠道判断
+        if (Objects.equals(1, payOrderDto.getType())) {
+            List<Integer> channelIdList = new ArrayList();
+            if (payOrderDto.getChannelId() != null) {
+                channelIdList.add(payOrderDto.getChannelId());
+            }
+            if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelId())){
+                channelIdList.addAll(userDataPermissionRule.getChannelId());
+            }
+            if(CollectionUtil.isNotEmpty(channelIdList)){
+                queryWrapper.in("co.channel_id", channelIdList);
+            }
+            List<Integer> channelSubIdList = new ArrayList();
+            if(payOrderDto.getChannelSubAccountId() != null){
+                channelSubIdList.add(payOrderDto.getChannelSubAccountId());
+            }
+            if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelSubAccountId())){
+                channelSubIdList.addAll(userDataPermissionRule.getChannelSubAccountId());
+            }
+            if(CollectionUtil.isNotEmpty(channelSubIdList)){
+                queryWrapper.in("co.channel_sub_account_id", channelSubIdList);
+            }
         }
         List<PayOrderVo> payOrderVos = payReportMapper.queryPayOrderList(page, queryWrapper);
 
@@ -433,27 +484,11 @@ public class PayReportServiceImpl  implements IPayReportService {
         if (ObjectUtils.isNotEmpty(payOrderDto.getOrderType())){
             queryWrapper.eq("oo.order_type",payOrderDto.getOrderType());
         }
-
-        if (ObjectUtils.isNotEmpty(payOrderDto.getGameId())){
-            queryWrapper.eq("oo.game_id",payOrderDto.getGameId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getSubGameId())){
-            queryWrapper.eq("oo.sub_game_id",payOrderDto.getGameId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getPkgId())){
-            queryWrapper.eq("oo.pkg_id",payOrderDto.getPkgId());
-        }
         if (ObjectUtils.isNotEmpty(payOrderDto.getDealId())){
             queryWrapper.in("co.deal_id",payOrderDto.getDealId());
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getChannelTypeId())){
             queryWrapper.eq("co.channel_type_id",payOrderDto.getChannelTypeId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getChannelId())){
-            queryWrapper.eq("co.channel_id",payOrderDto.getChannelId());
-        }
-        if (ObjectUtils.isNotEmpty(payOrderDto.getChannelSubAccountId())){
-            queryWrapper.eq("co.channel_sub_account_id",payOrderDto.getChannelSubAccountId());
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getBankType())){
             queryWrapper.eq("oo.bank_type",payOrderDto.getBankType());
@@ -469,6 +504,67 @@ public class PayReportServiceImpl  implements IPayReportService {
         }
         if (ObjectUtils.isNotEmpty(payOrderDto.getOrderEndTime())){
             queryWrapper.le("oo.open_time",payOrderDto.getOrderEndTime());
+        }
+
+        // 由于op_order表没有渠道字段无法使用统一权限 手动载入权限
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        String userId = loginUser.getId();
+        UserDataPermissionRule userDataPermissionRule = sysBaseAPI.getUserDataPermissionRule(userId);
+        List<Integer> gameIdList = new ArrayList<>();
+        if (payOrderDto.getGameId() != null) {
+            gameIdList.add(payOrderDto.getGameId());
+        }
+        if (CollectionUtil.isNotEmpty(userDataPermissionRule.getGameId())) {
+            gameIdList.addAll(userDataPermissionRule.getGameId());
+        }
+        if(CollectionUtil.isNotEmpty(gameIdList)){
+            queryWrapper.in("oo.game_id", gameIdList);
+        }
+
+        List<Integer> subGameIdList = new ArrayList<>();
+        if(payOrderDto.getSubGameId() != null){
+            subGameIdList.add(payOrderDto.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getSubGameId())){
+            subGameIdList.addAll(userDataPermissionRule.getSubGameId());
+        }
+        if(CollectionUtil.isNotEmpty(subGameIdList)){
+            queryWrapper.in("oo.sub_game_id", subGameIdList);
+        }
+
+        List<Integer> pkgIdList = new ArrayList<>();
+        if(payOrderDto.getPkgId()!= null){
+            pkgIdList.add(payOrderDto.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(userDataPermissionRule.getPkgId())){
+            pkgIdList.addAll(userDataPermissionRule.getPkgId());
+        }
+        if(CollectionUtil.isNotEmpty(pkgIdList)){
+            queryWrapper.in("oo.pkg_id", pkgIdList);
+        }
+
+        // 只有充值成功的订单有带渠道判断
+        if (Objects.equals(1, payOrderDto.getType())) {
+            List<Integer> channelIdList = new ArrayList();
+            if (payOrderDto.getChannelId() != null) {
+                channelIdList.add(payOrderDto.getChannelId());
+            }
+            if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelId())){
+                channelIdList.addAll(userDataPermissionRule.getChannelId());
+            }
+            if(CollectionUtil.isNotEmpty(channelIdList)){
+                queryWrapper.in("co.channel_id", channelIdList);
+            }
+            List<Integer> channelSubIdList = new ArrayList();
+            if(payOrderDto.getChannelSubAccountId() != null){
+                channelSubIdList.add(payOrderDto.getChannelSubAccountId());
+            }
+            if(CollectionUtil.isNotEmpty(userDataPermissionRule.getChannelSubAccountId())){
+                channelSubIdList.addAll(userDataPermissionRule.getChannelSubAccountId());
+            }
+            if(CollectionUtil.isNotEmpty(channelSubIdList)){
+                queryWrapper.in("co.channel_sub_account_id", channelSubIdList);
+            }
         }
 
         PayOrderTotalVo sumPayOrder = payReportMapper.getSumPayOrder(queryWrapper);

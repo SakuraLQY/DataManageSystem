@@ -39,6 +39,10 @@
         <version>3.4.4</version>
         <scope>compile</scope>
       </dependency>
+      <dependency>
+        <groupId>org.jeecgframework.boot</groupId>
+        <artifactId>jeecg-system-local-api</artifactId>
+      </dependency>
     </dependencies>
     <build>
         <!-- 打包名称 -->

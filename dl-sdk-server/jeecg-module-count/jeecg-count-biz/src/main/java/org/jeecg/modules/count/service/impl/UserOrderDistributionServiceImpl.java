@@ -557,15 +557,15 @@ public class UserOrderDistributionServiceImpl extends ServiceImpl<UserDataMapper
 
         StringBuilder stringBuilder = new StringBuilder();
         if(time >= 31556926){
-            stringBuilder.append(time/31556926+"年，");
+            stringBuilder.append(time/31556926+"年");
             time = (time%31556926);
         }
         if(time >= 86400){
-            stringBuilder.append(time/86400+"天，");
+            stringBuilder.append(time/86400+"天");
             time = (time%86400);
         }
         if(time >= 3600){
-            stringBuilder.append(time/3600+"小时，");
+            stringBuilder.append(time/3600+"小时");
             time = (time%3600);
         }
         if(time >= 60){
@@ -686,18 +686,17 @@ public class UserOrderDistributionServiceImpl extends ServiceImpl<UserDataMapper
         queryWrapper.apply("DATE_FORMAT(co.create_time,'%Y-%m-%d')=DATE_FORMAT(co.user_create_time,'%Y-%m-%d')");
 
         queryWrapper.groupBy("userCreateTime","co.user_id","co.pkg_id");
+        queryWrapper.orderByDesc("userCreateTime","co.user_id","co.pkg_id");
 
         List<PayUserStructDataVo> payUserStructs = userDataMapper.getPayUserStruct(queryWrapper);
 
 
-        HashMap<String, Map<String,Integer>> resultMap = new HashMap<>();
+        HashMap<String, Map<String,Integer>> resultMap = new LinkedHashMap<>();
 
 
         for (PayUserStructDataVo payUserStruct : payUserStructs) {
 
             BigDecimal addNum = new BigDecimal(0);
-
-            HashMap<String, Integer> childrenHashMap = new HashMap<>();
 
             String userCreateTime = payUserStruct.getUserCreateTime();
             BigDecimal money = payUserStruct.getMoney();

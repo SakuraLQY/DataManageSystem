@@ -9,6 +9,7 @@
            SUM(count_user)  as countUser,
            SUM(alive_money) as totalMoney
     from ct_daily
+    ${ew.customSqlSegment}
     GROUP BY subGameId, gameId
     ORDER BY gameId;
   </select>

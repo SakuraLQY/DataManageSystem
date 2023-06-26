@@ -3,7 +3,12 @@ package org.jeecg.modules.count.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.count.bo.GetOrderGroupBo;
+import org.jeecg.modules.count.dto.CtUserDto;
+import org.jeecg.modules.count.dto.DetailDto;
+import org.jeecg.modules.count.modal.CtUserModal;
 import org.jeecg.modules.count.vo.OrderDateGroupRateVo;
 import org.jeecg.modules.count.vo.OrderMoneyGroupRateVo;
 import org.jeecg.modules.count.dto.SummaryDto;
@@ -17,6 +22,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.count.entity.CtRole;
 import org.jeecg.modules.count.entity.CtUser;
 import org.jeecg.modules.count.modal.OrderDetailModal;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
+import org.springframework.beans.BeanUtils;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description: ct_order
@@ -116,5 +126,29 @@ public interface ICtOrderService extends IService<CtOrder> {
      * @date 14:56 2023/5/17/017
      **/
     Map<String, BigDecimal> getMoneyGroupRegTimeCreateTime(GetOrderGroupBo getOrderGroupBo);
+
+    /**
+     * @param object
+     * @param clazz
+     * @param title
+     * @return org.springframework.web.servlet.ModelAndView
+     * @author chenyw
+     * @description 导出首次付费比率
+     * @date 17:48 2023/6/19/019
+     **/
+    ModelAndView exportFirstMoneyRateXls(DetailDto object, Class<OrderMoneyGroupRateVo> clazz,
+        String title);
+
+    /**
+     * @param object
+     * @param clazz
+     * @param title
+     * @return org.springframework.web.servlet.ModelAndView
+     * @author chenyw
+     * @description 导出活跃付费比率
+     * @date 18:07 2023/6/19/019
+     **/
+    ModelAndView exportAliveMoneyRateXls(DetailDto object, Class<OrderMoneyGroupRateVo> clazz,
+        String title);
 
 }

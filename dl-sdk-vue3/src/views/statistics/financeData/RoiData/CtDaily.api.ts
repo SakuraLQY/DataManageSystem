@@ -1,5 +1,5 @@
 import { defHttp } from '/@/utils/http/axios';
-import { useMessage } from "/@/hooks/web/useMessage";
+import { useMessage } from '/@/hooks/web/useMessage';
 
 const { createConfirm } = useMessage();
 
@@ -16,6 +16,7 @@ enum Api {
   deleteBatch = '/count/ctUser/deleteBatch',
   importExcel = '/count/ctUser/importExcel',
   exportXls = '/count/ctUser/exportXls',
+  statCustomListexportXls = '/count/ctDaily/statCustomListexportXls',
 }
 
 /**
@@ -24,11 +25,12 @@ enum Api {
  */
 export const getExportUrl = Api.exportXls;
 
-
 /**
  * 导入api
  */
 export const getImportUrl = Api.importExcel;
+
+export const getstatCustomListexportXls = Api.statCustomListexportXls;
 
 /**
  * 列表接口
@@ -83,11 +85,11 @@ export const queryFinanceUserList = (params) => defHttp.get({ url: Api.queryFina
  * @param params
  * @param handleSuccess
  */
-export const deleteOne = (params,handleSuccess) => {
-  return defHttp.delete({url: Api.deleteOne, params}, {joinParamsToUrl: true}).then(() => {
+export const deleteOne = (params, handleSuccess) => {
+  return defHttp.delete({ url: Api.deleteOne, params }, { joinParamsToUrl: true }).then(() => {
     handleSuccess();
   });
-}
+};
 
 /**
  * 批量删除
@@ -102,11 +104,9 @@ export const batchDelete = (params, handleSuccess) => {
     okText: '确认',
     cancelText: '取消',
     onOk: () => {
-      return defHttp.delete({url: Api.deleteBatch, data: params}, {joinParamsToUrl: true}).then(() => {
+      return defHttp.delete({ url: Api.deleteBatch, data: params }, { joinParamsToUrl: true }).then(() => {
         handleSuccess();
       });
-    }
+    },
   });
-}
-
-
+};

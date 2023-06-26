@@ -23,9 +23,12 @@
             </a-col>
           </a-row>
       </a-form>
+      <keep-alive>
       <template v-if="toggleSearchStatus">
       <a-form  :model="configParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
+           <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
+            <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
             <a-col :lg="8">
               <a-form-item label="一级分组">
                 <a-input placeholder="请输入一级分组" v-model:value="configParam.firstGroup"></a-input>
@@ -46,9 +49,6 @@
                 <a-input placeholder="请输入渠道名称" v-model:value="configParam.channelNickName"></a-input>
               </a-form-item>
             </a-col>
-          
-            <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
-            <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
             <a-col :xl="6" :lg="7" :md="8" :sm="24">
               <span style="float: left; overflow: hidden" class="table-page-search-submitButtons">
                 <a-col :lg="6">
@@ -60,7 +60,7 @@
           <div  v-for="(item,index) in weekReportConfig" > 一级分组:{{ item.firstGroup }} &nbsp; 二级分组: {{ item.secondGroup }} &nbsp; 游戏名称:{{ item.gameNickName }} &nbsp; 渠道名称:{{ item.channelNickName }} &nbsp; 游戏名:{{ item.gameName }}&nbsp; 子游戏名:{{ item.subGameName }}&nbsp; 渠道游戏包名:{{ item.pkgName }}&nbsp; 渠道类型:{{ item.channelTypeName }}&nbsp; 渠道:{{ item.channelName }}&nbsp; 渠道子账号:{{ item.channelSubAccountName }}&nbsp;<a-button type="link" @click="deleteConfig(index)">删除</a-button></div>
       </a-form>
     </template>
-      
+  </keep-alive>
     </div>
     <BasicTable v-if = false></BasicTable>
     <a-table :columns="dataColumns" :data-source="dataData" :pagination="false" bordered>
@@ -134,6 +134,15 @@
    * 查询
    */
   function searchQuery() {
+    // 校验
+    if(!queryParam.value.startDate){
+      message.warn("请选择开始时间");
+      return;
+    }
+    if(!queryParam.value.endDate){
+      message.warn("请选择结束时间");
+      return;
+    }
     dataTableTitle.value = queryParam.value.startDate + "~" + queryParam.value.endDate + "数据报表";
     list(queryParam.value).then(res=>{
       //  数据报表
@@ -145,7 +154,6 @@
     });
     queryByConfigName({configName:configName}).then(res=>{
         weekReportConfig.value = res;
-        console.log(res);
         
     })
 
@@ -181,7 +189,10 @@
     });
     const param = getConfigParam();
     saveOrUpdateConfig({configName:configName, config:JSON.stringify(param)}, isUpdate).then(res=>
-      message.success("更新成功")
+      {
+        message.success("更新成功");
+        weekReportConfig.value = res.result;
+      }      
     );
   }
   
@@ -190,7 +201,9 @@
     weekReportConfig.value.splice(index, 1);
     const param = getConfigParam();
     saveOrUpdateConfig({configName:configName, config:JSON.stringify(param)}, true).then(res=>
-      message.success("更新成功")
+      {
+        message.success("更新成功");
+      }      
     );
   }
 

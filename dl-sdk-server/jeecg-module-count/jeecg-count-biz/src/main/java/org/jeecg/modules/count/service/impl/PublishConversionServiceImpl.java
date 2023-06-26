@@ -86,6 +86,9 @@ public class PublishConversionServiceImpl extends
             case "sub_game_id":
                 where.groupBy("sub_game_id");
                 break;
+            case "pkg_id":
+                where.groupBy("pkg_id");
+                break;
             default:
                 where.groupBy("time_daily");
         }
@@ -132,6 +135,11 @@ public class PublishConversionServiceImpl extends
                             conversionVo.setName(subGameName);
                             conversionVo.setTypeId(String.valueOf(conversionBo.getId()));
                             break;
+                        case "pkg_id":
+                            String pkgName=publishConversionMapper.selectByPkgId(conversionBo.getId());
+                            conversionVo.setName(pkgName);
+                            conversionVo.setTypeId(String.valueOf(conversionBo.getId()));
+                            break;
                         default:
                             try {
                                 conversionVo.setName(DateUtil.format(sdf.parse(String.valueOf(conversionBo.getDateTime())), "yyyy-MM-dd"));
@@ -162,8 +170,6 @@ public class PublishConversionServiceImpl extends
                 conversionVo.setValidUser(conversionBo.getCountDau());
                 resList.add(conversionVo);
             }
-        } else {
-            throw new RuntimeException("数据库查询为Null");
         }
         return resList;
     }

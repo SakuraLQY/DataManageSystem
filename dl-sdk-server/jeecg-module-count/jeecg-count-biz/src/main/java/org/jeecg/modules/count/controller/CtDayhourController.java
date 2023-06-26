@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.DayHourDto;
 import org.jeecg.modules.count.vo.CtDayHourVo;
 import org.jeecg.modules.count.vo.CtDayhour;
@@ -73,6 +74,7 @@ public class CtDayhourController extends JeecgController<CtDayhour, ICtDayhourSe
      **/
     @ApiOperation(value = "ct_dayHour查询", notes = "ct_dayHour列表查询")
     @GetMapping(value = "/queryList")
+    @UserPermissionData(alias = "ct_hour")
     public Result<List<CtDayHourVo>> queryList(DayHourDto dayHourDto) {
         List<CtDayHourVo> list = ctDayhourService.queryList(dayHourDto);
         return Result.OK(list);

@@ -225,7 +225,7 @@
    * 删除事件
    */
   async function handleDelete(record) {
-    await deleteOne({ id: record.id }, handleSuccess);
+    await deleteOne({ id: record.id, subGameId: record.subGameId }, handleSuccess);
   }
    
   /**

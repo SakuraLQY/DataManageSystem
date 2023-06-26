@@ -55,4 +55,13 @@ public interface LtvAnalysisMapper extends BaseMapper<LtvAnalysis> {
      * @date 9:58 2023/5/25
      **/
     String selectBySubGameId(Integer id);
+
+    /**
+     * @param id:
+     * @return String
+     * @author Fkh
+     * @description 查询渠道游戏包名字
+     * @date 2023/6/21 13:57
+     */
+    String selectByPkgId(Integer id);
 }

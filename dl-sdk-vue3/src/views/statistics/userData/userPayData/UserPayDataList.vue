@@ -26,10 +26,6 @@
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
                 <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
-                  {{ toggleSearchStatus ? '收起' : '展开' }}
-                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
               </a-col>
             </span>
           </a-col>
@@ -91,11 +87,14 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import GameThirdMuchOptionForm from '/@/views/common/gameThirdMuchOptionForm.vue';
   import ChannelThirdMuchOptionForm from '/@/views/common/channelThirdMuchOptionForm.vue';
+  import { formatToDate } from '/@/utils/dateUtil';
+  import dayjs, { Dayjs } from 'dayjs';
 
   const queryParam = ref<any>({ mode: 1 });
   const toggleSearchStatus = ref<boolean>(true);
   const registerModal = ref();
-  const userTime = ref<Moment[]>([]);
+  const dateFormat = 'YYYY-MM-DD';
+  const userTime = ref<Moment[]>([dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)]);
   const selectGameForm = ref();
   const selectChannelForm = ref();
 
@@ -460,6 +459,7 @@
     selectGameForm.value.reload();
     selectChannelForm.value.reload();
     queryParam.value.mode = 1;
+    userTime.value = [dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)];
     getFirstPay();
     getAccumulatePay();
   }

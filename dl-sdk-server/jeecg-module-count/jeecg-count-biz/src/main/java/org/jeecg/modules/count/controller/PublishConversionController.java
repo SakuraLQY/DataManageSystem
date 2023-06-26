@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.PublishConversionDto;
@@ -82,6 +83,7 @@ public class PublishConversionController extends JeecgController<PublishConversi
 	 **/
 	@ApiOperation(value="publish_conversion-分页列表查询", notes="conversion转换数据查询")
 	@GetMapping("/queryList")
+	@UserPermissionData(alias = "ct_daily")
 	public Result<List<PublishConversionVo>>queryList(PublishConversionDto publishConversionDto){
 		return Result.OK(publishConversionService.queryConversionList(publishConversionDto));
 	}

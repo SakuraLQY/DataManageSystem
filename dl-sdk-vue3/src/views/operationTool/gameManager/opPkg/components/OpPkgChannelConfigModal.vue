@@ -31,7 +31,7 @@
    * @param record
    */
   function edit(record) {
-    title.value = disableSubmit.value ? '详情' : '编辑';
+    title.value = '渠道参数设置';
     visible.value = true;
     nextTick(() => {
       registerForm.value.edit(record);

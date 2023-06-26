@@ -36,7 +36,7 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'createTime',
     customRender: ({ text }) => {
-      return !text ? '' : text.length > 10 ? text.substr(0, 10) : text;
+      return !text ? '' : text;
     },
   },
   {
@@ -49,7 +49,7 @@ export const columns: BasicColumn[] = [
     align: 'center',
     dataIndex: 'updateTime',
     customRender: ({ text }) => {
-      return !text ? '' : text.length > 10 ? text.substr(0, 10) : text;
+      return !text ? '' : text;
     },
   },
   {

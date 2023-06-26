@@ -88,9 +88,10 @@ public class CtReportConfigController extends
     @ApiOperation(value = "ct_report_config-添加", notes = "ct_report_config-添加")
     //@RequiresPermissions("count:ct_report_config:add")
     @PostMapping(value = "/add")
-    public Result<String> add(@RequestBody CtReportConfig ctReportConfig) {
+    public Result<List<JSONObject>> add(@RequestBody CtReportConfig ctReportConfig) {
         ctReportConfigService.save(ctReportConfig);
-        return Result.OK("添加成功！");
+        List<JSONObject> res = service.getByConfigName(ctReportConfig.getConfigName());
+        return Result.OK(res);
     }
 
     /**
@@ -103,11 +104,12 @@ public class CtReportConfigController extends
     @ApiOperation(value = "ct_report_config-编辑", notes = "ct_report_config-编辑")
     //@RequiresPermissions("count:ct_report_config:edit")
     @RequestMapping(value = "/edit", method = {RequestMethod.PUT, RequestMethod.POST})
-    public Result<String> edit(@RequestBody CtReportConfig ctReportConfig) {
+    public Result<List<JSONObject>> edit(@RequestBody CtReportConfig ctReportConfig) {
         LambdaQueryWrapper<CtReportConfig> lambdaQueryWrapper = new LambdaQueryWrapper<CtReportConfig>().eq(
             CtReportConfig::getConfigName, ctReportConfig.getConfigName());
         ctReportConfigService.update(ctReportConfig, lambdaQueryWrapper);
-        return Result.OK("编辑成功!");
+        List<JSONObject> res = service.getByConfigName(ctReportConfig.getConfigName());
+        return Result.OK(res);
     }
 
     /**

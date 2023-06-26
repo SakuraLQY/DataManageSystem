@@ -1,8 +1,10 @@
 package org.jeecg.modules.count.service.impl;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.count.dto.GameChargeDto;
+import org.jeecg.modules.count.entity.CtDaily;
 import org.jeecg.modules.count.vo.CtGameChargeTotal;
 import org.jeecg.modules.count.mapper.CtGameChargeTotalMapper;
 import org.jeecg.modules.count.service.ICtGameChargeTotalService;
@@ -33,7 +35,9 @@ public class CtGameChargeTotalServiceImpl extends ServiceImpl<CtGameChargeTotalM
     public List<GameChargeDto> queryList() {
         List<GameChargeDto>queryList = new ArrayList<>();
         //查出游戏id,子游戏id,注册数，总金额
-        List<CtGameChargeTotal>list = gameChargeTotalMapper.selectParams();
+        // TODO 权限失效
+        QueryWrapper<CtDaily> queryWrapper = new QueryWrapper();
+        List<CtGameChargeTotal> list = gameChargeTotalMapper.selectParams(queryWrapper);
         for (CtGameChargeTotal ctGameChargeTotal : list) {
             GameChargeDto data = new GameChargeDto();
             Integer gameId = ctGameChargeTotal.getGameId();

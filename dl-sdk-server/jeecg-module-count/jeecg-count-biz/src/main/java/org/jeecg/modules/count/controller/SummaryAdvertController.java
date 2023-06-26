@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.SummaryAdvertDto;
 import org.jeecg.modules.count.service.ISummaryAdvertService;
 import org.jeecg.modules.count.vo.SummaryAdvertBarVo;
@@ -33,6 +34,7 @@ public class SummaryAdvertController {
 
     @ApiOperation(value = "获取广告数据明细", notes = "获取广告数据明细")
     @GetMapping(value = "/list")
+    @UserPermissionData(alias = "a")
     public Result<List<SummaryAdvertVo>> queryPageList(SummaryAdvertDto summaryAdvertDto) {
         List<SummaryAdvertVo> res = summaryAdvertService.getSummaryAdvert(summaryAdvertDto);
         return Result.OK(res);

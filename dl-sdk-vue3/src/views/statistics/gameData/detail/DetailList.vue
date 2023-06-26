@@ -42,6 +42,9 @@
                 <a-radio-button value="firstMoneyRate">新增充值比例</a-radio-button>
                 <a-radio-button value="aliveMoneyRate">活跃充值比例</a-radio-button>
               </a-radio-group>
+              <a-radio-group>
+                <a-radio-button v-if="normalBar==false" value="export" @click="exportRate">导出</a-radio-button>
+              </a-radio-group>
             </a-col>
           </a-row>
           <div v-if="normalBar">
@@ -97,6 +100,8 @@
   import {ProfileTwoTone} from '@ant-design/icons-vue'
   import LineMulti from '/@/components/chart/LineMulti.vue';
   import Pie from '/@/components/chart/Pie.vue';
+  import { useMethods } from '/@/hooks/system/useMethods';
+
   const selectGameForm= ref();
   const selectChannelForm= ref();
   const lineMultiData = ref([]);
@@ -179,7 +184,7 @@
         res.forEach((item) => {
           if(item.day != "合计"){
             lineMultiData.value.push({ name: item.day, type: '注册', value: item.countUser });
-            lineMultiData.value.push({ name: item.day, type: '活跃', value: item.aliveUser });
+            lineMultiData.value.push({ name: item.day, type: '活跃', value: item.countDau });
             lineMultiData.value.push({ name: item.day, type: '新增付费', value: item.firstMoney });
             lineMultiData.value.push({ name: item.day, type: '活跃付费', value: item.aliveMoney });
           }
@@ -207,6 +212,23 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
+    //导入导出方法
+    const { handleExportXls, handleImportXls } = useMethods();
+
+    /**
+     * 导出首次付费比率
+     */
+    function exportFirstMoneyRate() {
+      return handleExportXls("首次付费比率", "/count/detail/exportFirstMoneyRate", queryParam.value);
+    }
+
+    /**
+     * 导出活跃付费比率
+     */
+      function exportAliveMoneyRate() {
+      return handleExportXls("活跃付费比率", "/count/detail/exportAliveMoneyRate", queryParam.value);
+    }
+
 
   /**
    * 新增事件
@@ -299,7 +321,10 @@
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {
+      regStartTime: formatToDate(new Date(new Date().getTime() - (6 * 24 * 60 * 60 * 1000))),
+      regEndTime: formatToDate(new Date())
+    };
     // selectedRowKeys.value = [];
     if(queryParam.value.groupType == 8) {
       groupByDealFlag.value = true;
@@ -333,10 +358,18 @@
       normalBar.value = false;
       firstMoneyRateBar.value = true;
       aliveMoneyRateBar.value = false;
-    }else{
+    }else if(type.target.value == "aliveMoneyRate"){
       normalBar.value = false;
       firstMoneyRateBar.value = false;
       aliveMoneyRateBar.value = true;
+    }
+  }
+
+  function exportRate(){
+    if(firstMoneyRateBar.value){
+      exportFirstMoneyRate();
+    }else if(aliveMoneyRateBar.value){
+      exportAliveMoneyRate();
     }
   }
   

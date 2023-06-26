@@ -1,6 +1,7 @@
 package org.jeecg.modules.count.dto;
 
 import java.util.ArrayList;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -22,6 +23,7 @@ public class OrderPurchaseVolumeDto {
     /**
      * 用户ID
      */
+    @Size(max = 10)
     private Integer userId;
 
     /**

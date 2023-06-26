@@ -16,7 +16,7 @@
             </a-col>
             <a-col :lg="8">
               <a-form-item label="展示方式">
-                <j-search-select placeholder="展示方式" v-model:value="queryParam.groupType"  dict="summary_advert_group_type" allowClear />
+                <j-search-select placeholder="展示方式" v-model:value="queryParam.groupType"  dict="summary_group_type" allowClear />
               </a-form-item>
             </a-col>
           </template>
@@ -36,7 +36,7 @@
       </a-form>
     </div>
     <!--引用表格-->
-    <BasicTable @register="registerTable" :rowSelection="rowSelection">
+    <BasicTable @register="registerTable">
       <!--操作栏-->
       <template #action="{ record }">
         <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>

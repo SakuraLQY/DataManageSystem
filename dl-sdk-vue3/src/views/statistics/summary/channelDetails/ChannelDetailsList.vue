@@ -241,7 +241,7 @@ function exportXlS() {
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {showType:'detail',startTime:formatToDate(new Date()),endTime:formatToDate(new Date())};
     selectedRowKeys.value = [];
     //刷新数据
     reload();

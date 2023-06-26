@@ -69,4 +69,13 @@ public interface PayAnalysisMapper extends BaseMapper<PayAnalysis> {
      * @date 17:18 2023/5/24
      **/
     String selectBySubGameId(Integer id);
+
+    /**
+     * @param id: 渠道游戏包id
+     * @return String 渠道游戏包名
+     * @author Fkh
+     * @description 查询渠道游戏包名
+     * @date 2023/6/21 14:26
+     */
+    String selectByPkgId(Integer id);
 }

@@ -98,17 +98,6 @@
     channelId: '',  //今日头条
     channelConf:{}
   });
-  // 监听下拉框变化
-  watch(
-    () => formData.channelId,
-    (newValue, oldValue) => {
-      if(oldValue){
-        // 初次加载不改变值
-        formData.channelConf = {};
-      }
-      
-    },
-  );
   const { createMessage } = useMessage();
   const labelCol = ref<any>({ xs: { span: 24 }, sm: { span: 5 } });
   const wrapperCol = ref<any>({ xs: { span: 24 }, sm: { span: 16 } });
@@ -151,7 +140,9 @@
       if(record.channelConf){
         formData.channelConf = JSON.parse(record.channelConf);
         // 数字类型下拉框无法回显
-        formData.channelConf.createAccountId = formData.channelConf.createAccountId + '';
+        if(formData.channelConf.createAccountId) {
+          formData.channelConf.createAccountId = formData.channelConf.createAccountId + '';
+        }
       }
     });
   }
@@ -168,6 +159,7 @@
     if(model.channelConf){    
       model.channelConf = JSON.stringify(formData.channelConf);
     }
+    
     if(model.channelConf.createAccountId){
       model.channelConf.createAccountId = Number(model.channelConf.createAccountId);
     }

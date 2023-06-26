@@ -655,31 +655,43 @@ public class CtUserServiceImpl extends ServiceImpl<CtUserMapper, CtUser> impleme
             opRegisterLoginSwitchVo.setCreateTime(new Date());
         } else {
             BeanUtils.copyProperties(list.get(0), opRegisterLoginSwitchVo);
-            String[] loginLimitUserArr = opRegisterLoginSwitchVo.getLoginLimitUserId()
-                .split("\\r?\\n");
-            String[] loginLimitIpArr = opRegisterLoginSwitchVo.getLoginLimitIp()
-                .split("\\r?\\n");
+            String[] loginLimitUserArr = null;
+            String[] loginLimitIpArr = null;
+            if (oConvertUtils.isNotEmpty(opRegisterLoginSwitchVo.getLoginLimitUserId())) {
+                loginLimitUserArr = opRegisterLoginSwitchVo.getLoginLimitUserId()
+                    .split("\\r?\\n");
+            }
+            if (oConvertUtils.isNotEmpty(opRegisterLoginSwitchVo.getLoginLimitIp())) {
+                loginLimitIpArr = opRegisterLoginSwitchVo.getLoginLimitIp()
+                    .split("\\r?\\n");
+            }
             List<String> arrList;
             if (Objects.equals(ctUserDto.getType(), BlockadeType.BLOCKADE_USER)) {
-                if (!Arrays.asList(loginLimitUserArr)
+                if (null == loginLimitUserArr ) {
+                    opRegisterLoginSwitchVo.setLoginLimitUserId(String.valueOf(ctUserDto.getUserId()));
+                }else if (!Arrays.asList(loginLimitUserArr)
                     .contains(String.valueOf(ctUserDto.getUserId()))) {
                     opRegisterLoginSwitchVo.setLoginLimitUserId(
                         opRegisterLoginSwitchVo.getLoginLimitUserId() + "\n"
                             + ctUserDto.getUserId());
                 }
             } else if (Objects.equals(ctUserDto.getType(), BlockadeType.BLOCKADE_IP)) {
-                if (!Arrays.asList(loginLimitIpArr)
+                if (null == loginLimitIpArr ) {
+                    opRegisterLoginSwitchVo.setLoginLimitIp(String.valueOf(ctUserDto.getClientIp()));
+                }else if (!Arrays.asList(loginLimitIpArr)
                     .contains(String.valueOf(ctUserDto.getClientIp()))) {
                     opRegisterLoginSwitchVo.setLoginLimitIp(
                         opRegisterLoginSwitchVo.getLoginLimitIp() + "\n"
                             + ctUserDto.getClientIp());
                 }
             } else if (Objects.equals(ctUserDto.getType(), BlockadeType.NOT_BLOCKADE_USER)) {
+                assert loginLimitUserArr != null;
                 arrList = Arrays.asList(loginLimitUserArr);
                 List<String> userArrList = new ArrayList<String>(arrList);
                 userArrList.remove(String.valueOf(ctUserDto.getUserId()));
                 opRegisterLoginSwitchVo.setLoginLimitUserId(String.join("\n", userArrList));
             } else {
+                assert loginLimitIpArr != null;
                 arrList = Arrays.asList(loginLimitIpArr);
                 List<String> ipArrList = new ArrayList<String>(arrList);
                 ipArrList.remove(ctUserDto.getClientIp());

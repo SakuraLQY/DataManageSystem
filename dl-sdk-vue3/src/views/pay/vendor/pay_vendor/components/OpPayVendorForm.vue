@@ -136,6 +136,11 @@
           </a-form-item>
         </a-col>
         <!-- 微信 -->
+        <a-col :span="24">
+          <a-form-item label="微信版本" v-bind="validateInfos.app_id" v-if="formData.payType == 7">
+            <j-search-select v-model:value="formData.version" dict="weixin_version" placeholder="请选择微信版本"  :disabled="disabled" />
+          </a-form-item>
+        </a-col>
         <!-- 应用ID -->
         <a-col :span="24">
           <a-form-item label="应用ID" v-bind="validateInfos.app_id" v-if="formData.payType == 7">
@@ -150,8 +155,8 @@
         </a-col>
         <!-- API V3密钥 -->
         <a-col :span="24">
-          <a-form-item label="API V3密钥" v-bind="validateInfos.api_key" v-if="formData.payType == 7">
-            <a-input v-model:value="formData.api_key" placeholder="请输入API V3密钥" :disabled="disabled"></a-input>
+          <a-form-item label="API 密钥" v-bind="validateInfos.api_key" v-if="formData.payType == 7">
+            <a-input v-model:value="formData.api_key" placeholder="请输入API 密钥" :disabled="disabled"></a-input>
           </a-form-item>
         </a-col>
         <!-- 商户API证书序列号 -->
@@ -188,6 +193,7 @@
   import { useMessage } from '/@/hooks/web/useMessage';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import { getValueType } from '/@/utils';
+  import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
   import { saveOrUpdate } from '../OpPayVendor.api';
   import { options } from '../OpPayVendor.data';
   import { Form } from 'ant-design-vue';
@@ -294,6 +300,7 @@
             formData.api_key = payConf.api_key;
             formData.serial_no = payConf.serial_no;
             formData.private_key = payConf.private_key;
+            formData.version = payConf.version;
         }
         formData.notify_url = payConf.notify_url;
       }
@@ -373,6 +380,7 @@
         payVendorConf.serial_no = model.serial_no;
         payVendorConf.private_key = model.private_key;
         payVendorConf.notify_url = model.notify_url;
+        payVendorConf.version = model.version;
     }
     // 处理最终的数据
     let data = {

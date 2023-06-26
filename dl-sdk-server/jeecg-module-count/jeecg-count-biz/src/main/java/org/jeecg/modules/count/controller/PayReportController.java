@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.DayPayReportDto;
 import org.jeecg.modules.count.dto.MonthPayReportDto;
 import org.jeecg.modules.count.dto.OrderPurchaseVolumeDto;
@@ -47,6 +48,7 @@ public class PayReportController {
 
     @ApiOperation(value="日充值汇总")
     @GetMapping(value = "/dayList")
+    @UserPermissionData(alias = "co")
     public Result<IPage<DayPayReportVo>> queryDayPageList(DayPayReportDto dayPayReportDto,
         @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
         @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -62,6 +64,7 @@ public class PayReportController {
      * @param request
      * @param
      */
+    @UserPermissionData(alias = "co")
     @RequestMapping(value = "/dayExportXls")
     public ModelAndView exportXls(HttpServletRequest request, DayPayReportDto dayPayReportDto) {
         return payReportService.exportXls(request, dayPayReportDto, "日充值汇总");
@@ -69,6 +72,7 @@ public class PayReportController {
 
     @ApiOperation(value="月充值汇总")
     @GetMapping(value = "/monthList")
+    @UserPermissionData(alias = "co")
     public Result<IPage<MonthPayReportVo>> queryMonthPageList(
         MonthPayReportDto monthPayReportController,
         @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -86,6 +90,7 @@ public class PayReportController {
      * @param
      */
     @RequestMapping(value = "/monthExportXls")
+    @UserPermissionData(alias = "co")
     public ModelAndView monthExportXls(HttpServletRequest request, MonthPayReportDto monthPayReportDto) {
         return payReportService.monthExportXls(request, monthPayReportDto, "月充值汇总");
     }
@@ -131,6 +136,7 @@ public class PayReportController {
 
     @ApiOperation(value="充值订单[买量]")
     @GetMapping(value = "/orderPurchaseVolumeList")
+    @UserPermissionData(alias = "co")
     public Result<IPage<OrderPurchaseVolumeVo>> orderPurchaseVolumeList(
         OrderPurchaseVolumeDto orderPurchaseVolumeDto,
         @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -146,6 +152,7 @@ public class PayReportController {
      * @param request
      * @param
      */
+    @UserPermissionData(alias = "co")
     @RequestMapping(value = "/orderPurchaseVolumeExportXls")
     public ModelAndView orderPurchaseVolumeExportXls(HttpServletRequest request, OrderPurchaseVolumeDto orderPurchaseVolumeDto) {
         return payReportService.orderPurchaseVolumeExportXls(request, orderPurchaseVolumeDto, "充值订单[买量]");

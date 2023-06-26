@@ -24,6 +24,9 @@ enum Api {
   frozenBatch = '/sys/user/frozenBatch',
   getUserAgent = '/sys/sysUserAgent/queryByUserName',
   syncUser = '/act/process/extActProcess/doSyncUser',
+  queryDataPermissionTreeList = '/sys/sysUserDataPermission/queryTreeList',
+  queryDataPermission = '/sys/sysUserDataPermission/queryPermission',
+  saveDataPermission = '/sys/sysUserDataPermission/savePermission',
 }
 /**
  * 导出api
@@ -165,3 +168,17 @@ export const saveOrUpdateAgent = (params) => {
  * @param params
  */
 export const syncUser = () => defHttp.put({ url: Api.syncUser });
+
+/**
+ * 根据角色查询树信息
+ * @param params
+ */
+export const queryDataPermissionTreeList = () => defHttp.get({ url: Api.queryDataPermissionTreeList });
+/**
+* 查询角色权限
+*/
+export const queryDataPermission = (params) => defHttp.get({ url: Api.queryDataPermission, params });
+/**
+* 保存角色权限
+*/
+export const saveDataPermission = (params) => defHttp.post({ url: Api.saveDataPermission, params });

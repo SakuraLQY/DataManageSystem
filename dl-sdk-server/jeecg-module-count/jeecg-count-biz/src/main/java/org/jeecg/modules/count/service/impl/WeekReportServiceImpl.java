@@ -394,21 +394,21 @@ public class WeekReportServiceImpl implements IWeekReportService {
                 .divide(BigDecimal.valueOf(detail.getCountUser()), 2, RoundingMode.HALF_UP));
             // ltv
             detail.setLtv1(
-                detail.getPayback1().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback1().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv2(
-                detail.getPayback2().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback2().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv3(
-                detail.getPayback3().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback3().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv4(
-                detail.getPayback4().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback4().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv5(
-                detail.getPayback5().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback5().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv6(
-                detail.getPayback6().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback6().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv7(
-                detail.getPayback7().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback7().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
             detail.setLtv15(
-                detail.getPayback15().divide(BigDecimal.valueOf(detail.getCountUser())));
+                detail.getPayback15().divide(BigDecimal.valueOf(detail.getCountUser()),2, RoundingMode.HALF_UP));
         }
     }
 

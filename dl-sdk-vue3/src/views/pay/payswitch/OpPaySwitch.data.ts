@@ -49,7 +49,19 @@ export const columns: BasicColumn[] = [
   {
     title: '非默认支付',
     align: "center",
-    dataIndex: 'noDefaultPay'
+    dataIndex: 'noDefaultPay',
+    customRender: ({ text }) => {
+      let chooses = "";
+      let values = text.split(",");
+      for(let val of values) {
+        for(let option of options){
+          if(option.value == val){
+            chooses += option.label + ","
+          }
+        }
+      }
+      return chooses.substring(0, chooses.length -1);
+    }
   },
   {
     title: '单笔订单金额',

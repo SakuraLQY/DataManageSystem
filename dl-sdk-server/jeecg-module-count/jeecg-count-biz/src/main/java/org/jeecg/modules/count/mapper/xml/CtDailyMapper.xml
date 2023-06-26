@@ -69,6 +69,7 @@
     <id column="count_dau" property="countDau"/>
     <id column="alive_payuser" property="alivePayuser"/>
     <id column="alive_money" property="aliveMoney"/>
+    <id column="alive_money_ios" property="aliveMoneyIos"/>
   </resultMap>
 
   <resultMap id="SummaryAdvertDailyBo" type="org.jeecg.modules.count.bo.SummaryAdvertDailyBo">
@@ -269,7 +270,8 @@
       sum (a.total_payuser) as total_payuser,
       sum (a.count_dau) as count_dau,
       sum (a.alive_payuser) as alive_payuser,
-      sum (a.alive_money) as alive_money
+      sum (a.alive_money) as alive_money,
+      sum (a.alive_money_ios) AS alive_money_ios
     from ct_daily a
       left join open_gateway.op_deal b
     on a.deal_id = b.id
@@ -417,6 +419,25 @@
     order by t.timeDaily desc
   </select>
 
+  <select id="getRecoveryData" resultType="org.jeecg.modules.count.bo.OverViewBo">
+    select *
+    from (select DATE (a.time_daily) as timeDaily,
+         SUM(a.count_dau) as countDau,
+         SUM(a.first_money) as firstMoney,
+         SUM(a.count_user) as countUser,
+         SUM(a.first_payuser) as firstPayuser,
+         SUM(a.alive_payuser) as alivePayuser,
+         SUM(a.alive_money) as aliveMoney,
+         SUM(a.total_payuser) as totalPayuser,
+         SUM(a.total_money) as totalMoney,
+         SUM(a.total_money_ios) as totalMoneyIos,
+         SUM(a.alive_money_ios) as aliveMoneyIos from `open_countly`.`ct_daily` a
+      left join `open_gateway`.`op_deal` f
+    on a.deal_id = f.id ${ew.customSqlSegment}
+    GROUP BY timeDaily ) as t
+    order by t.timeDaily asc
+  </select>
+
   <select id="getDayReportData" resultType="org.jeecg.modules.count.bo.DayReportBo">
     select DATE (time_daily) as timeDaily,
          pkg_id as pkgId,
@@ -434,13 +455,13 @@
   <select id="getRetentionData" resultType="org.jeecg.modules.count.bo.RetentionBo">
     select ${sql} AS id,
            SUM(a.count_user) AS countUser,
-           SUM(b.day2) AS day2,
-           SUM(b.day3) AS day3,
-           SUM(b.day7) AS day7,
-           SUM(b.day15) AS day15,
-           SUM(b.day30) AS day30,
-           SUM(b.day45) AS day45,
-           SUM(b.day60) AS day60
+           IFNULL(SUM(b.day2), 0) AS day2,
+           IFNULL(SUM(b.day3), 0) AS day3,
+           IFNULL(SUM(b.day7), 0) AS day7,
+           IFNULL(SUM(b.day15), 0) AS day15,
+           IFNULL(SUM(b.day30), 0) AS day30,
+           IFNULL(SUM(b.day45), 0) AS day45,
+           IFNULL(SUM(b.day60), 0) AS day60
     from `open_countly`.`ct_daily` a
       left join `open_countly`.`ct_daily_loyal` b
     on a.id = b.daily_id ${ew.customSqlSegment} GROUP BY ${sql}

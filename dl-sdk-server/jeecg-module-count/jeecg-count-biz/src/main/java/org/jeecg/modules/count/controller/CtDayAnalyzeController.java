@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.modules.count.dto.DailyAnalyzeDto;
 import org.jeecg.modules.count.vo.CtDayAnalyze;
@@ -68,6 +69,7 @@ public class CtDayAnalyzeController extends JeecgController<CtDayAnalyze, ICtDay
      **/
     @ApiOperation(value = "多日分时分析数据", notes = "列表信息查询展示")
     @GetMapping(value = "/queryList")
+    @UserPermissionData(alias = "ct_hour")
     public Result<List<CtDayAnalyze>> queryList(DailyAnalyzeDto dailyAnalyzeDto,
         HttpServletRequest req) {
         return Result.OK(ctDayAnalyzeService.queryList(dailyAnalyzeDto));

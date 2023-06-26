@@ -46,6 +46,8 @@
     <UserAgentModal @register="registerAgentModal" @success="reload" />
     <!--回收站-->
     <UserRecycleBinModal @register="registerModal" @success="reload" />
+    <!--角色菜单授权抽屉-->
+    <DataPermissionDrawer @register="dataPermissionDrawer" />
   </div>
 </template>
 
@@ -54,6 +56,7 @@
   import { ref, computed, unref } from 'vue';
   import { BasicTable, TableAction, ActionItem } from '/@/components/Table';
   import UserDrawer from './UserDrawer.vue';
+  import DataPermissionDrawer from './DataPermissionDrawer.vue';
   import UserRecycleBinModal from './UserRecycleBinModal.vue';
   import PasswordModal from './PasswordModal.vue';
   import UserAgentModal from './UserAgentModal.vue';
@@ -77,6 +80,7 @@
   const [registerPasswordModal, { openModal: openPasswordModal }] = useModal();
   //代理人model
   const [registerAgentModal, { openModal: openAgentModal }] = useModal();
+  const [dataPermissionDrawer, { openDrawer: openDataPermissionDrawer }] = useDrawer();
 
   // 列表页面公共参数、方法
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
@@ -238,6 +242,12 @@
       },
     ];
   }
+   /**
+   * 数据权限授权弹窗
+   */
+   function handlePerssion(record) {
+    openDataPermissionDrawer(true, { userId: record.id });
+  }
   /**
    * 下拉操作栏
    */
@@ -277,6 +287,10 @@
       {
         label: '代理人',
         onClick: handleAgentSettings.bind(null, record.username),
+      },
+      {
+        label: '数据权限',
+        onClick: handlePerssion.bind(null, record),
       },
     ];
   }

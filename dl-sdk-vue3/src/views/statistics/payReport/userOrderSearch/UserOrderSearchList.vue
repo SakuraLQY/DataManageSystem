@@ -6,7 +6,7 @@
         <a-row :gutter="24">
           <a-col :lg="8">
             <a-form-item label="用户名">
-              <a-input v-model:value="queryParam.userName" allowClear />
+              <a-input v-model:value="queryParam.userName" allowClear :maxLength="10" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">

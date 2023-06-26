@@ -17,6 +17,7 @@ import org.jeecg.common.game.vo.OpGameModel;
 import org.jeecg.common.game.vo.OpPkgModel;
 import org.jeecg.common.game.vo.OpSubGameModel;
 import org.jeecg.modules.count.bo.DetailDailyBo;
+import org.jeecg.modules.count.constant.DivideConstant;
 import org.jeecg.modules.count.dto.DetailDto;
 import org.jeecg.modules.count.service.ICtDailyService;
 import org.jeecg.modules.count.service.ICtOrderService;
@@ -167,9 +168,9 @@ public class DetailServiceImpl implements IDetailService {
         }
         // 新增付费率
         if (detailDailyBo.getCountUser() != 0) {
-            detailVo.setFirstMoneyRate(detailDailyBo.getFirstMoney().multiply(new BigDecimal(100))
-                .divide(BigDecimal.valueOf(detailDailyBo.getCountUser()), 2,
-                    RoundingMode.HALF_UP));
+            detailVo.setFirstMoneyRate(new BigDecimal(
+                detailDailyBo.getFirstPayuser() * 100 / detailDailyBo.getCountUser()).setScale(2,
+                BigDecimal.ROUND_HALF_EVEN));
         }
         // 新增ARPU
         if (detailDailyBo.getCountUser() != 0) {
@@ -208,10 +209,9 @@ public class DetailServiceImpl implements IDetailService {
         }
         if (detailDailyBo.getCountDau() != 0) {
             // 活跃付费率
-            detailVo.setAliveMoneyRate(
-                BigDecimal.valueOf(detailDailyBo.getAlivePayuser())
-                    .divide(BigDecimal.valueOf(detailDailyBo.getCountDau()), 2,
-                        RoundingMode.HALF_UP));
+            detailVo.setAliveMoneyRate(new BigDecimal(
+                detailDailyBo.getAlivePayuser() / detailDailyBo.getCountDau() * 100).setScale(2,
+                BigDecimal.ROUND_HALF_EVEN));
             // ARPU
             detailVo.setArpu(detailDailyBo.getAliveMoney()
                 .divide(BigDecimal.valueOf(detailDailyBo.getCountDau()), 2,
@@ -224,7 +224,10 @@ public class DetailServiceImpl implements IDetailService {
                 .divide(BigDecimal.valueOf(detailDailyBo.getAlivePayuser()), 2,
                     RoundingMode.HALF_UP));
         }
-
+        // sdk分成所得
+        detailVo.setSdkShare(detailDailyBo.getAliveMoney()
+            .subtract(detailDailyBo.getAliveMoneyIos().multiply(DivideConstant.IOS))
+            .setScale(2, RoundingMode.HALF_UP));
     }
 
     /**

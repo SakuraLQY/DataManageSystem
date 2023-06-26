@@ -15,6 +15,8 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.count.bo.ChannelAllTempBo;
+import org.jeecg.modules.count.bo.ChannelDetailAllBo;
 import org.jeecg.modules.count.bo.ChannelDetailBo;
 import org.jeecg.modules.count.bo.ChannelDetailTempBo;
 import org.jeecg.modules.count.bo.ChannelTotalBo;
@@ -93,6 +95,8 @@ public class ChannelDetailsServiceImpl extends
                 ChannelTotalBo channelDetailTempBo = new ChannelTotalBo();
                 BeanUtils.copyProperties(tempDatum, channelDetailTempBo);
                 BeanUtils.copyProperties(channelDetailTempBo, channelDetailVo);
+                String dateTime = DateUtil.format(tempDatum.getTimeDaily(), "yyyy-MM-dd");
+                channelDetailVo.setTimeDaily(dateTime);
                 channelDetailVo.setGameName("全部游戏");
                 channelDetailVo.setSubGameName("全部子游戏");
                 channelDetailVo.setChannel("全部渠道");
@@ -107,9 +111,11 @@ public class ChannelDetailsServiceImpl extends
                     (int)tempDatum.getSubGameName());
                 String channelName = channelDetailsMapper.getChannelNameById(
                     (int)tempDatum.getChannel());
+                String dateTime = DateUtil.format(tempDatum.getTimeDaily(), "yyyy-MM-dd");
                 channelDetailVo.setGameName(gameName);
                 channelDetailVo.setSubGameName(subGameName);
                 channelDetailVo.setChannel(channelName);
+                channelDetailVo.setTimeDaily(dateTime);
             }
             //计算激活注册率
             if (tempDatum.getCountActiveDev() != 0) {
@@ -132,23 +138,21 @@ public class ChannelDetailsServiceImpl extends
             //计算新增arpu
             if (tempDatum.getCountUser() != 0) {
                 BigDecimal firstArpu = BigDecimal.valueOf(tempDatum.getFirstMoney())
-                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
-                channelDetailVo.setArpu(firstArpu);
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2, RoundingMode.HALF_UP);
+                channelDetailVo.setFirstArpu(firstArpu);
             }else{
                 channelDetailVo.setFirstArpu(BigDecimal.ZERO);
             }
             //计算新增arppu
             if (tempDatum.getFirstPayUser() != 0) {
                 BigDecimal firstArppu = BigDecimal.valueOf(tempDatum.getFirstMoney())
-                    .divide(BigDecimal.valueOf(tempDatum.getFirstPayUser()),2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                    .divide(BigDecimal.valueOf(tempDatum.getFirstPayUser()),2, RoundingMode.HALF_UP);
                 channelDetailVo.setFirstArppu(firstArppu);
             }else{
                 channelDetailVo.setFirstArppu(BigDecimal.ZERO);
             }
             //计算老用户付费数
-            Integer oldPayUser = tempDatum.getCountUser() - tempDatum.getFirstPayUser();
+            Integer oldPayUser = tempDatum.getAlivePayUser() - tempDatum.getFirstPayUser();
             channelDetailVo.setOldPayUser(oldPayUser);
             //计算老用户付费金额
             BigDecimal oldMoney = BigDecimal.valueOf(tempDatum.getAliveMoney())
@@ -159,7 +163,7 @@ public class ChannelDetailsServiceImpl extends
             BigDecimal oldDau = BigDecimal.valueOf(tempDatum.getDau())
                 .subtract(BigDecimal.valueOf(tempDatum.getCountUser()));
             if (!oldDau.equals(BigDecimal.ZERO) ) {
-                BigDecimal oldPayRate = BigDecimal.valueOf(oldPayUser).divide(oldDau,2, RoundingMode.HALF_UP)
+                BigDecimal oldPayRate = BigDecimal.valueOf(oldPayUser).divide(oldDau,1, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100));
                 channelDetailVo.setOldPayRate(oldPayRate+"%");
             }else{
@@ -167,16 +171,14 @@ public class ChannelDetailsServiceImpl extends
             }
             //计算老用户的arpu
             if(!oldDau.equals(BigDecimal.ZERO)){
-                BigDecimal oldArpu = oldMoney.divide(oldDau,2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                BigDecimal oldArpu = oldMoney.divide(oldDau,2, RoundingMode.HALF_UP);
                 channelDetailVo.setOldArpu(oldArpu);
             }else{
                 channelDetailVo.setOldArpu(BigDecimal.ZERO);
             }
             //计算老用户的arppu
             if(oldPayUser!=0){
-                BigDecimal oldArppu = oldMoney.divide(BigDecimal.valueOf(oldPayUser),2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                BigDecimal oldArppu = oldMoney.divide(BigDecimal.valueOf(oldPayUser),2, RoundingMode.HALF_UP);
                 channelDetailVo.setOldArppu(oldArppu);
             }else{
                 channelDetailVo.setOldArppu(BigDecimal.ZERO);
@@ -184,8 +186,7 @@ public class ChannelDetailsServiceImpl extends
             //计算arpu
             if(tempDatum.getDau()!=0){
                 BigDecimal arpu = BigDecimal.valueOf(tempDatum.getAlivePayUser())
-                    .divide(BigDecimal.valueOf(tempDatum.getDau()),2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                    .divide(BigDecimal.valueOf(tempDatum.getDau()),2, RoundingMode.HALF_UP);
                 channelDetailVo.setArpu(arpu);
             }else{
                 channelDetailVo.setArpu(BigDecimal.ZERO);
@@ -193,8 +194,7 @@ public class ChannelDetailsServiceImpl extends
             //计算arppu
             if(tempDatum.getAlivePayUser()!=0){
                 BigDecimal arppu = BigDecimal.valueOf(tempDatum.getAliveMoney())
-                    .divide(BigDecimal.valueOf(tempDatum.getAlivePayUser()),2, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+                    .divide(BigDecimal.valueOf(tempDatum.getAlivePayUser()),2, RoundingMode.HALF_UP);
                 channelDetailVo.setArppu(arppu);
             }else{
                 channelDetailVo.setArppu(BigDecimal.ZERO);
@@ -208,9 +208,320 @@ public class ChannelDetailsServiceImpl extends
             }else{
                 channelDetailVo.setTotalPayRate(String.valueOf(BigDecimal.ZERO));
             }
+            //计算ltv
+            if(tempDatum.getCountUser()!=0){
+               BigDecimal ltv1 =  tempDatum.getLtv1()
+                   .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+               channelDetailVo.setLtv1(ltv1);
+            }else{
+                channelDetailVo.setLtv1(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv2 =  tempDatum.getLtv2()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv2(ltv2);
+            }else{
+                channelDetailVo.setLtv2(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv2 =  tempDatum.getLtv2()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv1(ltv2);
+            }else{
+                channelDetailVo.setLtv2(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv3 =  tempDatum.getLtv3()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv3(ltv3);
+            }else{
+                channelDetailVo.setLtv3(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv4 =  tempDatum.getLtv4()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv4(ltv4);
+            }else{
+                channelDetailVo.setLtv4(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv5 =  tempDatum.getLtv5()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv5(ltv5);
+            }else{
+                channelDetailVo.setLtv5(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv6 =  tempDatum.getLtv6()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv6(ltv6);
+            }else{
+                channelDetailVo.setLtv6(BigDecimal.ZERO);
+            }
+            if(tempDatum.getCountUser()!=0){
+                BigDecimal ltv7 =  tempDatum.getLtv7()
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP);
+                channelDetailVo.setLtv7(ltv7);
+            }else{
+                channelDetailVo.setLtv7(BigDecimal.ZERO);
+            }
+            //计算留存
+            if(tempDatum.getLoyal()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal = BigDecimal.valueOf(tempDatum.getLoyal())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal(loyal+"%");
+            }else{
+                channelDetailVo.setLoyal("0");
+            }
+            if(tempDatum.getLoyal3()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal3 = BigDecimal.valueOf(tempDatum.getLoyal3())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal3(loyal3+"%");
+            }else{
+                channelDetailVo.setLoyal3("0");
+            }
+            if(tempDatum.getLoyal4()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal4 = BigDecimal.valueOf(tempDatum.getLoyal4())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal4(loyal4+"%");
+            }else{
+                channelDetailVo.setLoyal4("0");
+            }
+            if(tempDatum.getLoyal5()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal5 = BigDecimal.valueOf(tempDatum.getLoyal5())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal5(loyal5+"%");
+            }else{
+                channelDetailVo.setLoyal5("0");
+            }
+            if(tempDatum.getLoyal6()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal6 = BigDecimal.valueOf(tempDatum.getLoyal6())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal6(loyal6+"%");
+            }else{
+                channelDetailVo.setLoyal6("0");
+            }
+            if(tempDatum.getLoyal7()!=null && tempDatum.getCountUser()!=0){
+                BigDecimal loyal7 = BigDecimal.valueOf(tempDatum.getLoyal7())
+                    .divide(BigDecimal.valueOf(tempDatum.getCountUser()),2,RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+                channelDetailVo.setLoyal7(loyal7+"%");
+            }else{
+                channelDetailVo.setLoyal7("0");
+            }
             list.add(channelDetailVo);
         }
+        //todo 计算合计栏
+        ChannelDetailVo allChannelVo = new ChannelDetailVo();
+        allChannelVo.setTimeDaily("合计");
+        allChannelVo.setGameName("---");
+        allChannelVo.setChannel("---");
+        allChannelVo.setSubGameName("---");
+        ChannelDetailAllBo channelDetailAllBo = channelDetailsMapper.getSumChannel(q);
+        ChannelAllTempBo temp = new ChannelAllTempBo();
+        BeanUtils.copyProperties(channelDetailAllBo,temp);
+        BeanUtils.copyProperties(temp,allChannelVo);
+        //计算激活注册率
+        if(channelDetailAllBo.getCountUser()!=null && channelDetailAllBo.getCountActiveDev()!=0){
+           BigDecimal activeRate =  BigDecimal.valueOf(channelDetailAllBo.getCountUser())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountActiveDev()),1,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setActiveRate(activeRate+"%");
+        }else{
+            allChannelVo.setActiveRate("0");
+        }
+        //计算老用户付费数
+        Integer alivePayUser = channelDetailAllBo.getAlivePayUser();
+        Integer firstPayUser = channelDetailAllBo.getFirstPayUser();
+        Integer oldPayUser = alivePayUser-firstPayUser;
+        allChannelVo.setOldPayUser(oldPayUser);
+        //计算老用户的dau
+        Integer oldDau = channelDetailAllBo.getDau()- channelDetailAllBo.getCountUser();
+        //计算老用户的付费金额
+        Integer oldPayMoney = channelDetailAllBo.getAliveMoney()- channelDetailAllBo.getFirstMoney();
+        allChannelVo.setOldMoney(BigDecimal.valueOf(oldPayMoney));
+        //计算老用户的付费率
+        if(oldPayUser!=null && oldDau!=0){
+            BigDecimal oldPayRate = BigDecimal.valueOf(oldPayUser)
+                .divide(BigDecimal.valueOf(oldDau),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setOldPayRate(oldPayRate+"%");
+        }else{
+            allChannelVo.setOldPayRate("0");
+        }
+        //计算老用户的arpu
+        if(oldPayMoney!=null && oldDau!=0){
+            BigDecimal oldArpu = BigDecimal.valueOf(oldPayMoney)
+                .divide(BigDecimal.valueOf(oldDau),2,RoundingMode.HALF_UP);
+            allChannelVo.setOldArpu(oldArpu);
+        }else{
+            allChannelVo.setOldArpu(BigDecimal.ZERO);
+        }
+        //计算老用户的arppu
+        if(oldPayMoney!=null && oldPayUser!=0){
+            BigDecimal oldArppu = BigDecimal.valueOf(oldPayMoney)
+                .divide(BigDecimal.valueOf(oldPayUser),2,RoundingMode.HALF_UP);
+            allChannelVo.setOldArppu(oldArppu);
+        }else{
+            allChannelVo.setOldArppu(BigDecimal.ZERO);
+        }
+        //计算新增Arpu
+        if(channelDetailAllBo.getFirstMoney()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal firstArpu = BigDecimal.valueOf(channelDetailAllBo.getFirstMoney())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setFirstArpu(firstArpu);
+        }else{
+            allChannelVo.setFirstArpu(BigDecimal.ZERO);
+        }
+        //计算新增Arpu
+        if(channelDetailAllBo.getFirstMoney()!=null && channelDetailAllBo.getFirstPayUser()!=0){
+            BigDecimal firstArppu = BigDecimal.valueOf(channelDetailAllBo.getFirstMoney())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getFirstPayUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setFirstArppu(firstArppu);
+        }else{
+            allChannelVo.setFirstArppu(BigDecimal.ZERO);
+        }
+        //计算ARPU
+        if(channelDetailAllBo.getAliveMoney()!=null && channelDetailAllBo.getDau()!=0){
+            BigDecimal arpu = BigDecimal.valueOf(channelDetailAllBo.getAliveMoney())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getDau()),2,RoundingMode.HALF_UP);
+            allChannelVo.setArpu(arpu);
+        }else{
+            allChannelVo.setArpu(BigDecimal.ZERO);
+        }
+        //計算ARPPU
+        if(channelDetailAllBo.getFirstMoney()!=null && channelDetailAllBo.getAlivePayUser()!=0){
+            BigDecimal arppu = BigDecimal.valueOf(channelDetailAllBo.getFirstMoney())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getAlivePayUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setArppu(arppu);
+        }else{
+            allChannelVo.setArppu(BigDecimal.ZERO);
+        }
+        //计算新增付费率
+        if(channelDetailAllBo.getFirstPayUser()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal firstPayRate = BigDecimal.valueOf(channelDetailAllBo.getFirstPayUser())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setFirstPayRate(firstPayRate+"%");
+        }else{
+            allChannelVo.setFirstPayRate("0");
+        }
+        //计算总付费率
+        if(channelDetailAllBo.getAlivePayUser()!=null && channelDetailAllBo.getDau()!=0){
+            BigDecimal totalRate = BigDecimal.valueOf(channelDetailAllBo.getAlivePayUser())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getDau()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setTotalPayRate(totalRate+"%");
+        }else{
+            allChannelVo.setTotalPayRate("0");
+        }
+        //计算LTV
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv1 = channelDetailAllBo.getLtv1()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv1(ltv1);
+        }else{
+            allChannelVo.setLtv1(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv2 = channelDetailAllBo.getLtv2()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv2(ltv2);
+        }else{
+            allChannelVo.setLtv2(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv3 = channelDetailAllBo.getLtv3()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv3(ltv3);
+        }else{
+            allChannelVo.setLtv3(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv4 = channelDetailAllBo.getLtv4()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv4(ltv4);
+        }else{
+            allChannelVo.setLtv4(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv5 = channelDetailAllBo.getLtv5()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv5(ltv5);
+        }else{
+            allChannelVo.setLtv5(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv6 = channelDetailAllBo.getLtv6()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv6(ltv6);
+        }else{
+            allChannelVo.setLtv6(BigDecimal.ZERO);
+        }
+        if(channelDetailAllBo.getCountUser()!=0){
+            BigDecimal ltv7 = channelDetailAllBo.getLtv7()
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP);
+            allChannelVo.setLtv7(ltv7);
+        }else{
+            allChannelVo.setLtv7(BigDecimal.ZERO);
+        }
+        //计算留存
+        if(channelDetailAllBo.getLoyal()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal = BigDecimal.valueOf(channelDetailAllBo.getLoyal())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal(loyal+"%");
+        }else{
+            allChannelVo.setLoyal("0");
+        }
+        if(channelDetailAllBo.getLoyal3()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal3 = BigDecimal.valueOf(channelDetailAllBo.getLoyal3())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal3(loyal3+"%");
+        }else{
+            allChannelVo.setLoyal3("0");
+        }
+        if(channelDetailAllBo.getLoyal4()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal4 = BigDecimal.valueOf(channelDetailAllBo.getLoyal4())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal4(loyal4+"%");
+        }else{
+            allChannelVo.setLoyal4("0");
+        }
+        if(channelDetailAllBo.getLoyal5()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal5 = BigDecimal.valueOf(channelDetailAllBo.getLoyal5())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal5(loyal5+"%");
+        }else{
+            allChannelVo.setLoyal5("0");
+        }
+        if(channelDetailAllBo.getLoyal6()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal6 = BigDecimal.valueOf(channelDetailAllBo.getLoyal6())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal6(loyal6+"%");
+        }else{
+            allChannelVo.setLoyal6("0");
+        }
+        if(channelDetailAllBo.getLoyal7()!=null && channelDetailAllBo.getCountUser()!=0){
+            BigDecimal loyal7 = BigDecimal.valueOf(channelDetailAllBo.getLoyal7())
+                .divide(BigDecimal.valueOf(channelDetailAllBo.getCountUser()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allChannelVo.setLoyal7(loyal7+"%");
+        }else{
+            allChannelVo.setLoyal7("0");
+        }
+        list.add(allChannelVo);
         return list;
+
     }
 
     @Override

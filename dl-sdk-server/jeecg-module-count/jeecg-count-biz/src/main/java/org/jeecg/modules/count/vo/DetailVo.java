@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import lombok.Data;
+import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
  * @Description: SummaryVo
@@ -62,6 +63,9 @@ public class DetailVo implements Serializable {
     /** 老用户arppu (aliveMoney-firstMoney)/(alivePayuser-firstPayuser) */
     @ApiModelProperty(value = "老用户ARPPU")
     private BigDecimal oldUserArppu = BigDecimal.ZERO;
+    /** 累计付费金额*/
+    @ApiModelProperty(value = "累计付费金额")
+    private Integer totalMoney = 0;
     /** DAU 日活*/
     @ApiModelProperty(value = "DAU")
     private Integer countDau = 0;
@@ -83,4 +87,8 @@ public class DetailVo implements Serializable {
     /** 推广费用 */
     @ApiModelProperty(value = "推广费用")
     private BigDecimal costMoney = BigDecimal.ZERO;
+    /**sdk分成所得*/
+    @Excel(name = "sdk分成所得", width = 15)
+    @ApiModelProperty(value = "sdk分成所得")
+    private BigDecimal sdkShare;
 }

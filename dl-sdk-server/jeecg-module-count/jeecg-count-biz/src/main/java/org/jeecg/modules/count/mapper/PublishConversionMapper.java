@@ -1,15 +1,12 @@
 package org.jeecg.modules.count.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import io.swagger.models.auth.In;
 import java.util.List;
-
 import org.apache.ibatis.annotations.Param;
-import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.modules.count.bo.ConversionBo;
 import org.jeecg.modules.count.entity.PublishConversion;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * @Description: publish_conversion
@@ -33,6 +30,8 @@ public interface PublishConversionMapper extends BaseMapper<PublishConversion> {
     String selectByGameId(Integer id);
 
     String selectBySubGameId(Integer id);
+
+    String selectByPkgId(Integer id);
 
     List<ConversionBo> queryConversionByTypeOther(@Param("type")String type,@Param(Constants.WRAPPER) QueryWrapper where);
 }

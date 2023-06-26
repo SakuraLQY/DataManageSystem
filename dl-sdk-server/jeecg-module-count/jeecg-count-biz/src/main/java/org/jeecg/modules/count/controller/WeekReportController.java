@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.SummaryDealInfoDataDto;
 import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.modules.count.service.ISummaryService;
@@ -34,6 +35,7 @@ public class WeekReportController {
 
     @ApiOperation(value = "数据周报", notes = "获取数据周报")
     @GetMapping(value = "/list")
+    @UserPermissionData(alias = "a")
     public Result<WeekReportVo> queryPageList(String startDate, String endDate) {
         WeekReportVo weekReportData = weekReportService.getWeekReportData(startDate, endDate);
         return Result.OK(weekReportData);

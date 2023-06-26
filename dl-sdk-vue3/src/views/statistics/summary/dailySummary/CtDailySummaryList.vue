@@ -680,9 +680,11 @@ if(res[0][4].level==="在线人数"){
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {createTime:formatToDate(new Date())};
     selectedRowKeys.value = [];
     //刷新数据
+    // selectGameForm.value.reload();
+    // selectChannelForm.value.reload();
     reload();
   }
   defineProps({

@@ -84,12 +84,15 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import GameThirdMuchOptionForm from '/@/views/common/gameThirdMuchOptionForm.vue';
   import ChannelThirdMuchOptionForm from '/@/views/common/channelThirdMuchOptionForm.vue';
+  import { formatToDate } from '/@/utils/dateUtil';
+  import dayjs, { Dayjs } from 'dayjs';
 
   const queryParam = ref<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
-  const orderTime = ref<Moment[]>([]);
-  const userTime = ref<Moment[]>([]);
+  const dateFormat = 'YYYY-MM-DD';
+  const orderTime = ref<Moment[]>([dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)]);
+  const userTime = ref<Moment[]>([dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)]);
   const selectGameForm = ref();
   const selectChannelForm = ref();
 
@@ -103,6 +106,24 @@
     queryParam.value.channelId = e.channelId;
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
+  changeDate();
+  function changeDate() {
+    if (orderTime.value != null && orderTime.value.length > 0) {
+      queryParam.value.orderStartTime = orderTime.value[0].format('YYYY-MM-DD') + ' 00:00:00';
+      queryParam.value.orderEndTime = orderTime.value[1].format('YYYY-MM-DD') + ' 23:59:59';
+    } else {
+      queryParam.value.orderStartTime = null;
+      queryParam.value.orderEndTime = null;
+    }
+
+    if (userTime.value != null && userTime.value.length > 0) {
+      queryParam.value.userStartTime = userTime.value[0].format('YYYY-MM-DD') + ' 00:00:00';
+      queryParam.value.userEndTime = userTime.value[1].format('YYYY-MM-DD') + ' 23:59:59';
+    } else {
+      queryParam.value.userStartTime = null;
+      queryParam.value.userEndTime = null;
+    }
+  }
   //注册table数据
   const { prefixCls, tableContext, onExportXls, onImportXls } = useListPage({
     tableProps: {
@@ -245,11 +266,12 @@
   function searchReset() {
     queryParam.value = {};
     selectedRowKeys.value = [];
-    userTime.value = [];
-    orderTime.value = [];
     //刷新数据
     selectGameForm.value.reload();
     selectChannelForm.value.reload();
+    userTime.value = [dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)];
+    orderTime.value = [dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)];
+    changeDate();
     reload();
   }
 </script>

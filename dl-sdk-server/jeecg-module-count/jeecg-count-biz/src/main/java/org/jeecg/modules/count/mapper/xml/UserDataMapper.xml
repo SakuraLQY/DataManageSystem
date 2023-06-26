@@ -17,10 +17,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE(co.user_create_time)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE(co.create_time)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE(co.user_create_time)=DATE(co.create_time)
     </if>
   </select>
 
@@ -28,10 +28,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-     where DATE(co.create_time)=DATE(co.user_create_time)
+     where DATE(co.user_create_time)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE(co.create_time)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE(co.user_create_time)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -41,10 +41,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 1 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 1 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 1 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -52,10 +52,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 1 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 1 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 1 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -65,10 +65,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 2 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 2 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 2 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -76,10 +76,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 2 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 2 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 2 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -89,10 +89,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 3 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 3 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 3 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -100,10 +100,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 3 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 3 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 3 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -113,10 +113,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 4 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 4 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 4 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -124,10 +124,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 4 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 4 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 4 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -137,10 +137,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 5 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 5 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 5 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -148,10 +148,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 5 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 5 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 5 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t
@@ -161,10 +161,10 @@
     select count(distinct co.user_id) as count
     from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 6 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 6 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 6 day)=DATE(co.create_time)
     </if>
   </select>
 
@@ -172,10 +172,10 @@
     select count(*) as count from
     (select co.user_id from `open_countly`.ct_order as co
     <if test="ew.emptyOfWhere">
-      where DATE(co.create_time)=DATE(co.user_create_time)
+      where DATE_ADD(co.user_create_time,interval 6 day)=DATE(co.create_time)
     </if>
     <if test="ew.emptyOfWhere==false">
-      ${ew.customSqlSegment} and DATE_ADD(co.create_time,interval 6 day)=DATE(co.user_create_time)
+      ${ew.customSqlSegment} and DATE_ADD(co.user_create_time,interval 6 day)=DATE(co.create_time)
     </if>
     group by co.user_id
     having count(co.user_id)>1 ) as t

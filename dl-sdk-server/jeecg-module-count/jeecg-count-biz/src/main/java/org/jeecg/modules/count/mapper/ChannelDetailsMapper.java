@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.jeecg.modules.count.bo.ChannelDetailAllBo;
 import org.jeecg.modules.count.bo.ChannelDetailBo;
 import org.jeecg.modules.count.bo.ChannelTotalBo;
 import org.jeecg.modules.count.entity.ChannelDetails;
@@ -54,4 +55,11 @@ public interface ChannelDetailsMapper extends BaseMapper<ChannelDetails> {
      * @date  17:05 2023/05/13
      **/
     String getChannelNameById(Integer channelId);
+
+    /**@param  q
+     * @author chenglin
+     * @description
+     * @date  11:46 获取合计数据
+     **/
+    ChannelDetailAllBo getSumChannel(@Param(Constants.WRAPPER) QueryWrapper q);
 }

@@ -25,7 +25,7 @@
             </a-col>
             <a-col :lg="8">
               <a-form-item label="对比维度">
-                <j-dict-select-tag   placeholder="请输入对比维度"  v-model:value="queryParam.level" :options =" compareLevelOption">
+                <j-dict-select-tag placeholder="请输入对比维度"  v-model:value="queryParam.level" :showChooseOption="false"  :options =" compareLevelOption">
               
                 </j-dict-select-tag>
                   <!-- <a-select-option @click="toclick(item.id)" v-for="(item,index) in mylist" :value="index">{{item.type}}</a-select-option>
@@ -322,7 +322,7 @@
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {level:'count_active',startTime:formatToDate(new Date()),endTime:formatToDate(new Date())};
     selectedRowKeys.value = [];
     //刷新数据
     reload();

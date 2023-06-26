@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.PayUserStructDto;
 import org.jeecg.modules.count.dto.UserAccumulateLevelDto;
 import org.jeecg.modules.count.dto.UserOrderDistributionDto;
@@ -38,6 +39,7 @@ public class UserOrderDataController {
     private IUserOrderDistributionService iUserOrderDistributionService;
     @ApiOperation(value="首日付费")
     @GetMapping(value = "/userOrderDistribution")
+    @UserPermissionData(alias = "co")
     public Result<ListUserOrderDistributionVo> userOrderDistribution(
         UserOrderDistributionDto userOrderDistributionDto,
         @RequestParam(name="isOneDay", defaultValue="true") Boolean isOneDay) {
@@ -49,6 +51,7 @@ public class UserOrderDataController {
 
     @ApiOperation(value="累计付费")
     @GetMapping(value = "/userAccumulatePay")
+    @UserPermissionData(alias = "co")
     public Result<ListUserOrderDistributionVo> userAccumulatePay(
         UserOrderDistributionDto userOrderDistributionDto) {
         ListUserOrderDistributionVo listUserOrderDistributionVo = iUserOrderDistributionService
@@ -58,6 +61,7 @@ public class UserOrderDataController {
 
     @ApiOperation(value="用户首充等级分布数据")
     @GetMapping(value = "/getUserAccumulateLevel")
+    @UserPermissionData(alias = "co")
     public Result<UserFirstPayVo> getUserAccumulateLevel(
         UserAccumulateLevelDto userAccumulateLevelDto) {
         UserFirstPayVo data = iUserOrderDistributionService
@@ -67,6 +71,7 @@ public class UserOrderDataController {
 
     @ApiOperation(value="用户二次付费数据")
     @GetMapping(value = "/getPayUserTwoPay")
+    @UserPermissionData(alias = "co")
     public Result<ArrayList> getPayUserTwoPay(
         UserTwoPayDto userTwoPayDto) {
         UserTwoPayVo payUserTwoPay = iUserOrderDistributionService.getPayUserTwoPay(userTwoPayDto);
@@ -77,6 +82,7 @@ public class UserOrderDataController {
 
     @ApiOperation(value="充值结构数据")
     @GetMapping(value = "/getPayUserStruct")
+    @UserPermissionData(alias = "co")
     public Result<ArrayList<Map>> getPayUserStruct(
         PayUserStructDto payUserStructDto) {
         ArrayList<Map> payUserStruct = iUserOrderDistributionService

@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.ComputePayDto;
@@ -82,6 +83,7 @@ public class ComputeMoneyController extends JeecgController<ComputeMoney, ICompu
 	 **/
 	 @ApiOperation(value="data_tool-计算付费列表查询", notes="data_tool-分页列表查询")
 	 @GetMapping(value = "/queryList")
+	 @UserPermissionData(alias = {"a","ct_user"})
 	public Result<List<ComputePayVo>>queryList(ComputePayDto computePayDto){
 		return Result.OK(computeMoneyService.queryList(computePayDto));
 	}

@@ -1,5 +1,6 @@
 package org.jeecg.modules.count.dto;
 
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -21,5 +22,6 @@ public class UserOrderDto {
     /**
      * 用户ID
      */
+    @Size(max = 10)
     private Integer userId;
 }

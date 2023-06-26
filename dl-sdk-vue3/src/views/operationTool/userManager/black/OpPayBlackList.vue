@@ -13,8 +13,8 @@
            <a-form-item label="游戏名">
              <j-search-select v-if="queryParam.ruleType === undefined || queryParam.ruleType === null || queryParam.ruleType === ''" v-model:value="queryParam.ruleId" placeholder="请先选择规则类型" allowClear/>
               <j-search-select v-if="queryParam.ruleType === '0'" v-model:value="queryParam.ruleId" dict="open_gateway.op_game,game_name,id"  placeholder="请选择游戏" allowClear/>
-              <j-search-select v-if="queryParam.ruleType === '1'" v-model:value="queryParam.ruleId" dict="open_gateway.op_sub_game,game_name,id"  placeholder="请选择子游戏" allowClear/>
-              <j-search-select v-if="queryParam.ruleType === '2'" v-model:value="queryParam.ruleId" dict="open_gateway.op_pkg,pkg_name,id"  placeholder="请选择渠道游戏包" allowClear/>
+              <j-search-select v-if="queryParam.ruleType === '1'" v-model:value="queryParam.ruleId" dict="open_gateway.op_sub_game where status = 0,game_name,id"  placeholder="请选择子游戏" allowClear/>
+              <j-search-select v-if="queryParam.ruleType === '2'" v-model:value="queryParam.ruleId" dict="open_gateway.op_pkg where status = 0,pkg_name,id"  placeholder="请选择渠道游戏包" allowClear/>
             <!-- <a-select v-model:value="queryParam.ruleId" placeholder="请选择游戏" >
                 <a-select-option
                   v-for="(optionItem,index) in gameList"

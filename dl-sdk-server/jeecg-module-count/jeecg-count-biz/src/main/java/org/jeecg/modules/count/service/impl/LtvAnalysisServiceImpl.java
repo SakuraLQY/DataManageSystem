@@ -83,6 +83,9 @@ public class LtvAnalysisServiceImpl extends ServiceImpl<LtvAnalysisMapper, LtvAn
             case "sub_game_id":
                 where.groupBy("a.sub_game_id");
                 break;
+            case "pkg_id":
+                where.groupBy("a.pkg_id");
+                break;
             default:
                 where.groupBy("a.time_daily");
         }
@@ -125,6 +128,10 @@ public class LtvAnalysisServiceImpl extends ServiceImpl<LtvAnalysisMapper, LtvAn
                         String subGameName = ltvAnalysisMapper.selectBySubGameId(ltvAnalysisBo.getId());
                         analysisVo.setName(subGameName);
                         break;
+                    case "pkg_id":
+                        String pkgName=ltvAnalysisMapper.selectByPkgId(ltvAnalysisBo.getId());
+                        analysisVo.setName(pkgName);
+                        break;
                     default:
                         analysisVo.setName(String.valueOf(DateUtil.format(ltvAnalysisBo.getDateTime(),"yyyy-MM-dd")));
                 }
@@ -149,20 +156,20 @@ public class LtvAnalysisServiceImpl extends ServiceImpl<LtvAnalysisMapper, LtvAn
             BigDecimal ltv120 = ltv90.add(ltvAnalysisBo.getLtv120());
             BigDecimal ltv150 = ltv120.add(ltvAnalysisBo.getLtv150());
             //计算其ltv
-            analysisVo.setLtv1(ltv1.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv2(ltv2.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv3(ltv3.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv4(ltv4.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv5(ltv5.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv6(ltv6.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv7(ltv7.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv15(ltv15.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv30(ltv30.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv45( ltv45.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv60(ltv60.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv90(ltv90.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv120(ltv120.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
-            analysisVo.setLtv150(ltv150.divide(BigDecimal.valueOf(countUser)).setScale(2, RoundingMode.HALF_UP));
+            analysisVo.setLtv1(ltv1.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv2(ltv2.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv3(ltv3.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv4(ltv4.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv5(ltv5.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv6(ltv6.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv7(ltv7.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv15(ltv15.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv30(ltv30.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv45( ltv45.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv60(ltv60.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv90(ltv90.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv120(ltv120.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
+            analysisVo.setLtv150(ltv150.divide(BigDecimal.valueOf(countUser),2,RoundingMode.HALF_UP));
             resList.add(analysisVo);
         }
         return resList;

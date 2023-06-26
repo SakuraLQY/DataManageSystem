@@ -47,7 +47,9 @@ export const columns: BasicColumn[] = [
       let games = JSON.parse(text);
       let str = "";
       for(let game of games){
-        str += "游戏：" + faList.value[game.gameId].gameName + "<=> 子游戏：" + getSubName(game.subGameId,faList.value[game.gameId].list)
+        if(faList.value[game.gameId]){
+          str += "游戏：" + faList.value[game.gameId].gameName + "<=> 子游戏：" + getSubName(game.subGameId,faList.value[game.gameId].list)
+        }
       }
       return str;
     }

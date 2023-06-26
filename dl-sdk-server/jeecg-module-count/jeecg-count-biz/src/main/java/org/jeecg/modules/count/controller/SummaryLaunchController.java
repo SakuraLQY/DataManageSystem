@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.modal.SummaryLaunchModal;
 import org.jeecg.modules.count.vo.SummaryLaunchVo;
 import org.jeecg.modules.count.service.ISummaryLaunchService;
@@ -58,6 +59,7 @@ public class SummaryLaunchController extends
      */
     @ApiOperation(value = "数据投放数据展示", notes = "数据投放-列表查询")
     @GetMapping(value = "queryList")
+    @UserPermissionData(alias = "a")
     public Result<List<SummaryLaunchVo>> queryList(SummaryLaunchDto summaryLaunchDto,
         HttpServletRequest req) {
         List<SummaryLaunchVo> list = summaryLaunchService.queryList(summaryLaunchDto);

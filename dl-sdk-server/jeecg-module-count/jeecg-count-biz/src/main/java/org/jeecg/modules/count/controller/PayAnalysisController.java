@@ -1,43 +1,34 @@
 package org.jeecg.modules.count.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.system.query.QueryGenerator;
-import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.count.dto.PayAnalysisDto;
-import org.jeecg.modules.count.entity.PayAnalysis;
-import org.jeecg.modules.count.service.IPayAnalysisService;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
-
-import org.jeecg.modules.count.vo.PayAnalysisVo;
-import org.jeecgframework.poi.excel.ExcelImportUtil;
-import org.jeecgframework.poi.excel.def.NormalExcelConstants;
-import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.jeecgframework.poi.excel.entity.ImportParams;
-import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
-import org.jeecg.common.system.base.controller.JeecgController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
+import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.modules.count.dto.PayAnalysisDto;
+import org.jeecg.modules.count.entity.PayAnalysis;
+import org.jeecg.modules.count.service.IPayAnalysisService;
+import org.jeecg.modules.count.vo.PayAnalysisVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
  /**
  * @Description: pay_analysis
@@ -78,11 +69,12 @@ public class PayAnalysisController extends JeecgController<PayAnalysis, IPayAnal
 
 	/**@param payAnalysisDto
 	 * @author chenglin
-	 * @description 自定义查询付费数据
+	 * @description 自定义查询付费数据统计
 	 * @date 15:26 2023/5/24
 	 **/
-	@ApiOperation(value="pay_analysis-自定义分页查询", notes="pay_analysis-自定义分页查询")
+	@ApiOperation(value="付费数据统计")
 	@GetMapping("/queryList")
+	@UserPermissionData(alias = {"ct_daily", "ct_order"})
 	public Result<List<PayAnalysisVo>>queryList(PayAnalysisDto payAnalysisDto){
 		return Result.OK(payAnalysisService.queryList(payAnalysisDto));
 	}

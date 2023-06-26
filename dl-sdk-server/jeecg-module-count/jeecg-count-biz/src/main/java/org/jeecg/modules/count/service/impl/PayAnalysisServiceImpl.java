@@ -95,6 +95,10 @@ public class PayAnalysisServiceImpl extends ServiceImpl<PayAnalysisMapper, PayAn
                 where3.groupBy("sub_game_id");
                 where2.groupBy("sub_game_id");
                 break;
+            case "pkg_id":
+                where3.groupBy("pkg_id");
+                where2.groupBy("pkg_id");
+                break;
             default:
                 where3.groupBy("create_time");
                 where2.groupBy("time_daily");
@@ -149,6 +153,11 @@ public class PayAnalysisServiceImpl extends ServiceImpl<PayAnalysisMapper, PayAn
                     case "sub_game_id":
                         String subGameName = payAnalysisMapper.selectBySubGameId(payAnalysisBo.getId());
                         analysisVo.setName(subGameName);
+                        analysisVo.setTypeId(String.valueOf(payAnalysisBo.getId()));
+                        break;
+                    case "pkg_id":
+                        String pkgName = payAnalysisMapper.selectByPkgId(payAnalysisBo.getId());
+                        analysisVo.setName(pkgName);
                         analysisVo.setTypeId(String.valueOf(payAnalysisBo.getId()));
                         break;
                     default:

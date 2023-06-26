@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.SummaryDealInfoDataDto;
 import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.modules.count.dto.UserPayRateDto;
@@ -35,6 +36,7 @@ public class UserPayRateController {
 
     @ApiOperation(value = "获取用户付费率", notes = "获取用户付费率")
     @GetMapping(value = "/list")
+    @UserPermissionData(alias = "a")
     public Result<List<UserPayRateVo>> getPayRate(UserPayRateDto userPayRateDto) {
         List<UserPayRateVo> res = userPayRateService.getPayRate(userPayRateDto);
         return Result.OK(res);

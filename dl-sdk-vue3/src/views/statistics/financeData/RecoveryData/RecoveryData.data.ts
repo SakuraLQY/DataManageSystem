@@ -7,7 +7,8 @@ export const columns: BasicColumn[] = [
   {
     title: '日期',
     align: "center",
-    dataIndex: 'roiDate'
+    dataIndex: 'roiDate',
+    fixed: 'left', // 固定列
   },
   {
     title: '游戏名',

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.LogDeviceDataDto;
 import org.jeecg.modules.count.service.ILogManageService;
 import org.jeecg.modules.count.vo.DayPayReportVo;
@@ -36,6 +37,7 @@ public class LogManageController {
 
     @ApiOperation(value="设备数据")
     @GetMapping(value = "/getDeviceData")
+    @UserPermissionData(alias = "cd")
     public Result<IPage> getDeviceData(
         LogDeviceDataDto logDeviceDataDto,
         @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -52,6 +54,7 @@ public class LogManageController {
      * @param request
      * @param
      */
+    @UserPermissionData(alias = "cd")
     @RequestMapping(value = "/deviceDataExportXls")
     public ModelAndView deviceDataExportXls(HttpServletRequest request, LogDeviceDataDto logDeviceDataDto) {
         return iLogManageService.deviceDataExportXls(request, logDeviceDataDto, "设备数据");

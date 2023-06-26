@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.modules.count.dto.SummaryDto;
 import org.jeecg.modules.count.dto.SummaryDealInfoDataDto;
 import org.jeecg.modules.count.service.ISummaryService;
@@ -32,6 +33,7 @@ public class SummaryController {
 
     @ApiOperation(value = "获取数据汇总", notes = "获取数据汇总")
     @GetMapping(value = "/list")
+    @UserPermissionData(alias = "a")
     public Result<List<SummaryVo>> queryPageList(SummaryDto summaryDto) {
         List<SummaryVo> res = summaryService.getSummary(summaryDto);
         return Result.OK(res);

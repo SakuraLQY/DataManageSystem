@@ -47,10 +47,10 @@
           <pie :chartData="dateRateGroup" height="50vh" :option="dateRateOption" />
         </a-col>
         <a-col :lg="8">
-          <pie :chartData="aliveMoneyRateGroup" height="50vh" :option="firstMoneyRateOption" />
+          <pie :chartData="aliveMoneyRateGroup" height="50vh" :option="aliveMoneyRateOption" />
         </a-col>
         <a-col :lg="8">
-          <pie :chartData="firstMoneyRateGroup" height="50vh" :option="aliveMoneyRateOption" />
+          <pie :chartData="firstMoneyRateGroup" height="50vh" :option="firstMoneyRateOption" />
         </a-col>
       </a-row>
     </div>
@@ -188,13 +188,15 @@
         // 设置图表
         showEchart.value = false;
         if(queryParam.value.dealId){
-          showEchart.value = true;
-          // 设置首次付费和活跃付费
-          dateRateGroup.value = [];
-          aliveMoneyRateGroup.value = [];
-          firstMoneyRateGroup.value = [];
+         
          // 饼图
           getSummaryAdvertEChart(queryParam.value).then(res=>{
+            showEchart.value = true;
+            // 设置首次付费和活跃付费
+            dateRateGroup.value = [];
+            aliveMoneyRateGroup.value = [];
+            firstMoneyRateGroup.value = [];
+              debugger
             if(res && res.dateRateGroup){
               res.dateRateGroup.forEach((item)=>{
                 dateRateGroup.value.push({name:`日期:${item.day}，数量:${item.count}`, value:item.rate});
@@ -214,6 +216,8 @@
           // 折线图
 
           getSummaryAdvertLine(queryParam.value).then(res=>{
+            option.xAxis.data = [];
+            option.series = [];
             let xData = [];
             let countActiveLine = {name:"激活数",type:"line",data:[]}; 
             let countActiveDevLine = {name:"激活设备数",type:"line",data:[]}; 

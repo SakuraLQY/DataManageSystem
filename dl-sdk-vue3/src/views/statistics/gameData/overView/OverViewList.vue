@@ -4,9 +4,9 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <GameThirdMuchOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdMuchOptionForm>
           <template v-if="toggleSearchStatus">
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
             <a-col :lg="8">
               <a-form-item label="日期">
@@ -284,7 +284,7 @@
    */
   function getList() {
     queryOverViewList(queryParam.value).then((res: any)=>{
-      resList.value = res
+      resList.value = res.reverse()
       lineMultiData.value = []
       lineMultiData2.value = []
       lineMultiData3.value = []
@@ -300,30 +300,48 @@
       data9.value = []
       data10.value = []
       data11.value = []
-      resList.value.forEach(element => {
-        lineMultiData.value.push({ name: element.roiDate, type: '老用户充值金额', value: element.oldUserPay })
-        lineMultiData.value.push({ name: element.roiDate, type: '新增充值金额', value: element.addCostPrice })
-        lineMultiData.value.push({ name: element.roiDate, type: '总充值金额', value: element.activeCostPrice })
-        lineMultiData2.value.push({ name: element.roiDate, type: '付费率', value: element.activeProbability })
-        lineMultiData2.value.push({ name: element.roiDate, type: '新角色付费率', value: element.addCostProbability })
-        lineMultiData2.value.push({ name: element.roiDate, type: '老角色付费率', value: element.oldUserPayProbability })
-        lineMultiData3.value.push({ name: element.roiDate, type: 'ARPPU', value: element.arppu })
-        lineMultiData3.value.push({ name: element.roiDate, type: '新角色ARPPU', value: element.addArppu })
-        lineMultiData3.value.push({ name: element.roiDate, type: '老角色APRRU', value: element.oldUserPayArppu })
-        lineMultiData4.value.push({ name: element.roiDate, type: '活跃账号', value: element.dau })
-        lineMultiData4.value.push({ name: element.roiDate, type: '新增账号', value: element.regCount })
-        data.value.push(element.oldUserPay)
-        data2.value.push(element.addCostPrice)
-        data3.value.push(element.activeCostPrice)
-        data4.value.push(element.activeProbability)
-        data5.value.push(element.addCostProbability)
-        data6.value.push(element.oldUserPayProbability)
-        data7.value.push(element.arppu)
-        data8.value.push(element.addArppu)
-        data9.value.push(element.oldUserPayArppu)
-        data10.value.push(element.dau)
-        data11.value.push(element.regCount)
-      });
+      //初始化表中的值
+      if(resList.value.length > 0) {
+        overViewInfo.value.oldUserPay = resList.value[resList.value.length - 1].oldUserPay
+        overViewInfo.value.addCostPrice = resList.value[resList.value.length - 1].addCostPrice
+        overViewInfo.value.activeCostPrice = resList.value[resList.value.length - 1].activeCostPrice
+        title.value = '每日充值金额' + '(' + resList.value[resList.value.length - 1].roiDate + ')'
+        overViewInfo.value.activeProbability = resList.value[resList.value.length - 1].activeProbability + '%'
+        overViewInfo.value.addCostProbability = resList.value[resList.value.length - 1].addCostProbability + '%'
+        overViewInfo.value.oldUserPayProbability = resList.value[resList.value.length - 1].oldUserPayProbability + '%'
+        title2.value = '付费率' + '(' + resList.value[resList.value.length - 1].roiDate + ')'
+        overViewInfo.value.arppu = resList.value[resList.value.length - 1].arppu
+        overViewInfo.value.addArppu = resList.value[resList.value.length - 1].addArppu
+        overViewInfo.value.oldUserPayArppu = resList.value[resList.value.length - 1].oldUserPayArppu
+        title3.value = 'ARPPU' + '(' + resList.value[resList.value.length - 1].roiDate + ')'
+        overViewInfo.value.dau = resList.value[resList.value.length - 1].dau
+        overViewInfo.value.regCount = resList.value[resList.value.length - 1].regCount
+        title4.value = '账号统计' + '(' + resList.value[resList.value.length - 1].roiDate + ')'
+        resList.value.forEach(element => {
+          lineMultiData.value.push({ name: element.roiDate, type: '老用户充值金额', value: element.oldUserPay })
+          lineMultiData.value.push({ name: element.roiDate, type: '新增充值金额', value: element.addCostPrice })
+          lineMultiData.value.push({ name: element.roiDate, type: '总充值金额', value: element.activeCostPrice })
+          lineMultiData2.value.push({ name: element.roiDate, type: '付费率', value: element.activeProbability })
+          lineMultiData2.value.push({ name: element.roiDate, type: '新角色付费率', value: element.addCostProbability })
+          lineMultiData2.value.push({ name: element.roiDate, type: '老角色付费率', value: element.oldUserPayProbability })
+          lineMultiData3.value.push({ name: element.roiDate, type: 'ARPPU', value: element.arppu })
+          lineMultiData3.value.push({ name: element.roiDate, type: '新角色ARPPU', value: element.addArppu })
+          lineMultiData3.value.push({ name: element.roiDate, type: '老角色APRRU', value: element.oldUserPayArppu })
+          lineMultiData4.value.push({ name: element.roiDate, type: '活跃账号', value: element.dau })
+          lineMultiData4.value.push({ name: element.roiDate, type: '新增账号', value: element.regCount })
+          data.value.push(element.oldUserPay)
+          data2.value.push(element.addCostPrice)
+          data3.value.push(element.activeCostPrice)
+          data4.value.push(element.activeProbability)
+          data5.value.push(element.addCostProbability)
+          data6.value.push(element.oldUserPayProbability)
+          data7.value.push(element.arppu)
+          data8.value.push(element.addArppu)
+          data9.value.push(element.oldUserPayArppu)
+          data10.value.push(element.dau)
+          data11.value.push(element.regCount)
+        });
+      }
       option.value = {
         // 图例
         legend: {
@@ -341,21 +359,21 @@
           name: '充值金额'
         },
         // 悬浮提示框
-        // tooltip: {
-        //   trigger: 'axis',
-        //   triggerOn: 'mousemove',
-        //   formatter: function(params) {
-        //     // 获取第一个数据点的数值和X轴标签
-        //     // var value = params[0].value;
-        //     // var label = params[0].axisValue;
-        //     overViewInfo.value.oldUserPay = params[0].value
-        //     overViewInfo.value.addCostPrice = params[1].value
-        //     overViewInfo.value.activeCostPrice = params[2].value
-        //     title.value = '每日充值金额' + '(' + params[0].axisValue + ')'
-        //     // 返回提示框的标题和内容
-        //     return '日期：' + params[0].axisValue + '<br/>老用户充值金额：' + params[0].value + '<br/>新增充值金额：' + params[1].value + '<br/>总充值金额：' + params[2].value;
-        //   }
-        // },
+        tooltip: {
+          trigger: 'axis',
+          triggerOn: 'mousemove',
+          formatter: function(params) {
+            // 获取第一个数据点的数值和X轴标签
+            // var value = params[0].value;
+            // var label = params[0].axisValue;
+            overViewInfo.value.oldUserPay = params[0].value
+            overViewInfo.value.addCostPrice = params[1].value
+            overViewInfo.value.activeCostPrice = params[2].value
+            title.value = '每日充值金额' + '(' + params[0].axisValue + ')'
+            // 返回提示框的标题和内容
+            return '日期：' + params[0].axisValue + '<br/>老用户充值金额：' + params[0].value + '<br/>新增充值金额：' + params[1].value + '<br/>总充值金额：' + params[2].value;
+          }
+        },
         grid: {
             bottom: 80  // 调整底部留白区域的大小
           },
@@ -456,6 +474,9 @@
         },
       };
     })
+
+    
+    
   }
 
   /**

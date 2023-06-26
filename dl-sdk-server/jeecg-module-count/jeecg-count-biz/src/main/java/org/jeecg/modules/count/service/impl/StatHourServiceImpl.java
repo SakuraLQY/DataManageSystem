@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,11 +32,8 @@ import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -91,16 +89,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        switch (type) {
-            case "deal_id":
-                where.groupBy("deal_id", "time_daily", "sub_game_id");
-                break;
-            case "time_daily":
-                where.groupBy("time_daily", "sub_game_id", "deal_id");
-                break;
-            default:
-                where.groupBy("time_daily", "sub_game_id", "deal_id");
-        }
+        where.groupBy("time_daily","deal_id",  "sub_game_id");
         String sql = "";
         for (int i = 1; i <= 90; i++) {
             sql += "IFNULL(SUM(c.day" + i + "),0) AS ltv" + i + ",";
@@ -126,7 +115,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
         stat.put("loyal15", BigDecimal.ZERO);
         stat.put("loyal30", BigDecimal.ZERO);
         stat.put("countActive", BigDecimal.ZERO);
-        stat.put("allCountActive", BigDecimal.ZERO);
+        stat.put("countAllActive", BigDecimal.ZERO);
         stat.put("countUserDev", BigDecimal.ZERO);
         stat.put("regCount", BigDecimal.ZERO);
         stat.put("allValidRegCount", BigDecimal.ZERO);
@@ -141,7 +130,10 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
         stat.put("alivePayRate", BigDecimal.ZERO);
         stat.put("firstArpu", BigDecimal.ZERO);
         stat.put("totalArpu", BigDecimal.ZERO);
+
         List<StatHourVo> resList = new ArrayList<>();
+        StatHourVo allStatHourVo = new StatHourVo();
+
         if (resultChannelList != null) {
             for (StatHourBo resultChannel : resultChannelList) {
                 StatHourVo statHourVo = new StatHourVo();
@@ -206,8 +198,8 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                     .add(stat.getOrDefault("countActive", BigDecimal.ZERO)));
                 //所有激活数
                 statHourVo.setCountAllActive(resultChannel.getCountAllActive());
-                stat.put("allCountActive", BigDecimal.valueOf(resultChannel.getCountAllActive())
-                    .add(stat.getOrDefault("allCountActive", BigDecimal.ZERO)));
+                stat.put("countAllActive", BigDecimal.valueOf(resultChannel.getCountAllActive())
+                    .add(stat.getOrDefault("countAllActive", BigDecimal.ZERO)));
                 //注册数
                 statHourVo.setRegCount(resultChannel.getRegCount());
                 stat.put("regCount", BigDecimal.valueOf(resultChannel.getRegCount())
@@ -269,7 +261,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setLoyal2(loyal2 + "%");
                 } else {
-                    statHourVo.setLoyal2("0");
+                    statHourVo.setLoyal2("0.00%");
                 }
                 if (resultChannel.getLoyal3().compareTo(BigDecimal.ZERO) > 0
                     && resultChannel.getCountUserDev() > 0) {
@@ -278,7 +270,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setLoyal3(loyal3 + "%");
                 } else {
-                    statHourVo.setLoyal3("0");
+                    statHourVo.setLoyal3("0.00%");
                 }
                 if (resultChannel.getLoyal7().compareTo(BigDecimal.ZERO) > 0
                     && resultChannel.getCountUserDev() > 0) {
@@ -287,7 +279,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setLoyal7(loyal7 + "%");
                 } else {
-                    statHourVo.setLoyal7("0");
+                    statHourVo.setLoyal7("0.00%");
                 }
                 if (resultChannel.getLoyal15().compareTo(BigDecimal.ZERO) > 0
                     && resultChannel.getCountUserDev() > 0) {
@@ -297,7 +289,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setLoyal15(loyal15 + "%");
                 } else {
-                    statHourVo.setLoyal15("0");
+                    statHourVo.setLoyal15("0.00%");
                 }
                 if (resultChannel.getLoyal30().compareTo(BigDecimal.ZERO) > 0
                     && resultChannel.getCountUserDev() > 0) {
@@ -307,7 +299,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setLoyal30(loyal30 + "%");
                 } else {
-                    statHourVo.setLoyal30("0");
+                    statHourVo.setLoyal30("0.00%");
                 }
                 //计算比率
                 if (resultChannel.getFirstPayUser() != null
@@ -318,7 +310,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setFirstPayRate(firstPayRate + "%");
                 } else {
-                    statHourVo.setFirstPayRate("0");
+                    statHourVo.setFirstPayRate("0.00%");
                 }
                 if (resultChannel.getAlivePayUser() != null
                     && resultChannel.getCountUserDev() > 0) {
@@ -328,7 +320,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                             RoundingMode.HALF_UP);
                     statHourVo.setAlivePayRate(alivePayRate + "%");
                 } else {
-                    statHourVo.setAlivePayRate("0");
+                    statHourVo.setAlivePayRate("0.00%");
                 }
                 //计算对应的arpu
                 if (resultChannel.getCountUserDev() >0
@@ -401,47 +393,64 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                 resList.add(statHourVo);
             }
         }
-        //计算合计栏
-        StatHourVo allStatHourVo = new StatHourVo();
-        //名称
-        switch (statHourDto.getType()) {
-            case "deal_id":
-                allStatHourVo.setDealName("合计");
-                break;
-            default:
-                allStatHourVo.setDateTime("合计");
+        if (resList.size()==0){
+            return resList;
         }
-        //计算费率
+        //计算合计栏
+        //名称
+        allStatHourVo.setDealName("合计");
+
+        //激活数
+        allStatHourVo.setCountActive(stat.get("countActive").intValue());
+        //全部激活数
+        allStatHourVo.setCountAllActive(stat.get("countAllActive").intValue());
+        //注册数
+        allStatHourVo.setRegCount(stat.get("regCount").intValue());
+        //有效注册数
+        allStatHourVo.setValidReg(stat.get("validReg").intValue());
+        //新增付费数
+        allStatHourVo.setFirstPayUser(stat.get("firstPayUser").intValue());
+        //新增付费金额
+        allStatHourVo.setFirstPayMoney(stat.get("firstPayMoney"));
+        //活跃人数
+        allStatHourVo.setCountDau(stat.get("countDau").intValue());
+        //活跃付费人数
+        allStatHourVo.setAlivePayUser(stat.get("alivePayUser").intValue());
+        //付费总额
+        allStatHourVo.setTotalMoney(stat.get("totalMoney"));
+
+        //新增付费率
         if (stat.containsKey("firstPayUser") && stat.containsKey("countUserDev")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal firstPayRate = stat.get("firstPayUser")
                 .multiply(BigDecimal.valueOf(100))
                 .divide(stat.get("countUserDev"), 2, RoundingMode.HALF_UP);
-            ;
             allStatHourVo.setFirstPayRate(firstPayRate + "%");
         } else {
-            allStatHourVo.setFirstPayRate("0");
+            allStatHourVo.setFirstPayRate("0.00%");
         }
+
+
         if (stat.containsKey("alivePayUser") && stat.containsKey("countDau")
             && stat.get("countDau").compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal alivePayUser = stat.get("alivePayUser")
+            BigDecimal alivePayRate = stat.get("alivePayUser")
                 .multiply(BigDecimal.valueOf(100))
                 .divide(stat.get("countDau"), 2, RoundingMode.HALF_UP);
-            allStatHourVo.setAlivePayRate(alivePayUser + "%");
+            allStatHourVo.setAlivePayRate(alivePayRate + "%");
         } else {
             allStatHourVo.setAlivePayRate("0");
         }
         //计算arpu
         if (stat.containsKey("countUserDev") && stat.containsKey("firstPayMoney")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal firstArpu = stat.get("firstPayMoney").divide(stat.get("countUserDev"), 2);
+            BigDecimal firstArpu = stat.get("firstPayMoney").divide(stat.get("countUserDev"), 2,RoundingMode.HALF_UP);
             allStatHourVo.setFirstArpu(firstArpu);
         } else {
             allStatHourVo.setFirstArpu(BigDecimal.ZERO);
         }
         if (stat.containsKey("countDau") && stat.containsKey("alivePayMoney")
             && stat.get("countDau").compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal totalArpu = stat.get("alivePayMoney").divide(stat.get("countDau"), 2);
+            BigDecimal totalArpu = stat.get("alivePayMoney").divide(stat.get("countDau"), 2,RoundingMode.HALF_UP);
             allStatHourVo.setTotalArpu(totalArpu);
         } else {
             allStatHourVo.setTotalArpu(BigDecimal.ZERO);
@@ -455,7 +464,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
 
             allStatHourVo.setLoyal2(loyal2 + "%");
         } else {
-            allStatHourVo.setLoyal2("0");
+            allStatHourVo.setLoyal2("0.00%");
         }
         if (stat.containsKey("loyal3") && stat.containsKey("countUserDev")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
@@ -464,7 +473,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                 .divide(stat.get("countUserDev"), 2, RoundingMode.HALF_UP);
             allStatHourVo.setLoyal3(loyal3 + "%");
         } else {
-            allStatHourVo.setLoyal3("0");
+            allStatHourVo.setLoyal3("0.00%");
         }
         if (stat.containsKey("loyal7") && stat.containsKey("countUserDev")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
@@ -473,7 +482,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                 .divide(stat.get("countUserDev"), 2, RoundingMode.HALF_UP);
             allStatHourVo.setLoyal7(loyal7 + "%");
         } else {
-            allStatHourVo.setLoyal7("0");
+            allStatHourVo.setLoyal7("0.00%");
         }
         if (stat.containsKey("loyal15") && stat.containsKey("countUserDev")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
@@ -482,7 +491,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                 .divide(stat.get("countUserDev"), 2, RoundingMode.HALF_UP);
             allStatHourVo.setLoyal15(loyal15 + "%");
         } else {
-            allStatHourVo.setLoyal15("0");
+            allStatHourVo.setLoyal15("0.00%");
         }
         if (stat.containsKey("loyal30") && stat.containsKey("countUserDev")
             && stat.get("countUserDev").compareTo(BigDecimal.ZERO) > 0) {
@@ -491,7 +500,7 @@ public class StatHourServiceImpl extends ServiceImpl<StatHourMapper, StatHour> i
                 .divide(stat.get("countUserDev"), 2, RoundingMode.HALF_UP);
             allStatHourVo.setLoyal30(loyal30 + "%");
         } else {
-            allStatHourVo.setLoyal30("0");
+            allStatHourVo.setLoyal30("0.00%");
         }
         //计算LTV
         if (stat.containsKey("ltv1") && stat.containsKey("countUserDev")

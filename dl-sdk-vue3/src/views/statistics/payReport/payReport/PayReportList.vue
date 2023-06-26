@@ -6,27 +6,27 @@
         <a-row :gutter="24">
           <a-col :lg="8">
             <a-form-item label="SKD订单号">
-              <a-input v-model:value="queryParam.orderId" allowClear />
+              <a-input v-model:value="queryParam.orderId" allowClear :maxLength="64" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="CP订单号">
-              <a-input v-model:value="queryParam.gameOrderId" allowClear />
+              <a-input v-model:value="queryParam.gameOrderId" allowClear :maxLength="128" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="渠道订单号">
-              <a-input v-model:value="queryParam.bankOrderId" allowClear />
+              <a-input v-model:value="queryParam.bankOrderId" allowClear :maxLength="64" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="用户id">
-              <a-input v-model:value="queryParam.userId" allowClear />
+              <a-input v-model:value="queryParam.userId" allowClear :maxLength="10" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="类型">
-              <j-dict-select-tag v-model:value="queryParam.type" :options="type" />
+              <j-dict-select-tag v-model:value="queryParam.type" :options="type" :showChooseOption="false" />
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -71,10 +71,6 @@
               <a-col :lg="6">
                 <a-button type="primary" preIcon="ant-design:search-outlined" @click="searchQuery">查询</a-button>
                 <a-button type="primary" preIcon="ant-design:reload-outlined" @click="searchReset" style="margin-left: 8px">重置</a-button>
-                <a @click="toggleSearchStatus = !toggleSearchStatus" style="margin-left: 8px">
-                  {{ toggleSearchStatus ? '收起' : '展开' }}
-                  <Icon :icon="toggleSearchStatus ? 'ant-design:up-outlined' : 'ant-design:down-outlined'" />
-                </a>
               </a-col>
             </span>
           </a-col>
@@ -174,13 +170,16 @@
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
   import GameThirdSingleOptionForm from '/@/views/common/gameThirdSingleOptionForm.vue';
   import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
+  import { formatToDate } from '/@/utils/dateUtil';
+  import dayjs, { Dayjs } from 'dayjs';
 
   const queryParam = ref<any>({ type: 1, sendStatus: 1 });
   const supplementaryOrderParam = ref<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const flag = ref(false);
-  const orderTime = ref<Moment[]>([]);
+  const dateFormat = 'YYYY-MM-DD';
+  const orderTime = ref<Moment[]>([dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)]);
   const title = ref<string>('');
   const width = ref<number>(800);
   const visible = ref<boolean>(false);
@@ -202,6 +201,16 @@
     queryParam.value.channelSubAccountId = e.channelSubAccountId;
   };
 
+  changeDate();
+  function changeDate() {
+    if (orderTime.value != null && orderTime.value.length > 0) {
+      queryParam.value.orderStartTime = orderTime.value[0].format('YYYY-MM-DD') + ' 00:00:00';
+      queryParam.value.orderEndTime = orderTime.value[1].format('YYYY-MM-DD') + ' 23:59:59';
+    } else {
+      queryParam.value.orderStartTime = null;
+      queryParam.value.orderEndTime = null;
+    }
+  }
   /**
    * 获取数据总数
    */
@@ -425,6 +434,9 @@
     //刷新数据
     selectGameForm.value.reload();
     selectChannelForm.value.reload();
+    queryParam.value.type = 1;
+    orderTime.value = [dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)];
+    changeDate();
     reload();
 
     getAllToTal();

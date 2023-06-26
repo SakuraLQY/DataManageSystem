@@ -58,4 +58,7 @@
   <select id="selectBySubGameId" resultType="java.lang.String">
     select game_name as 'subGameName' from open_gateway.op_sub_game where id = #{id};
   </select>
+  <select id="selectByPkgId" resultType="java.lang.String">
+    select pkg_name as 'pkgName' from open_gateway.op_pkg where id = #{id};
+  </select>
 </mapper>

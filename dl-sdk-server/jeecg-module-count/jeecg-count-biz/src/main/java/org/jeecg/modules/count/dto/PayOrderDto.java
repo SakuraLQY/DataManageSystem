@@ -1,6 +1,7 @@
 package org.jeecg.modules.count.dto;
 
 import java.util.ArrayList;
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -17,21 +18,25 @@ public class PayOrderDto {
     /**
      * SDK订单
      */
+    @Size(max = 64)
     private String orderId;
 
     /**
      * CP订单
      */
+    @Size(max = 128)
     private String gameOrderId;
 
     /**
      * 渠道订单号
      */
+    @Size(max = 64)
     private String bankOrderId;
 
     /**
      * 用户ID
      */
+    @Size(max = 10)
     private Integer userId;
 
     /**

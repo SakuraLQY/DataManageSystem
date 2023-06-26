@@ -328,7 +328,7 @@ public class SummaryServiceImpl implements ISummaryService {
         SummaryOrderDevBo summaryOrderdevBo, SummaryDailyBo summaryDailyBo, SummaryVo summaryVo) {
         // 赋值同名参数
         BeanUtils.copyProperties(summaryDailyBo, summaryVo);
-        if (costMoneyModel != null) {
+        if (costMoneyModel != null && costMoneyModel.getCostMoney()!=null) {
             // 设置成本
             summaryVo.setCostMoney(costMoneyModel.getCostMoney());
         }
@@ -352,7 +352,7 @@ public class SummaryServiceImpl implements ISummaryService {
                     RoundingMode.HALF_UP));
         }
         if (summaryDailyBo.getCountUserDev() != 0) {
-            summaryVo.setCostCountUserDev(costMoneyModel.getCostMoney()
+            summaryVo.setCostCountUserDev(summaryVo.getCostMoney()
                 .divide(BigDecimal.valueOf(summaryDailyBo.getCountUserDev()), 2,
                     RoundingMode.HALF_UP));
         }
@@ -462,11 +462,11 @@ public class SummaryServiceImpl implements ISummaryService {
         }
         // 老用户ARPPU
         if (!BigDecimal.ZERO.equals(oldPayuser)) {
-            summaryVo.setOldUserArppu(oldMoney.multiply(BigDecimal.valueOf(100))
+            summaryVo.setOldUserArppu(oldMoney
                 .divide(oldPayuser, 2, RoundingMode.HALF_UP));
         }
         if (!BigDecimal.ZERO.equals(oldPayuserDev)) {
-            summaryVo.setOldUserArppuDev(oldMoneyDev.multiply(BigDecimal.valueOf(100))
+            summaryVo.setOldUserArppuDev(oldMoneyDev
                 .divide(oldPayuserDev, 2, RoundingMode.HALF_UP));
         }
         // 周期

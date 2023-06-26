@@ -1,10 +1,19 @@
 package org.jeecg.modules.count.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
+import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.count.dto.OverViewDto;
@@ -16,26 +25,23 @@ import org.jeecg.modules.count.modal.DayReportResultModal;
 import org.jeecg.modules.count.modal.RoiModal;
 import org.jeecg.modules.count.modal.XingtuDayReportModal;
 import org.jeecg.modules.count.service.ICtDailyService;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
-
 import org.jeecg.modules.count.vo.FinanceUserVo;
 import org.jeecg.modules.count.vo.OverViewVo;
 import org.jeecg.modules.count.vo.RecoveryVo;
 import org.jeecg.modules.count.vo.RetentionVo;
 import org.jeecg.modules.count.vo.RoiVo;
-import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.modules.count.vo.StatCustomVo;
 import org.jeecg.modules.count.vo.XingtuDayReportVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.jeecg.common.aspect.annotation.AutoLog;
 
 /**
  * @Description: ct_daily
@@ -75,30 +81,48 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 
 	@ApiOperation(value="ct_daily-发行合作商数据统计-留存数据统计", notes="ct_daily-发行合作商数据统计-留存数据统计")
 	@GetMapping(value = "/queryRetentionList")
+	@UserPermissionData(alias = "a")
 	public Result<List<RetentionVo>> queryRetentionList(RetentionDto retentionDto) {
 		return Result.OK(ctDailyService.queryRetentionList(retentionDto));
 	}
 
 	@ApiOperation(value="ct_daily-合作商数据统计 合作商数据【数据】", notes="ct_daily-合作商数据统计 合作商数据【数据】")
 	@GetMapping(value = "/queryStatCustomList")
+	@UserPermissionData(alias = "a")
 	public Result<List<StatCustomVo>> queryStatCustomList(RetentionDto retentionDto) {
 		return Result.OK(ctDailyService.queryStatCustomList(retentionDto));
 	}
 
+	/**
+	 * @param request:
+	 * @param retentionDto:
+	 * @return ModelAndView
+	 * @author Fkh
+	 * @description 合作商数据【数据】导出功能
+	 * @date 2023/6/21 14:52
+	 */
+	@RequestMapping(value = "/statCustomListexportXls")
+	public ModelAndView statCustomListexportXls(HttpServletRequest request, RetentionDto retentionDto) {
+		return ctDailyService.statCustomListexportXls(request, retentionDto, "合作商数据【数据】");
+	}
+
 	@ApiOperation(value="ct_daily-数据日报", notes="ct_daily-数据日报")
 	@GetMapping(value = "/queryDayReportList")
+	@UserPermissionData(alias = {"`op_cost`", "`ct_daily`"})
 	public Result<DayReportResultModal> queryDayReportList(OverViewDto overViewDto) {
 		return Result.OK(ctDailyService.queryDayReportList(overViewDto));
 	}
 
 	@ApiOperation(value="ct_daily-星图日报", notes="ct_daily-星图日报")
 	@GetMapping(value = "/queryXingtuDayReportList")
+	@UserPermissionData(alias = "a")
 	public Result<List<XingtuDayReportVo>> queryXingtuDayReportList(XingtuDayReportDto xingtuDayReportDto) {
 		return Result.OK(ctDailyService.queryXingtuDayReportList(xingtuDayReportDto));
 	}
 
 	@ApiOperation(value="ct_daily-星图日报导出", notes="ct_daily-星图日报导出")
 	@RequestMapping(value = "/xingtuDayReportExportXls")
+	@UserPermissionData(alias = "a")
 	public ModelAndView xingtuDayReportExportXls(XingtuDayReportDto xingtuDayReportDto) {
 		return ctDailyService.xingtuDayReportExportXls(xingtuDayReportDto, XingtuDayReportModal.class, "星图日报");
 	}
@@ -112,6 +136,7 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	 **/
 	 @ApiOperation(value="ct_daily-ROI查询", notes="ct_daily-ROI查询")
 	 @GetMapping(value = "/queryROIList")
+	 @UserPermissionData(alias = "a")
 	 public Result<List<RoiVo>> queryROIList(RoiDto roiDto) {
 		 return Result.OK(ctDailyService.queryROIList(roiDto));
 	 }
@@ -125,6 +150,7 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	  **/
 	@ApiOperation(value="ct_daily-财务数据-回收数据", notes="ct_daily-财务数据-回收数据")
 	@GetMapping(value = "/queryRecoveryList")
+	@UserPermissionData(alias = "a")
 	public Result<List<RecoveryVo>> queryRecoveryList(OverViewDto overViewDto) {
 		return Result.OK(ctDailyService.queryRecoveryList(overViewDto));
 	}
@@ -138,6 +164,7 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	  **/
 	 @ApiOperation(value="游戏数据概况查询", notes="游戏数据概况查询")
 	 @GetMapping(value = "/queryOverViewList")
+	 @UserPermissionData(alias = "a")
 	 public Result<List<OverViewVo>> queryOverViewList(OverViewDto overViewDto) {
 		 return Result.OK(ctDailyService.queryOverViewList(overViewDto));
 	 }
@@ -151,6 +178,7 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	  **/
 	@ApiOperation(value="财务数据-用户数据查询", notes="财务数据-用户数据查询")
 	@GetMapping(value = "/queryFinanceUserList")
+	@UserPermissionData(alias = "a")
 	public Result<List<FinanceUserVo>> queryFinanceUserList(OverViewDto overViewDto) {
 		return Result.OK(ctDailyService.queryFinanceUserList(overViewDto));
 	}
@@ -162,6 +190,7 @@ public class CtDailyController extends JeecgController<CtDaily, ICtDailyService>
 	  */
 	 //@RequiresPermissions("count:ct_daily:exportXls")
 	 @RequestMapping(value = "/roiExportXls")
+	 @UserPermissionData(alias = "a")
 	 public ModelAndView roiExportXls(RoiDto roiDto) {
 		 return ctDailyService.exportXls(roiDto, RoiModal.class, "ROI数据表");
 	 }

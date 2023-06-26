@@ -4,21 +4,21 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-            <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
+          <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
             <a-col :lg="8">
               <a-form-item label="注册时间">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择注册日期" v-model:value="queryParam.startTime" />
-              <span>至</span>
-                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请输入结束日期" v-model:value="queryParam.endTime"/>
+                <span>至</span>
+                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请输入结束日期" v-model:value="queryParam.endTime" />
               </a-form-item>
             </a-col>
             <a-col :lg="8">
               <a-form-item label="付费时间">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择付费日期" v-model:value="queryParam.payStart" />
-              <span>至</span>
-                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请输入结束日期" v-model:value="queryParam.payEnd"/>
+                <span>至</span>
+                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请输入结束日期" v-model:value="queryParam.payEnd" />
               </a-form-item>
             </a-col>
           </template>
@@ -53,25 +53,26 @@
               </a-menu-item>
             </a-menu>
           </template>
-          <a-button>批量操作
+          <a-button
+            >批量操作
             <Icon icon="mdi:chevron-down"></Icon>
           </a-button>
         </a-dropdown>
       </template>
       <!--操作栏-->
       <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
+        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)" />
       </template>
       <!--字段回显插槽-->
-      <template #htmlSlot="{text}">
+      <template #htmlSlot="{ text }">
         <div v-html="text"></div>
       </template>
       <!--省市区字段回显插槽-->
-      <template #pcaSlot="{text}">
+      <template #pcaSlot="{ text }">
         {{ getAreaTextByCode(text) }}
       </template>
-      <template #fileSlot="{text}">
-        <span v-if="!text" style="font-size: 12px;font-style: italic;">无文件</span>
+      <template #fileSlot="{ text }">
+        <span v-if="!text" style="font-size: 12px; font-style: italic">无文件</span>
         <a-button v-else :ghost="true" type="primary" preIcon="ant-design:download-outlined" size="small" @click="downloadFile(text)">下载</a-button>
       </template>
     </BasicTable>
@@ -87,14 +88,19 @@
   import { columns } from './ComputeMoney.data';
   import { queryList, deleteOne, batchDelete, getImportUrl, getExportUrl } from './ComputeMoney.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
-  import ComputeMoneyModal from './components/ComputeMoneyModal.vue'
+  import ComputeMoneyModal from './components/ComputeMoneyModal.vue';
   import GameThirdSingleOptionForm from '/@/views/common/gameThirdSingleOptionForm.vue';
   import ChannelThirdOptionForm from '/@/views/common/channelThirdOptionForm.vue';
   import JSearchSelect from '/@/components/Form/src/jeecg/components/JSearchSelect.vue';
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
-  import {formatToDate } from '/@/utils/dateUtil';
-  import {formatToDates } from '/@/utils/dateUtil';
-  const queryParam = ref<any>({startTime:formatToDates(new Date()),endTime:formatToDate(new Date()),payStart:formatToDates(new Date()),payEnd:formatToDate(new Date())});
+  import { formatToDate } from '/@/utils/dateUtil';
+  import { formatToDates } from '/@/utils/dateUtil';
+  const queryParam = ref<any>({
+    startTime: formatToDate(new Date()),
+    endTime: formatToDate(new Date()),
+    payStart: formatToDate(new Date()),
+    payEnd: formatToDate(new Date()),
+  });
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   let getGameVal = (e: any) => {
@@ -113,10 +119,10 @@
       title: 'data_tool',
       api: queryList,
       columns,
-      canResize:false,
+      canResize: false,
       useSearchForm: false,
-      showActionColumn:false,
-      pagination:false,
+      showActionColumn: false,
+      pagination: false,
       actionColumn: {
         width: 120,
         fixed: 'right',
@@ -126,15 +132,16 @@
       },
     },
     exportConfig: {
-      name: "data_tool",
+      name: 'data_tool',
       url: getExportUrl,
     },
-	  importConfig: {
-	    url: getImportUrl,
-	    success: handleSuccess
-	  },
+    importConfig: {
+      url: getImportUrl,
+      success: handleSuccess,
+    },
   });
-  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] = tableContext;
+  const [registerTable, { reload, collapseAll, updateTableDataRecord, findTableDataRecord, getDataSource }, { rowSelection, selectedRowKeys }] =
+    tableContext;
   const labelCol = reactive({
     xs: { span: 24 },
     sm: { span: 7 },
@@ -151,7 +158,7 @@
     registerModal.value.disableSubmit = false;
     registerModal.value.add();
   }
-  
+
   /**
    * 编辑事件
    */
@@ -159,7 +166,7 @@
     registerModal.value.disableSubmit = false;
     registerModal.value.edit(record);
   }
-   
+
   /**
    * 详情
    */
@@ -167,28 +174,28 @@
     registerModal.value.disableSubmit = true;
     registerModal.value.edit(record);
   }
-   
+
   /**
    * 删除事件
    */
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
   }
-   
+
   /**
    * 批量删除事件
    */
   async function batchHandleDelete() {
     await batchDelete({ ids: selectedRowKeys.value }, handleSuccess);
   }
-   
+
   /**
    * 成功回调
    */
   function handleSuccess() {
     (selectedRowKeys.value = []) && reload();
   }
-   
+
   /**
    * 操作栏
    */
@@ -200,7 +207,7 @@
       },
     ];
   }
-   
+
   /**
    * 下拉操作栏
    */
@@ -209,14 +216,15 @@
       {
         label: '详情',
         onClick: handleDetail.bind(null, record),
-      }, {
+      },
+      {
         label: '删除',
         popConfirm: {
           title: '是否确认删除',
           confirm: handleDelete.bind(null, record),
-        }
-      }
-    ]
+        },
+      },
+    ];
   }
 
   /**
@@ -225,7 +233,7 @@
   function searchQuery() {
     reload();
   }
-  
+
   /**
    * 重置
    */
@@ -233,12 +241,14 @@
     queryParam.value = {};
     selectedRowKeys.value = [];
     //刷新数据
+    queryParam.value = {
+      startTime: formatToDate(new Date()),
+      endTime: formatToDate(new Date()),
+      payStart: formatToDate(new Date()),
+      payEnd: formatToDate(new Date()),
+    };
     reload();
   }
-  
-
-
-
 </script>
 
 <style lang="less" scoped>
@@ -248,14 +258,14 @@
       margin-bottom: 24px;
       white-space: nowrap;
     }
-    .query-group-cust{
+    .query-group-cust {
       width: calc(50% - 15px);
       min-width: 100px !important;
     }
-    .query-group-split-cust{
+    .query-group-split-cust {
       width: 30px;
       display: inline-block;
-      text-align: center
+      text-align: center;
     }
   }
 </style>

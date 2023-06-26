@@ -4,10 +4,10 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <template v-if="toggleSearchStatus">
             <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
+            <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
             <a-col :lg="8">
               <a-form-item label="注册日期">
                 <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择注册开始日期" v-model:value="queryParam.regStartTime" />
@@ -31,17 +31,17 @@
             </a-col> -->
             <a-col :lg="8">
               <a-form-item label="用户ID">
-                <a-input placeholder="请输入用户ID" v-model:value="queryParam.userId"></a-input>
+                <a-input placeholder="请输入用户ID" :maxLength="10" v-model:value="queryParam.userId" allowClear></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8">
               <a-form-item label="账号">
-                <a-input placeholder="请输入账号" v-model:value="queryParam.userName"></a-input>
+                <a-input placeholder="请输入账号" v-model:value="queryParam.userName" allowClear></a-input>
               </a-form-item>
             </a-col>
             <a-col :lg="8">
               <a-form-item label="角色名">
-                <a-input placeholder="请输入角色名" v-model:value="queryParam.roleName"></a-input>
+                <a-input placeholder="请输入角色名" v-model:value="queryParam.roleName" allowClear></a-input>
               </a-form-item>
             </a-col>
           </template>
@@ -302,6 +302,8 @@
    */
   function handleUserPay(record: Recordable) {
     visible.value = true
+    orderDetailParam.payStartTime = undefined
+    orderDetailParam.payEndTime = undefined
     orderDetailParam.userId = record.userId
     orderDetailParam.dealId = record.dealId
   }

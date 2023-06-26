@@ -8,7 +8,7 @@
             <ChannelThirdMuchOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdMuchOptionForm>
             <a-col :lg="8">
               <a-form-item label="日期">
-                <a-date-picker valueFormat="YYYY-MM-DD" placeholder="请选择起始日期" v-model:value="queryParam.startTime" />
+                <a-date-picker valueFormat="YYYY-MM-DD" :allowClear="false" placeholder="请选择起始日期" v-model:value="queryParam.startTime" />
               </a-form-item>
             </a-col>
           <a-col :xl="6" :lg="7" :md="8" :sm="24">
@@ -68,7 +68,6 @@
   const queryParam = ref<any>({startTime:dateString});
   let title = ref(year + '年' + (month < 10 ? '0' + month : month) + '月' + (day < 10 ? '0' + day : day) + '日数据报表')
   const selectGameForm= ref();
-  const selectDealForm= ref();
   const selectChannelForm= ref();
   let getGameVal = (e: any) => {
     queryParam.value.gameId = e.gameId;
@@ -309,7 +308,6 @@
     queryParam.value = {startTime:dateString};
     selectGameForm.value.reload();
     selectChannelForm.value.reload();
-    selectDealForm.value.reload();
     //刷新数据
     getList()
   }

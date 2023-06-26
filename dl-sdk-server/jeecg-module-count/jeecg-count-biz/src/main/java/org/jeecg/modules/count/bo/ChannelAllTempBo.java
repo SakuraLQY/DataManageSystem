@@ -2,18 +2,15 @@ package org.jeecg.modules.count.bo;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
 /**
- * @description: 用于接收对象拷贝的对象
+ * @description: 拷贝对象
  * @author: chenglin
- * @date: 2023年05月12日 13:18
+ * @date: 2023年06月15日 14:47
  */
 @Data
-public class ChannelDetailTempBo implements Serializable {
-//    @ApiModelProperty(value = "日期")
-//    private Date timeDaily;
+public class ChannelAllTempBo implements Serializable {
     @ApiModelProperty(value = "激活")
     private Integer countActive;
     /**
@@ -66,5 +63,4 @@ public class ChannelDetailTempBo implements Serializable {
      */
     @ApiModelProperty(value = "活跃付费金额")
     private Integer aliveMoney;
-
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.modules.count.dto.DailySummaryDto;
 import org.jeecg.modules.count.vo.CtDailySummary;
@@ -66,6 +67,7 @@ public class CtDailySummaryController extends
 
     @ApiOperation(value = "dailySummary-查询今日汇总数据")
     @GetMapping(value = "queryList")
+    @UserPermissionData(alias = "a")
     public Result<List<List<DailySummaryDto>>> queryTodayData(CtDailySummary ctDailySummary) {
         return Result.OK(ctDailySummaryService.queryList(ctDailySummary));
     }

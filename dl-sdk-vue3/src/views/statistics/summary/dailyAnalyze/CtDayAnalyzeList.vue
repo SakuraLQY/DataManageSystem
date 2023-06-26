@@ -611,7 +611,7 @@ function handleClick(type) {
    * 重置
    */
   function searchReset() {
-    queryParam.value = {};
+    queryParam.value = {startTime:formatToDate(new Date()),endTime:formatToDate(new Date())};
     selectedRowKeys.value = [];
     //刷新数据
     reload();

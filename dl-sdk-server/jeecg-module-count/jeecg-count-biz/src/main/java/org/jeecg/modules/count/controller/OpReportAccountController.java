@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.modules.count.dto.ReportAccountDto;
@@ -65,10 +66,10 @@ public class OpReportAccountController extends JeecgController<OpReport, IOpRepo
 
 	/**@param reportAccountDto
 	 * @author chenglin
-	 * @description 查询数据报表的信息
+	 * @description 查询数据报表中的账号报表的信息
 	 * @date 16:23 2023/5/22
 	 **/
-	@ApiOperation(value="数据报表-自定义分页列表查询", notes="数据报表-分页列表查询")
+	@ApiOperation(value="查询账号报表的信息")
 	@GetMapping(value = "/queryList")
 	public Result<List<ReportAccountVo>>queryList(ReportAccountDto reportAccountDto,HttpServletRequest request){
 		String  username = JwtUtil.getUserNameByToken(request);
@@ -80,7 +81,7 @@ public class OpReportAccountController extends JeecgController<OpReport, IOpRepo
 	 * @description 根据账户accountId查询对应的账单信息
 	 * @date 11:24 2023/5/23
 	 **/
-	@ApiOperation(value="数据报表-自定义分页列表查询", notes="数据报表-分页列表查询")
+	@ApiOperation(value="数据报表查询", notes="数据报表查询")
 	@GetMapping(value = "/queryBill")
 	public Result<List<ReportAccountBillVo>>queryBill(@RequestParam(value = "account") Integer account){
 		return Result.OK(OpReportAccountService.queryBillByAccountId(account));

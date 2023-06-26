@@ -61,13 +61,16 @@
   import Pie from '/@/components/chart/Pie.vue';
   import JDictSelectTag from '/@/components/Form/src/jeecg/components/JDictSelectTag.vue';
   import JSelectMultiple from '/@/components/Form/src/jeecg/components/JSelectMultiple.vue';
+  import { formatToDate } from '/@/utils/dateUtil';
+  import dayjs, { Dayjs } from 'dayjs';
 
   const queryParam = ref<any>({});
   const toggleSearchStatus = ref<boolean>(false);
   const registerModal = ref();
   const selectGameForm = ref();
   const selectChannelForm = ref();
-  const userTime = ref<Moment[]>([]);
+  const dateFormat = 'YYYY-MM-DD';
+  const userTime = ref<Moment[]>([dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)]);
 
   let getGameVal = (e: any) => {
     queryParam.value.gameId = e.gameId;
@@ -263,6 +266,7 @@
     selectedRowKeys.value = [];
     userTime.value = [];
     //刷新数据
+    userTime.value = [dayjs(formatToDate(new Date()), dateFormat), dayjs(formatToDate(new Date()), dateFormat)];
     selectGameForm.value.reload();
     selectChannelForm.value.reload();
     getUserAccumulateLevelData();

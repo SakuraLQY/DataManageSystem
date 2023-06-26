@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.formula.functions.T;
 import org.checkerframework.checker.units.qual.A;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.CtRoleDto;
@@ -73,6 +74,7 @@ public class CtRoleController extends JeecgController<CtRole, ICtRoleService> {
 	//@AutoLog(value = "ct_role-分页列表查询")
 	@ApiOperation(value="ct_role-分页列表查询", notes="ct_role-分页列表查询")
 	@GetMapping(value = "/list")
+	@UserPermissionData(alias = "a")
 	public Result<IPage<CtRoleVo>> queryPageList(CtRoleDto ctRole,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -172,6 +174,7 @@ public class CtRoleController extends JeecgController<CtRole, ICtRoleService> {
     */
     //@RequiresPermissions("count:ct_role:exportXls")
     @RequestMapping(value = "/exportXls")
+	@UserPermissionData(alias = "a")
     public ModelAndView exportXls(CtRoleDto ctRole) {
         return ctRoleService.exportXls(ctRole, CtRoleModal.class, "角色数据");
     }

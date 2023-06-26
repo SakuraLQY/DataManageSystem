@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.constant.enums.PayTypeEnum;
 import org.jeecg.common.exception.JeecgBootException;
 import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtil;
 import org.jeecg.modules.count.bo.GetOrderGroupBo;
 import org.jeecg.modules.count.bo.OrderDateGroupBo;
@@ -26,6 +28,7 @@ import org.jeecg.modules.count.bo.OrderMoneyGroupRegTimeCreateTimeBo;
 import org.jeecg.modules.count.bo.OrderNumGroupRegTimeCreateTimeBo;
 import org.jeecg.modules.count.constant.enums.SummaryEnum;
 import org.jeecg.modules.count.bo.OrderMoneyGroupBo;
+import org.jeecg.modules.count.dto.DetailDto;
 import org.jeecg.modules.count.vo.OrderDateGroupRateVo;
 import org.jeecg.modules.count.vo.OrderMoneyGroupRateVo;
 import org.jeecg.modules.count.dto.SummaryDto;
@@ -43,10 +46,16 @@ import org.jeecg.modules.count.mapper.CtOrderMapper;
 import org.jeecg.modules.count.modal.OrderDetailModal;
 import org.jeecg.modules.count.service.ICtOrderService;
 import org.jeecg.modules.count.vo.OrderDetailVo;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @Description: ct_order
@@ -61,6 +70,8 @@ public class CtOrderServiceImpl extends ServiceImpl<CtOrderMapper, CtOrder> impl
 
     @Autowired
     private CtOrderMapper ctOrderMapper;
+    @Value("${jeecg.path.upload}")
+    private String upLoadPath;
 
     @Override
     public OrderDetailModal getOrderDetail(OrderDetailDto orderDetailDto) {
@@ -246,6 +257,50 @@ public class CtOrderServiceImpl extends ServiceImpl<CtOrderMapper, CtOrder> impl
             }
         }
         return result;
+    }
+
+    @Override
+    public ModelAndView exportFirstMoneyRateXls(DetailDto object,
+        Class<OrderMoneyGroupRateVo> clazz, String title) {
+        GetOrderGroupBo getOrderGroupBo = new GetOrderGroupBo();
+        BeanUtils.copyProperties(object, getOrderGroupBo);
+        List<OrderMoneyGroupRateVo> exportList = getFirstMoneyGroup(getOrderGroupBo);
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.FILE_NAME, title);
+        mv.addObject(NormalExcelConstants.CLASS, clazz);
+        //update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+        ExportParams exportParams = new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(),
+            title);
+        exportParams.setImageBasePath(upLoadPath);
+        //update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+        mv.addObject(NormalExcelConstants.PARAMS, exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
+    }
+
+    @Override
+    public ModelAndView exportAliveMoneyRateXls(DetailDto object,
+        Class<OrderMoneyGroupRateVo> clazz, String title) {
+        GetOrderGroupBo getOrderGroupBo = new GetOrderGroupBo();
+        BeanUtils.copyProperties(object, getOrderGroupBo);
+        List<OrderMoneyGroupRateVo> exportList = getAliveMoneyGroup(getOrderGroupBo);
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.FILE_NAME, title);
+        mv.addObject(NormalExcelConstants.CLASS, clazz);
+        //update-begin--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置--------------------
+        ExportParams exportParams = new ExportParams(title + "报表", "导出人:" + sysUser.getRealname(),
+            title);
+        exportParams.setImageBasePath(upLoadPath);
+        //update-end--Author:liusq  Date:20210126 for：图片导出报错，ImageBasePath未设置----------------------
+        mv.addObject(NormalExcelConstants.PARAMS, exportParams);
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
     }
 
 

@@ -59,4 +59,8 @@ public class DetailDailyBo implements Serializable {
      *  活跃金额
      */
     private BigDecimal aliveMoney = BigDecimal.ZERO;
+    /**
+     *  活跃付费金额-ios
+     */
+    private BigDecimal aliveMoneyIos = BigDecimal.ZERO;
 }

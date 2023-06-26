@@ -47,7 +47,7 @@
 
   <select id="queryAllList" resultMap="CtUserVo">
     select a.*,
-           b.user_name
+           b.user_name,
            c.game_name gameName,
            d.game_name subGameName,
            e.pkg_name  pkgName,

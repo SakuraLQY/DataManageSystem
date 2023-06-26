@@ -154,7 +154,7 @@ public class SummaryAdvertServiceImpl implements ISummaryAdvertService {
         }
         // 新增ARPU = 首日付费额/注册数
         if (summaryAdvertDailyBo.getCountUser() != 0) {
-            summaryAdvertVo.setArpu(summaryAdvertDailyBo.getFirstMoney()
+            summaryAdvertVo.setFirstArpu(summaryAdvertDailyBo.getFirstMoney()
                 .divide(BigDecimal.valueOf(summaryAdvertDailyBo.getCountUser()), 2,
                     RoundingMode.HALF_UP));
         }

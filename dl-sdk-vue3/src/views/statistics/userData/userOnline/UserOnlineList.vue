@@ -4,12 +4,12 @@
     <div class="jeecg-basic-table-form-container">
       <a-form @keyup.enter.native="searchQuery" :model="queryParam" :label-col="labelCol" :wrapper-col="wrapperCol">
         <a-row :gutter="24">
-          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <GameThirdSingleOptionForm ref="selectGameForm" @handler="getGameVal"></GameThirdSingleOptionForm>
           <ChannelThirdOptionForm ref="selectChannelForm" @handler="getChannelVal"></ChannelThirdOptionForm>
+          <DealOptionSelect ref="selectDealForm" @handler="getDealVal"></DealOptionSelect>
           <a-col :lg="8">
             <a-form-item label="归类方式">
-              <j-search-select placeholder="请选择归类方式" v-model:value="queryParam.type"  dict="user_online_type" allowClear />
+              <j-search-select placeholder="请选择归类方式" v-model:value="queryParam.type"  dict="user_online_type" />
             </a-form-item>
           </a-col>
           <!-- <template v-if="toggleSearchStatus">

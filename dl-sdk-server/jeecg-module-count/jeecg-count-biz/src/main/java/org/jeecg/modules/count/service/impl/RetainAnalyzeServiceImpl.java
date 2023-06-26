@@ -376,26 +376,29 @@ public class RetainAnalyzeServiceImpl extends
             result.setRegCount(retainAnalyzeBo.getRegCount());
             //记录付费人数
             Integer payUserNumber = 0;
-            //
+            // 付费留存
             Integer[] pay_loyal = new Integer[9];
             Arrays.fill(pay_loyal, 1, 9, 0);
-            for (PayResBo payUser : payRes) {
-                if (payRes.isEmpty()) {
-                    continue;
-                }
-                if (payUser.getDateTime().equals(retainAnalyzeBo.getDateTime())) {
-                    payUserNumber++;
-                }
-                for (int i = 1; i <= 8; i++) {
-                    if (0 != payUser.getPayUserLoginMask() & (1 << i) != 0) {
-                        if (pay_loyal[i] == null) {
-                            pay_loyal[i] = 1;
-                        } else {
-                            pay_loyal[i]++;
+//            Arrays.fill(pay_loyal, 0);
+            if(!payRes.isEmpty()){
+                for (PayResBo payUser : payRes) {
+                    if (payUser.getDateTime().equals(retainAnalyzeBo.getDateTime())) {
+                        //注册时间=
+                        payUserNumber++;
+                    }
+                    for (int i = 1; i <= 8; i++) {
+                        if (0 != (payUser.getPayUserLoginMask() & (1 << i))) {
+                            //避免空指针异常
+                            if (pay_loyal[i] == null) {
+                                pay_loyal[i] = 1;
+                            } else {
+                                pay_loyal[i]++;
+                            }
                         }
                     }
                 }
             }
+
             //如果查询出来有成本的话
             if (costMap.containsKey(result.getDateTime())) {
                 result.setCostPay(costMap.get(result.getDateTime()));
@@ -412,7 +415,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal(firstPayLoyal + "%");
             } else {
-                result.setFirstPayLoyal("0%");
+                result.setFirstPayLoyal("0.00%");
             }
             //计算新增付费3留
             if (payUserNumber > 0) {
@@ -422,7 +425,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal3(firstPayLoyal3 + "%");
             } else {
-                result.setFirstPayLoyal3("0%");
+                result.setFirstPayLoyal3("0.00%");
             }
             //计算新增付费7留
             if (payUserNumber > 0) {
@@ -432,7 +435,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal7(firstPayLoyal7 + "%");
             } else {
-                result.setFirstPayLoyal7("0%");
+                result.setFirstPayLoyal7("0.00%");
             }
             //计算新增付费15留
             if (payUserNumber > 0) {
@@ -442,7 +445,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal15(firstPayLoyal15 + "%");
             } else {
-                result.setFirstPayLoyal15("0%");
+                result.setFirstPayLoyal15("0.00%");
             }
             //计算新增付费30留
             if (payUserNumber > 0) {
@@ -452,7 +455,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal30(firstPayLoyal30 + "%");
             } else {
-                result.setFirstPayLoyal30("0%");
+                result.setFirstPayLoyal30("0.00%");
             }
             //计算新增付费45留
             if (payUserNumber > 0) {
@@ -462,7 +465,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal45(firstPayLoyal45 + "%");
             } else {
-                result.setFirstPayLoyal45("0%");
+                result.setFirstPayLoyal45("0.00%");
             }
             //计算新增付费60留
             if (payUserNumber > 0) {
@@ -472,7 +475,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal60(firstPayLoyal60 + "%");
             } else {
-                result.setFirstPayLoyal60("0%");
+                result.setFirstPayLoyal60("0.00%");
             }
             //计算新增付费90留
             if (payUserNumber > 0) {
@@ -482,7 +485,7 @@ public class RetainAnalyzeServiceImpl extends
                     .setScale(2, RoundingMode.HALF_UP);
                 result.setFirstPayLoyal90(firstPayLoyal90 + "%");
             } else {
-                result.setFirstPayLoyal90("0%");
+                result.setFirstPayLoyal90("0.00%");
             }
             //计算新增付费留存单价
             if (pay_loyal[1] > 0) {
@@ -674,82 +677,81 @@ public class RetainAnalyzeServiceImpl extends
         if (null != tempCalculate.getPayLoyal2() && null != tempCalculate.getPayUserNumCount2()
             && tempCalculate.getPayUserNumCount2() > 0) {
             BigDecimal firstPayLoyal2 = BigDecimal.valueOf(tempCalculate.getPayLoyal2())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount2()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount2()),2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal(firstPayLoyal2 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal("0%");
+            allRetainNewLoyal.setFirstPayLoyal("0.00%");
         }
         if (null != tempCalculate.getPayLoyal3() && null != tempCalculate.getPayUserNumCount3()
             && tempCalculate.getPayUserNumCount3() > 0) {
             BigDecimal firstPayLoyal3 = BigDecimal.valueOf(tempCalculate.getPayLoyal3())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount3()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount3()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal3(firstPayLoyal3 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal3("0%");
+            allRetainNewLoyal.setFirstPayLoyal3("0.00%");
         }
         if (null != tempCalculate.getPayLoyal7() && null != tempCalculate.getPayUserNumCount7()
             && tempCalculate.getPayUserNumCount7() > 0) {
             BigDecimal firstPayLoyal7 = BigDecimal.valueOf(tempCalculate.getPayLoyal7())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount7()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount7()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal7(firstPayLoyal7 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal7("0%");
+            allRetainNewLoyal.setFirstPayLoyal7("0.00%");
         }
         if (null != tempCalculate.getPayLoyal15() && null != tempCalculate.getPayUserNumCount15()
             && tempCalculate.getPayUserNumCount15() > 0) {
             BigDecimal firstPayLoyal15 = BigDecimal.valueOf(tempCalculate.getPayLoyal15())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount15()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
-            allRetainNewLoyal.setFirstPayLoyal(firstPayLoyal15 + "%");
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount15()),2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+            allRetainNewLoyal.setFirstPayLoyal15(firstPayLoyal15 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal15("0%");
+            allRetainNewLoyal.setFirstPayLoyal15("0.00%");
         }
         if (null != tempCalculate.getPayLoyal30() && null != tempCalculate.getPayUserNumCount30()
             && tempCalculate.getPayUserNumCount30() > 0) {
             BigDecimal firstPayLoyal30 = BigDecimal.valueOf(tempCalculate.getPayLoyal30())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount30()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount30()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal30(firstPayLoyal30 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal30("0%");
+            allRetainNewLoyal.setFirstPayLoyal30("0.00%");
         }
         if (null != tempCalculate.getPayLoyal45() && null != tempCalculate.getPayUserNumCount45()
             && tempCalculate.getPayUserNumCount45() > 0) {
             BigDecimal firstPayLoyal45 = BigDecimal.valueOf(tempCalculate.getPayLoyal45())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount45()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount45()),2, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal45(firstPayLoyal45 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal45("0%");
+            allRetainNewLoyal.setFirstPayLoyal45("0.00%");
         }
         if (null != tempCalculate.getPayLoyal60() && null != tempCalculate.getPayUserNumCount60()
             && tempCalculate.getPayUserNumCount60() > 0) {
             BigDecimal firstPayLoyal60 = BigDecimal.valueOf(tempCalculate.getPayLoyal60())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount60()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount60()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal60(firstPayLoyal60 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal60("0%");
+            allRetainNewLoyal.setFirstPayLoyal60("0.00%");
         }
         if (null != tempCalculate.getPayLoyal90() && null != tempCalculate.getPayUserNumCount90()
             && tempCalculate.getPayUserNumCount90() > 0) {
             BigDecimal firstPayLoyal90 = BigDecimal.valueOf(tempCalculate.getPayLoyal90())
-                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount90()))
-                .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(tempCalculate.getPayUserNumCount90()),2,RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
             allRetainNewLoyal.setFirstPayLoyal90(firstPayLoyal90 + "%");
         } else {
-            allRetainNewLoyal.setFirstPayLoyal90("0%");
+            allRetainNewLoyal.setFirstPayLoyal90("0.00%");
         }
         //计算新增付费合计单价
         if (null != tempCalculate.getPayLoyal2() && null != tempCalculate.getPayUserCostCount2()
             && !tempCalculate.getPayUserCostCount2().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice =
                 tempCalculate.getPayUserCostCount2()
-                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal2()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal2()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice(firstPayPrice);
         } else {
             allRetainNewLoyal.setFirstPayPrice(BigDecimal.ZERO);
@@ -758,8 +760,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount3().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice3 =
                 (tempCalculate.getPayUserCostCount3()).divide(
-                        BigDecimal.valueOf(tempCalculate.getPayLoyal3()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal.valueOf(tempCalculate.getPayLoyal3()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice3(firstPayPrice3);
         } else {
             allRetainNewLoyal.setFirstPayPrice3(BigDecimal.ZERO);
@@ -768,8 +769,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount7().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice7 =
                 (tempCalculate.getPayUserCostCount7()).divide(
-                        BigDecimal.valueOf(tempCalculate.getPayLoyal7()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal.valueOf(tempCalculate.getPayLoyal7()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice7(firstPayPrice7);
         } else {
             allRetainNewLoyal.setFirstPayPrice7(BigDecimal.ZERO);
@@ -778,8 +778,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount15().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice15 =
                 tempCalculate.getPayUserCostCount15()
-                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal15()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal15()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice15(firstPayPrice15);
         } else {
             allRetainNewLoyal.setFirstPayPrice15(BigDecimal.ZERO);
@@ -788,8 +787,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount30().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice30 =
                 (tempCalculate.getPayUserCostCount30()).divide(
-                        BigDecimal.valueOf(tempCalculate.getPayLoyal30()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal.valueOf(tempCalculate.getPayLoyal30()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice30(firstPayPrice30);
         } else {
             allRetainNewLoyal.setFirstPayPrice30(BigDecimal.ZERO);
@@ -798,8 +796,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount45().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice45 =
                 tempCalculate.getPayUserCostCount45()
-                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal45()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal45()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice45(firstPayPrice45);
         } else {
             allRetainNewLoyal.setFirstPayPrice45(BigDecimal.ZERO);
@@ -808,8 +805,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount60().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice60 =
                 tempCalculate.getPayUserCostCount60()
-                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal60()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal60()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice60(firstPayPrice60);
         } else {
             allRetainNewLoyal.setFirstPayPrice60(BigDecimal.ZERO);
@@ -818,8 +814,7 @@ public class RetainAnalyzeServiceImpl extends
             && !tempCalculate.getPayUserCostCount90().equals(BigDecimal.ZERO)) {
             BigDecimal firstPayPrice90 =
                 tempCalculate.getPayUserCostCount90()
-                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal90()))
-                    .setScale(2, RoundingMode.HALF_UP);
+                    .divide(BigDecimal.valueOf(tempCalculate.getPayLoyal90()),2,RoundingMode.HALF_UP);
             allRetainNewLoyal.setFirstPayPrice90(firstPayPrice90);
         } else {
             allRetainNewLoyal.setFirstPayPrice90(BigDecimal.ZERO);

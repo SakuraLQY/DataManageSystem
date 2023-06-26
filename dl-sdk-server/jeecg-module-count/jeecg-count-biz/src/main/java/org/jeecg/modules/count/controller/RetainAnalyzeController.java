@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.count.dto.RetainAnalyzeDto;
@@ -87,6 +88,7 @@ public class RetainAnalyzeController extends JeecgController<RetainAnalyze, IRet
 	 **/
 	 @ApiOperation(value="自定义分页列表查询", notes="留存分析-查询")
 	 @GetMapping(value = "/queryList")
+	 @UserPermissionData(alias = "a")
 	public Result<?>queryList(RetainAnalyzeDto retainAnalyzeDto){
 		if(retainAnalyzeDto.getRetainType().equals(LOYAL_RETAIN)){
 			List<RetainLoyalVo>retainList = retainAnalyzeService.queryRetainList(retainAnalyzeDto);

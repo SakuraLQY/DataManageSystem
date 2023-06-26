@@ -43,42 +43,42 @@ public class CostDataVo implements Serializable {
     private String costDay;
 	/**成本金额*/
     @ApiModelProperty(value = "成本金额")
-    private BigDecimal costMoney;
+    private BigDecimal costMoney = BigDecimal.ZERO;
     /**下载*/
     @ApiModelProperty(value = "下载")
-    private Integer download;
+    private Integer download = 0;
     /**展示*/
     @ApiModelProperty(value = "展示")
-    private Integer exhibition;
+    private Integer exhibition = 0;
     /**主播id*/
     @ApiModelProperty(value = "主播id")
     private java.lang.String anchorPlanId;
     /**直播间观看人数*/
     @ApiModelProperty(value = "直播间观看人数")
-    private java.lang.Integer lubanLiveEnterCnt;
+    private java.lang.Integer lubanLiveEnterCnt = 0;
     /**超过1分钟观看数*/
     @ApiModelProperty(value = "超过1分钟观看数")
-    private java.lang.Integer liveWatchOneMinuteCount;
+    private java.lang.Integer liveWatchOneMinuteCount = 0;
     /**直播间打赏次数*/
     @ApiModelProperty(value = "直播间打赏次数")
-    private java.lang.Integer lubanLiveGiftCnt;
+    private java.lang.Integer lubanLiveGiftCnt = 0;
     /**直播间评论数*/
     @ApiModelProperty(value = "直播间评论数")
-    private java.lang.Integer lubanLiveCommentCnt;
+    private java.lang.Integer lubanLiveCommentCnt = 0;
     /**直播间关注数*/
     @ApiModelProperty(value = "直播间关注数")
-    private java.lang.Integer lubanLiveFollowCnt;
+    private java.lang.Integer lubanLiveFollowCnt = 0;
     /**直播间加入粉丝团*/
     @ApiModelProperty(value = "直播间加入粉丝团")
-    private java.lang.Integer liveFansClubJoinCnt;
+    private java.lang.Integer liveFansClubJoinCnt = 0;
     /**直播间分享数*/
     @ApiModelProperty(value = "直播间分享数")
-    private java.lang.Integer lubanLiveShareCnt;
+    private java.lang.Integer lubanLiveShareCnt = 0;
     /**成本平台*/
     @ApiModelProperty(value = "成本平台")
     private Integer platform;
     /**点击*/
     @ApiModelProperty(value = "点击")
-    private Integer click;
+    private Integer click = 0;
 
 }

@@ -1,47 +1,36 @@
 package org.jeecg.modules.count.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.system.query.QueryGenerator;
-import org.jeecg.common.system.util.JwtUtil;
-import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.count.dto.ChannelDetailDto;
-import org.jeecg.modules.count.dto.StatHourDto;
-import org.jeecg.modules.count.entity.StatHour;
-import org.jeecg.modules.count.modal.ChannelDetailModal;
-import org.jeecg.modules.count.modal.StatHourModal;
-import org.jeecg.modules.count.service.IStatHourService;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
-
-import org.jeecg.modules.count.vo.StatHourVo;
-import org.jeecgframework.poi.excel.ExcelImportUtil;
-import org.jeecgframework.poi.excel.def.NormalExcelConstants;
-import org.jeecgframework.poi.excel.entity.ExportParams;
-import org.jeecgframework.poi.excel.entity.ImportParams;
-import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
-import org.jeecg.common.system.base.controller.JeecgController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.Arrays;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.jeecg.common.aspect.annotation.UserPermissionData;
+import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.util.JwtUtil;
+import org.jeecg.modules.count.dto.StatHourDto;
+import org.jeecg.modules.count.entity.StatHour;
+import org.jeecg.modules.count.modal.StatHourModal;
+import org.jeecg.modules.count.service.IStatHourService;
+import org.jeecg.modules.count.vo.StatHourVo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
  /**
  * @Description: cooperator_stat
@@ -86,8 +75,9 @@ public class StatHourController extends JeecgController<StatHour, IStatHourServi
 	 * @description 查询合作商数据-渠道
 	 * @date 11:37 2023/5/29
 	 **/
-	 @ApiOperation(value="cooperator_stat-自定义列表查询", notes="cooperate-渠道分页列表查询")
+	 @ApiOperation(value="合作商数据【渠道】")
 	 @GetMapping(value = "/queryList")
+	 @UserPermissionData(alias = "a")
 	public Result<List<StatHourVo>>queryList(StatHourDto statHourDto,HttpServletRequest request){
 		 String  username = JwtUtil.getUserNameByToken(request);
 		return Result.OK(statHourService.queryList(statHourDto,username));
@@ -100,6 +90,7 @@ public class StatHourController extends JeecgController<StatHour, IStatHourServi
 	  * @date  16:12 2023/6/13
 	  **/
 	 @GetMapping(value = "/exportExcel")
+	 @UserPermissionData(alias = "a")
 	 public ModelAndView exportExcel(HttpServletRequest request, StatHourDto statHourDto) {
 		 return statHourService.exportExcel(request,statHourDto, StatHourModal.class,"合作商数据-渠道信息表");
 	 }
